@@ -44,6 +44,16 @@ class SesionLocal @Inject constructor(
     val refreshToken: String?
         @Synchronized get() = prefs.getString(K_REFRESH, null)
 
+    /**
+     * Sucursal activa (multi-sucursal, Fase B): su id se manda como cabecera `X-Sucursal-Id` para acotar
+     * ventas/rentas/caja. {@code null} = todas las sucursales (sin cabecera).
+     */
+    var sucursalActivaId: String?
+        @Synchronized get() = prefs.getString(K_SUCURSAL, null)
+        @Synchronized set(value) {
+            prefs.edit().apply { if (value.isNullOrBlank()) remove(K_SUCURSAL) else putString(K_SUCURSAL, value) }.apply()
+        }
+
     fun haySesion(): Boolean = !accessToken.isNullOrBlank()
 
     @Synchronized
@@ -56,5 +66,6 @@ class SesionLocal @Inject constructor(
         const val K_ACCESS = "access_token"
         const val K_REFRESH = "refresh_token"
         const val K_TYPE = "token_type"
+        const val K_SUCURSAL = "sucursal_activa"
     }
 }

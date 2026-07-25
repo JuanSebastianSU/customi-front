@@ -21,14 +21,13 @@ class AuthInterceptor @Inject constructor(
             return chain.proceed(original)
         }
         val token = sesion.accessToken
-        val request = if (!token.isNullOrBlank()) {
-            original.newBuilder()
-                .header("Authorization", "Bearer $token")
-                .build()
-        } else {
-            original
+        val builder = original.newBuilder()
+        if (!token.isNullOrBlank()) {
+            builder.header("Authorization", "Bearer $token")
         }
-        return chain.proceed(request)
+        // Multi-sucursal (Fase B): acota ventas/rentas/caja a la sucursal activa; sin ella = todas.
+        sesion.sucursalActivaId?.takeIf { it.isNotBlank() }?.let { builder.header("X-Sucursal-Id", it) }
+        return chain.proceed(builder.build())
     }
 
     companion object {

@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.Rol
 import com.costumi.app.data.repo.AuthRepository
+import com.costumi.app.data.repo.ContextoGestionRepository
 import com.costumi.app.data.repo.MembresiaRepository
 import com.costumi.apiclient.models.CambiarContextoRequest
+import com.costumi.apiclient.models.SucursalResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +23,7 @@ import javax.inject.Inject
 class GestionShellViewModel @Inject constructor(
     private val repo: AuthRepository,
     private val membresiaRepo: MembresiaRepository,
+    private val contexto: ContextoGestionRepository,
 ) : ViewModel() {
 
     private val _rol = MutableStateFlow<Rol?>(null)
@@ -33,10 +36,31 @@ class GestionShellViewModel @Inject constructor(
     private val _irAComprar = MutableStateFlow(false)
     val irAComprar = _irAComprar.asStateFlow()
 
+    /** Secciones a las que el usuario tiene acceso (paso 5); null mientras carga → no filtra. */
+    private val _misSecciones = MutableStateFlow<Set<String>?>(null)
+    val misSecciones = _misSecciones.asStateFlow()
+
+    /** Sucursales de la empresa para el selector (A3); vacío = sin multi-sucursal o sin permiso. */
+    private val _sucursales = MutableStateFlow<List<SucursalResponse>>(emptyList())
+    val sucursales = _sucursales.asStateFlow()
+
     init {
         viewModelScope.launch {
             (repo.rolActual() as? RespuestaRed.Exito)?.let { _rol.value = it.data }
         }
+        viewModelScope.launch {
+            (contexto.misSecciones() as? RespuestaRed.Exito)?.let { _misSecciones.value = it.data }
+        }
+        viewModelScope.launch {
+            (contexto.sucursales() as? RespuestaRed.Exito)?.let { _sucursales.value = it.data }
+        }
+    }
+
+    fun sucursalActivaId(): String? = contexto.sucursalActivaId
+
+    /** Fija la sucursal activa (null = todas). El interceptor la manda como X-Sucursal-Id. */
+    fun elegirSucursal(id: String?) {
+        contexto.sucursalActivaId = id
     }
 
     fun cerrarSesion() {

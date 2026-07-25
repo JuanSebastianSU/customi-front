@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
@@ -16,6 +17,8 @@ import com.costumi.app.databinding.FragmentMasBinding
 import com.costumi.app.ui.irAHome
 import com.costumi.app.ui.irALogin
 import com.costumi.app.ui.observar
+import com.costumi.apiclient.models.SucursalResponse
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -34,6 +37,10 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
     private var _binding: FragmentMasBinding? = null
     private val binding get() = _binding!!
 
+    private var rolActual: Rol? = null
+    private var seccionesPermitidas: Set<String>? = null
+    private var sucursalesActuales: List<SucursalResponse> = emptyList()
+
     private val secciones = listOf(
         "Rentas",
         "Devoluciones",
@@ -47,6 +54,22 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
         "Notificaciones",
         "Mensajes automaticos",
         "Auditoria",
+    )
+
+    /** Cada sección de «Más» → la {@code Seccion} del backend que la habilita (para el filtro por permisos). */
+    private val seccionEnumDe = mapOf(
+        "Rentas" to "RENTAS",
+        "Devoluciones" to "DEVOLUCIONES",
+        "Pagos y cobros" to "PAGOS",
+        "Caja / turnos" to "CAJA",
+        "Reembolsos" to "REEMBOLSOS",
+        "Reportes" to "REPORTES",
+        "Empleados" to "EMPLEADOS",
+        "Sucursales" to "SUCURSALES",
+        "Configuracion" to "CONFIGURACION",
+        "Notificaciones" to "NOTIFICACIONES",
+        "Mensajes automaticos" to "NOTIFICACIONES",
+        "Auditoria" to "AUDITORIA",
     )
 
     /**
@@ -70,10 +93,18 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentMasBinding.bind(view)
 
-        // Hasta conocer el rol se pinta todo; al llegar el rol se filtra (evita un parpadeo vacio).
+        // Hasta conocer el contexto se pinta todo; al llegar rol/permisos se filtra (evita un parpadeo vacio).
         pintarSecciones(secciones)
-        observar(vm.rol) { rol ->
-            rol?.let { r -> pintarSecciones(secciones.filter { s -> s in seccionesDe(r) }) }
+        observar(vm.rol) { rolActual = it; refiltrar() }
+        // Filtro fino por las capacidades propias (paso 5); más preciso que el default por rol.
+        observar(vm.misSecciones) { seccionesPermitidas = it; refiltrar() }
+
+        // Selector de sucursal activa (A3): visible solo si hay más de una.
+        binding.botonSucursal.setOnClickListener { elegirSucursalDialogo() }
+        observar(vm.sucursales) { lista ->
+            sucursalesActuales = lista
+            binding.botonSucursal.isVisible = lista.size > 1
+            actualizarTextoSucursal()
         }
 
         binding.botonComprar.setOnClickListener { vm.irAComprar() }
@@ -85,6 +116,36 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
         observar(vm.cerrada) { cerrada ->
             if (cerrada) requireActivity().findNavController(R.id.nav_host).irALogin()
         }
+    }
+
+    /** Filtra las secciones por las capacidades propias (si ya cargaron) o, si no, por el default del rol. */
+    private fun refiltrar() {
+        val permitidas = seccionesPermitidas
+        val rol = rolActual
+        val visibles = secciones.filter { s ->
+            when {
+                permitidas != null -> seccionEnumDe[s] in permitidas
+                rol != null -> s in seccionesDe(rol)
+                else -> true
+            }
+        }
+        pintarSecciones(visibles)
+    }
+
+    private fun actualizarTextoSucursal() {
+        val activa = sucursalesActuales.firstOrNull { it.id?.toString() == vm.sucursalActivaId() }
+        binding.botonSucursal.text = "Sucursal activa: ${activa?.nombre ?: "Todas"}"
+    }
+
+    private fun elegirSucursalDialogo() {
+        val opciones = (listOf("Todas") + sucursalesActuales.map { it.nombre.orEmpty() }).toTypedArray()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Sucursal activa")
+            .setItems(opciones) { _, i ->
+                vm.elegirSucursal(if (i == 0) null else sucursalesActuales[i - 1].id?.toString())
+                actualizarTextoSucursal()
+            }
+            .show()
     }
 
     private fun pintarSecciones(visibles: List<String>) {

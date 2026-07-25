@@ -108,6 +108,12 @@ object NetworkModule {
     fun provideMembresiaApi(retrofit: Retrofit): com.costumi.apiclient.apis.MembresiaControllerApi =
         retrofit.create(com.costumi.apiclient.apis.MembresiaControllerApi::class.java)
 
+    // Fase B (paso 5): las capacidades del propio usuario, para armar la navegación por permisos.
+    @Provides
+    @Singleton
+    fun provideMisPermisosApi(retrofit: Retrofit): com.costumi.apiclient.apis.MisPermisosControllerApi =
+        retrofit.create(com.costumi.apiclient.apis.MisPermisosControllerApi::class.java)
+
     @Provides
     @Singleton
     fun provideMarketplaceApi(retrofit: Retrofit): MarketplaceControllerApi =

@@ -30,6 +30,18 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
+            <!-- Sucursal activa (multi-sucursal, Fase B): acota ventas/rentas/caja. Solo si hay más de una. -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonSucursal"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                app:icon="@drawable/ic_chevron_right"
+                android:text="Sucursal activa: Todas"
+                android:visibility="gone" />
+
             <!-- Volver a modo compra (Fase B): la misma persona pasa a operar como cliente. -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/botonComprar"
