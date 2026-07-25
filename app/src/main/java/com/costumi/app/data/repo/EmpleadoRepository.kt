@@ -18,6 +18,7 @@ import com.costumi.apiclient.models.CapacidadDto
 import com.costumi.apiclient.models.EmpleadoDetalleResponse
 import com.costumi.apiclient.models.EmpleadoResponse
 import com.costumi.apiclient.models.EstablecerPermisoRequest
+import com.costumi.apiclient.models.InvitacionPendienteResponse
 import com.costumi.apiclient.models.InvitacionResponse
 import com.costumi.apiclient.models.InvitarEmpleadoRequest
 import com.costumi.apiclient.models.MembresiaEstadoResponse
@@ -77,6 +78,14 @@ class EmpleadoRepository @Inject constructor(
     /** Da de baja al empleado (despido definitivo); queda solo-cliente. */
     suspend fun quitar(id: UUID): RespuestaRed<MembresiaEstadoResponse> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.quitar(id) } }
+
+    /** Invitaciones pendientes de aceptar (Fase B). */
+    suspend fun invitacionesPendientes(): RespuestaRed<List<InvitacionPendienteResponse>> =
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.invitacionesPendientes() } }
+
+    /** Cancela una invitación pendiente. */
+    suspend fun cancelarInvitacion(id: UUID): RespuestaRed<Unit> =
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.cancelarInvitacion(id) } }
 
     suspend fun asignarSucursales(id: UUID, sucursalIds: List<UUID>): RespuestaRed<List<UUID>> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.asignarSucursales(id, AsignarSucursalesRequest(sucursalIds)) } }

@@ -15,6 +15,7 @@ import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.alBuscar
 import com.costumi.app.ui.observar
+import com.costumi.apiclient.models.InvitacionPendienteResponse
 import com.costumi.apiclient.models.InvitarEmpleadoRequest
 import com.costumi.apiclient.models.CambiarRolRequest
 import com.costumi.apiclient.models.EmpleadoDetalleResponse
@@ -42,6 +43,9 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
         binding.barraBusqueda.tilBuscar.hint = "Buscar por correo"
         binding.barraBusqueda.editBuscar.alBuscar { vm.buscar(it) }
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        binding.toolbar.menu.add("Invitaciones pendientes").setOnMenuItemClickListener {
+            vm.verPendientes(); true
+        }
         binding.lista.adapter = adapter
         binding.fabNuevo.setOnClickListener { dialogoAlta() }
 
@@ -61,6 +65,7 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
                 is EventoEmpleado.Error -> mostrarMensaje(evento.mensaje)
                 is EventoEmpleado.Actividad -> mostrarActividad(evento)
                 is EventoEmpleado.Invitacion -> mostrarInvitacion(evento)
+                is EventoEmpleado.Pendientes -> mostrarPendientes(evento.invitaciones)
             }
         }
     }
@@ -84,6 +89,29 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
             .setTitle("Actividad de ${a.email}")
             .setMessage("Ventas realizadas: ${a.ventas}\nTotal vendido: ${a.total.comoPrecio() ?: "$0"}")
             .setPositiveButton("Cerrar", null)
+            .show()
+    }
+
+    /** Lista las invitaciones pendientes; tocar una ofrece cancelarla. */
+    private fun mostrarPendientes(invs: List<InvitacionPendienteResponse>) {
+        if (invs.isEmpty()) {
+            mostrarMensaje("No hay invitaciones pendientes.")
+            return
+        }
+        val etiquetas = invs.map { "${it.email.orEmpty()} — ${it.rol.orEmpty()}" }.toTypedArray()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Invitaciones pendientes")
+            .setItems(etiquetas) { _, i ->
+                val inv = invs[i]
+                val id = inv.id ?: return@setItems
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("¿Cancelar invitación?")
+                    .setMessage("Se cancelará la invitación a ${inv.email.orEmpty()}.")
+                    .setPositiveButton("Cancelar invitación") { _, _ -> vm.cancelarInvitacion(id) }
+                    .setNegativeButton("No", null)
+                    .show()
+            }
+            .setNegativeButton("Cerrar", null)
             .show()
     }
 

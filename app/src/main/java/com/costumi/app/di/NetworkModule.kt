@@ -102,6 +102,12 @@ object NetworkModule {
     fun provideAuthApi(retrofit: Retrofit): AuthControllerApi =
         retrofit.create(AuthControllerApi::class.java)
 
+    // Fase B: cambio de contexto (Comprando/Trabajando), membresías y desvinculación.
+    @Provides
+    @Singleton
+    fun provideMembresiaApi(retrofit: Retrofit): com.costumi.apiclient.apis.MembresiaControllerApi =
+        retrofit.create(com.costumi.apiclient.apis.MembresiaControllerApi::class.java)
+
     @Provides
     @Singleton
     fun provideMarketplaceApi(retrofit: Retrofit): MarketplaceControllerApi =

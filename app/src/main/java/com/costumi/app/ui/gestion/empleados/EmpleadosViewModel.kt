@@ -6,6 +6,7 @@ import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.UiState
 import com.costumi.app.data.repo.EmpleadoRepository
 import com.costumi.apiclient.models.CambiarRolRequest
+import com.costumi.apiclient.models.InvitacionPendienteResponse
 import com.costumi.apiclient.models.InvitarEmpleadoRequest
 import com.costumi.apiclient.models.EmpleadoDetalleResponse
 import com.costumi.apiclient.models.SucursalResponse
@@ -24,6 +25,8 @@ sealed interface EventoEmpleado {
     data class Actividad(val email: String, val ventas: Long, val total: java.math.BigDecimal?) : EventoEmpleado
     /** Invitación creada: el enlace de aceptación para compartir con la persona (Fase B). */
     data class Invitacion(val email: String, val enlace: String) : EventoEmpleado
+    /** Invitaciones pendientes de la tienda (para listar/cancelar). */
+    data class Pendientes(val invitaciones: List<InvitacionPendienteResponse>) : EventoEmpleado
 }
 
 /** Gestión de personal: lista, alta, cambiar rol, baja/reactivación y asignar sucursales. */
@@ -99,6 +102,28 @@ class EmpleadosViewModel @Inject constructor(
     fun suspender(id: UUID) = ejecutar("Empleado suspendido del trabajo.") { repo.suspenderMembresia(id) }
     fun reactivarMembresia(id: UUID) = ejecutar("Empleado reactivado en el trabajo.") { repo.reactivarMembresia(id) }
     fun quitar(id: UUID) = ejecutar("Empleado dado de baja.") { repo.quitar(id) }
+
+    /** Carga las invitaciones pendientes y las emite para mostrarlas. */
+    fun verPendientes() {
+        viewModelScope.launch {
+            when (val r = repo.invitacionesPendientes()) {
+                is RespuestaRed.Exito -> _eventos.tryEmit(EventoEmpleado.Pendientes(r.data))
+                is RespuestaRed.Fallo -> _eventos.tryEmit(EventoEmpleado.Error(r.error.mensaje))
+            }
+        }
+    }
+
+    fun cancelarInvitacion(id: UUID) {
+        viewModelScope.launch {
+            when (val r = repo.cancelarInvitacion(id)) {
+                is RespuestaRed.Exito -> {
+                    _eventos.tryEmit(EventoEmpleado.Info("Invitación cancelada."))
+                    verPendientes()
+                }
+                is RespuestaRed.Fallo -> _eventos.tryEmit(EventoEmpleado.Error(r.error.mensaje))
+            }
+        }
+    }
 
     fun asignarSucursales(id: UUID, sucursalIds: List<UUID>) =
         ejecutar("Sucursales asignadas.") { repo.asignarSucursales(id, sucursalIds) }

@@ -11,6 +11,8 @@ import com.costumi.app.R
 import com.costumi.app.databinding.DialogCambiarContrasenaBinding
 import com.costumi.app.databinding.DialogRegistrarTiendaBinding
 import com.costumi.app.databinding.FragmentPerfilBinding
+import com.costumi.app.core.ModoApp
+import com.costumi.app.ui.irAHome
 import com.costumi.app.ui.irALogin
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.observar
@@ -74,14 +76,33 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
             binding.botonGuardar.isEnabled = !procesando
             binding.botonContrasena.isEnabled = !procesando
         }
+        // Modo trabajo (Fase B): visible solo si la persona tiene una membresía de trabajo activa.
+        binding.botonTrabajar.setOnClickListener { vm.entrarATrabajar() }
+        binding.botonDesvincularme.setOnClickListener { confirmarDesvincularme() }
+        observar(vm.membresiaActiva) { m ->
+            binding.botonTrabajar.isVisible = m != null
+            binding.botonDesvincularme.isVisible = m != null
+            binding.botonTrabajar.text = m?.empresaNombre?.let { "Entrar a trabajar en $it" } ?: "Entrar a trabajar"
+        }
         observar(vm.eventos) { evento ->
             when (evento) {
                 EventoPerfil.SesionCerrada ->
                     requireActivity().findNavController(R.id.nav_host).irALogin()
+                EventoPerfil.IrAGestion ->
+                    requireActivity().findNavController(R.id.nav_host).irAHome(ModoApp.GESTION)
                 is EventoPerfil.Info -> mostrarMensaje(evento.mensaje)
                 is EventoPerfil.Error -> mostrarMensaje(evento.mensaje)
             }
         }
+    }
+
+    private fun confirmarDesvincularme() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("¿Desvincularte de la tienda?")
+            .setMessage("Dejarás de trabajar ahí y quedarás como solo cliente. Para volver, la tienda deberá re-invitarte.")
+            .setPositiveButton("Desvincularme") { _, _ -> vm.desvincularme() }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     private fun mostrarDialogoContrasena() {

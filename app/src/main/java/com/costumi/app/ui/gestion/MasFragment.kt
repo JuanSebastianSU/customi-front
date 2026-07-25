@@ -10,8 +10,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.costumi.app.R
+import com.costumi.app.core.ModoApp
 import com.costumi.app.core.Rol
 import com.costumi.app.databinding.FragmentMasBinding
+import com.costumi.app.ui.irAHome
 import com.costumi.app.ui.irALogin
 import com.costumi.app.ui.observar
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,6 +74,11 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
         pintarSecciones(secciones)
         observar(vm.rol) { rol ->
             rol?.let { r -> pintarSecciones(secciones.filter { s -> s in seccionesDe(r) }) }
+        }
+
+        binding.botonComprar.setOnClickListener { vm.irAComprar() }
+        observar(vm.irAComprar) { ir ->
+            if (ir) requireActivity().findNavController(R.id.nav_host).irAHome(ModoApp.CLIENTE)
         }
 
         binding.botonLogout.setOnClickListener { vm.cerrarSesion() }

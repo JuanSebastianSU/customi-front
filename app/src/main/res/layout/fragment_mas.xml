@@ -30,13 +30,23 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
+            <!-- Volver a modo compra (Fase B): la misma persona pasa a operar como cliente. -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonComprar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                app:icon="@drawable/ic_carrito"
+                android:text="Ir a comprar" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/botonLogout"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 android:text="Cerrar sesion" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
