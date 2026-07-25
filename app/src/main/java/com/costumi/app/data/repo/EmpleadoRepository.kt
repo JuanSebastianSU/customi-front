@@ -20,6 +20,7 @@ import com.costumi.apiclient.models.EmpleadoResponse
 import com.costumi.apiclient.models.EstablecerPermisoRequest
 import com.costumi.apiclient.models.InvitacionResponse
 import com.costumi.apiclient.models.InvitarEmpleadoRequest
+import com.costumi.apiclient.models.MembresiaEstadoResponse
 import com.costumi.apiclient.models.SucursalResponse
 import com.google.gson.Gson
 import kotlinx.coroutines.withContext
@@ -64,6 +65,18 @@ class EmpleadoRepository @Inject constructor(
 
     suspend fun desactivar(id: UUID): RespuestaRed<EmpleadoResponse> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.desactivar(id) } }
+
+    /** Suspende la membresía de trabajo (reversible); el empleado queda solo-cliente (Fase B). */
+    suspend fun suspenderMembresia(id: UUID): RespuestaRed<MembresiaEstadoResponse> =
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.suspender1(id) } }
+
+    /** Reactiva una membresía suspendida. */
+    suspend fun reactivarMembresia(id: UUID): RespuestaRed<MembresiaEstadoResponse> =
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.reactivar1(id) } }
+
+    /** Da de baja al empleado (despido definitivo); queda solo-cliente. */
+    suspend fun quitar(id: UUID): RespuestaRed<MembresiaEstadoResponse> =
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.quitar(id) } }
 
     suspend fun asignarSucursales(id: UUID, sucursalIds: List<UUID>): RespuestaRed<List<UUID>> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.asignarSucursales(id, AsignarSucursalesRequest(sucursalIds)) } }

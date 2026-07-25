@@ -102,7 +102,19 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
             AccionEmpleado.ACTIVIDAD -> vm.verActividad(id, empleado.email.orEmpty())
             AccionEmpleado.ACTIVAR -> vm.activar(id)
             AccionEmpleado.DESACTIVAR -> confirmarDesactivar(id, empleado.email.orEmpty())
+            AccionEmpleado.SUSPENDER -> vm.suspender(id)
+            AccionEmpleado.REACTIVAR_MEMBRESIA -> vm.reactivarMembresia(id)
+            AccionEmpleado.QUITAR -> confirmarQuitar(id, empleado.email.orEmpty())
         }
+    }
+
+    private fun confirmarQuitar(id: UUID, email: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("¿Dar de baja a $email?")
+            .setMessage("Dejará de trabajar en la tienda (sigue siendo cliente). Para volver, habrá que re-invitarlo.")
+            .setPositiveButton("Dar de baja") { _, _ -> vm.quitar(id) }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     private fun dialogoAlta() {

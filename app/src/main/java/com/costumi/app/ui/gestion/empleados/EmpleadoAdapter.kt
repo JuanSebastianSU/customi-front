@@ -14,7 +14,7 @@ import com.costumi.app.ui.common.pintarPastilla
 import com.costumi.apiclient.models.EmpleadoDetalleResponse
 
 /** Acción sobre un empleado. */
-enum class AccionEmpleado { ROL, SUCURSALES, PERMISOS, ACTIVIDAD, ACTIVAR, DESACTIVAR }
+enum class AccionEmpleado { ROL, SUCURSALES, PERMISOS, ACTIVIDAD, ACTIVAR, DESACTIVAR, SUSPENDER, REACTIVAR_MEMBRESIA, QUITAR }
 
 /** Lista de personal: email, rol, estado, sucursales asignadas y menú de gestión. */
 class EmpleadoAdapter(
@@ -72,13 +72,20 @@ class EmpleadoAdapter(
                 menu.add(0, 2, 1, "Asignar sucursales")
                 menu.add(0, 5, 2, "Permisos")
                 menu.add(0, 6, 3, "Actividad")
-                if (activo) menu.add(0, 3, 4, "Desactivar") else menu.add(0, 4, 4, "Reactivar")
+                // Membresía de trabajo (Fase B): suspender/reactivar (reversible) o quitar (despido).
+                menu.add(0, 7, 4, "Suspender del trabajo")
+                menu.add(0, 8, 5, "Reactivar en el trabajo")
+                menu.add(0, 9, 6, "Quitar (despedir)")
+                if (activo) menu.add(0, 3, 7, "Desactivar cuenta") else menu.add(0, 4, 7, "Reactivar cuenta")
                 setOnMenuItemClickListener { item ->
                     val accion = when (item.itemId) {
                         1 -> AccionEmpleado.ROL
                         2 -> AccionEmpleado.SUCURSALES
                         5 -> AccionEmpleado.PERMISOS
                         6 -> AccionEmpleado.ACTIVIDAD
+                        7 -> AccionEmpleado.SUSPENDER
+                        8 -> AccionEmpleado.REACTIVAR_MEMBRESIA
+                        9 -> AccionEmpleado.QUITAR
                         3 -> AccionEmpleado.DESACTIVAR
                         else -> AccionEmpleado.ACTIVAR
                     }

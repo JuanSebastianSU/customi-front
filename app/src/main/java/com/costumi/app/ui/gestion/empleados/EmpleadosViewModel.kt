@@ -92,8 +92,13 @@ class EmpleadosViewModel @Inject constructor(
     fun cambiarRol(id: UUID, rol: CambiarRolRequest.Rol) =
         ejecutar("Rol actualizado.") { repo.cambiarRol(id, rol) }
 
-    fun activar(id: UUID) = ejecutar("Empleado reactivado.") { repo.activar(id) }
-    fun desactivar(id: UUID) = ejecutar("Empleado desactivado.") { repo.desactivar(id) }
+    fun activar(id: UUID) = ejecutar("Cuenta reactivada.") { repo.activar(id) }
+    fun desactivar(id: UUID) = ejecutar("Cuenta desactivada.") { repo.desactivar(id) }
+
+    // Membresía de trabajo (Fase B): el empleado sigue siendo cliente, solo cambia su acceso al trabajo.
+    fun suspender(id: UUID) = ejecutar("Empleado suspendido del trabajo.") { repo.suspenderMembresia(id) }
+    fun reactivarMembresia(id: UUID) = ejecutar("Empleado reactivado en el trabajo.") { repo.reactivarMembresia(id) }
+    fun quitar(id: UUID) = ejecutar("Empleado dado de baja.") { repo.quitar(id) }
 
     fun asignarSucursales(id: UUID, sucursalIds: List<UUID>) =
         ejecutar("Sucursales asignadas.") { repo.asignarSucursales(id, sucursalIds) }
