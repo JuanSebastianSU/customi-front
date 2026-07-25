@@ -1,0 +1,151 @@
+package com.costumi.app.ui.gestion.ventas
+
+import android.os.Bundle
+import android.view.View
+import android.widget.LinearLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import com.costumi.app.R
+import com.costumi.app.databinding.FragmentVentasBinding
+import com.costumi.app.databinding.ItemDevolverLineaBinding
+import com.costumi.app.core.comoPrecio
+import com.costumi.app.ui.gestion.LineaDesglose
+import com.costumi.app.ui.gestion.inventario.PrendasLoadStateAdapter
+import com.costumi.app.ui.gestion.mostrarDesglose
+import com.costumi.app.ui.gestion.pagos.PagoConceptoFragment
+import com.costumi.app.ui.mostrarMensaje
+import com.costumi.app.ui.alBuscar
+import com.costumi.app.ui.observar
+import com.costumi.apiclient.models.LineaADevolver
+import com.costumi.apiclient.models.VentaResponse
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+
+/** Ventas — listado paginado con alta (POS) y devolución por línea. */
+@AndroidEntryPoint
+class VentasFragment : Fragment(R.layout.fragment_ventas) {
+
+    private val vm: VentasViewModel by viewModels()
+    private var _binding: FragmentVentasBinding? = null
+    private val binding get() = _binding!!
+    private val adapter = VentaAdapter(
+        alTocar = { mostrarDesgloseVenta(it) },
+        alDevolver = { dialogoDevolver(it) },
+        alCobrar = { abrirCobros(it) },
+    )
+
+    /** Desglose de la venta: sus artículos (foto+nombre+cantidad+subtotal), total y código de retiro. */
+    private fun mostrarDesgloseVenta(v: VentaResponse) {
+        val lineas = v.lineas.orEmpty().map { l ->
+            val devuelto = (l.cantidadDevuelta ?: 0).takeIf { it > 0 }?.let { " · devuelto $it" } ?: ""
+            LineaDesglose(
+                fotoUrl = l.fotoUrl,
+                nombre = l.nombre ?: "Articulo",
+                detalle = "Cantidad: ${l.cantidad ?: 1}$devuelto  ·  ${l.precioUnitario.comoPrecio() ?: "-"} c/u",
+                monto = l.subtotal.comoPrecio(),
+            )
+        }
+        val pie = buildList {
+            v.descuento?.takeIf { it.signum() > 0 }?.let { add("Descuento" to (it.comoPrecio() ?: "-")) }
+            v.total?.let { add("Total" to (it.comoPrecio() ?: "-")) }
+            v.montoReembolsado?.takeIf { it.signum() > 0 }?.let { add("Devuelto" to (it.comoPrecio() ?: "-")) }
+        }
+        mostrarDesglose(
+            titulo = "Compra · ${EstadoDeVenta.etiqueta(v)}",
+            codigoRetiro = v.codigoRetiro,
+            lineas = lineas,
+            pie = pie,
+        )
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        _binding = FragmentVentasBinding.bind(view)
+        binding.barraBusqueda.tilBuscar.hint = "Buscar por codigo de retiro (V-...)"
+        binding.barraBusqueda.editBuscar.alBuscar { vm.buscar(it) }
+        binding.lista.adapter = adapter.withLoadStateFooter(PrendasLoadStateAdapter { adapter.retry() })
+
+        setFragmentResultListener(VentaPosFragment.RESULT_REGISTRADA) { _, _ -> adapter.refresh() }
+        setFragmentResultListener(PagoConceptoFragment.RESULT_COBRADO) { _, _ -> adapter.refresh() }
+        binding.fabNueva.setOnClickListener { findNavController().navigate(R.id.ventaPosFragment) }
+
+        observar(vm.ventas) { adapter.submitData(viewLifecycleOwner.lifecycle, it) }
+        observar(adapter.loadStateFlow) { estados -> pintarEstado(estados.refresh) }
+        observar(vm.eventos) { evento ->
+            when (evento) {
+                is EventoVenta.Info -> { mostrarMensaje(evento.mensaje); adapter.refresh() }
+                is EventoVenta.Error -> mostrarMensaje(evento.mensaje)
+            }
+        }
+    }
+
+    private fun dialogoDevolver(venta: VentaResponse) {
+        val id = venta.id ?: return
+        val devolvibles = venta.lineas.orEmpty().filter { (it.cantidad ?: 0) - (it.cantidadDevuelta ?: 0) > 0 }
+        if (devolvibles.isEmpty()) {
+            mostrarMensaje("Esta venta no tiene unidades por devolver.")
+            return
+        }
+        val contenedor = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 16, 48, 0)
+        }
+        val filas = devolvibles.map { linea ->
+            val max = (linea.cantidad ?: 0) - (linea.cantidadDevuelta ?: 0)
+            val fila = ItemDevolverLineaBinding.inflate(layoutInflater, contenedor, false)
+            fila.etiqueta.text = "${vm.nombrePrenda(linea.prendaId)} (max $max)"
+            contenedor.addView(fila.root)
+            Triple(linea.prendaId, max, fila)
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Devolver unidades")
+            .setView(contenedor)
+            .setPositiveButton("Devolver") { _, _ ->
+                val lineas = filas.mapNotNull { (prendaId, max, fila) ->
+                    val cant = fila.editCantidad.text?.toString()?.toIntOrNull() ?: 0
+                    if (prendaId != null && cant in 1..max) LineaADevolver(prendaId, cant) else null
+                }
+                vm.devolver(id, lineas)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun abrirCobros(venta: VentaResponse) {
+        val id = venta.id ?: return
+        findNavController().navigate(
+            R.id.pagoConceptoFragment,
+            PagoConceptoFragment.args(
+                tipo = "VENTA",
+                conceptoId = id,
+                sucursalId = venta.sucursalId,
+                total = venta.total,
+                titulo = "Venta · ${venta.total.comoPrecio() ?: "-"}",
+            ),
+        )
+    }
+
+    private fun pintarEstado(refresh: LoadState) {
+        when (refresh) {
+            is LoadState.Loading -> if (adapter.itemCount == 0) binding.stateView.cargando()
+            is LoadState.Error ->
+                binding.stateView.error(refresh.error.localizedMessage ?: "No se pudieron cargar las ventas.") {
+                    adapter.refresh()
+                }
+            is LoadState.NotLoading ->
+                if (adapter.itemCount == 0) {
+                    binding.stateView.vacio("No hay ventas. Registra la primera con el boton +.")
+                } else {
+                    binding.stateView.ocultar()
+                }
+        }
+    }
+
+    override fun onDestroyView() {
+        binding.lista.adapter = null
+        _binding = null
+        super.onDestroyView()
+    }
+}

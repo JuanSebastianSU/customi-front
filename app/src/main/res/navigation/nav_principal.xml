@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_principal"
+    app:startDestination="@id/splashFragment">
+
+    <!-- Auth -->
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.costumi.app.ui.auth.SplashFragment"
+        android:label="Costumi" />
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.costumi.app.ui.auth.LoginFragment"
+        android:label="Iniciar sesion" />
+
+    <fragment
+        android:id="@+id/registroFragment"
+        android:name="com.costumi.app.ui.auth.RegistroFragment"
+        android:label="Crear cuenta" />
+
+    <fragment
+        android:id="@+id/recuperarFragment"
+        android:name="com.costumi.app.ui.auth.RecuperarFragment"
+        android:label="Recuperar contrasena" />
+
+    <fragment
+        android:id="@+id/restablecerFragment"
+        android:name="com.costumi.app.ui.auth.RestablecerFragment"
+        android:label="Nueva contrasena" />
+
+    <!-- Modo CLIENTE (marketplace): shell con bottom nav + grafo anidado (nav_cliente) -->
+    <fragment
+        android:id="@+id/clienteShellFragment"
+        android:name="com.costumi.app.ui.cliente.ClienteShellFragment"
+        android:label="Costumi" />
+
+    <!-- Modo GESTIÓN (dueño/empleados): shell con bottom nav + grafo anidado (nav_gestion) -->
+    <fragment
+        android:id="@+id/gestionShellFragment"
+        android:name="com.costumi.app.ui.gestion.GestionShellFragment"
+        android:label="Gestion" />
+
+    <!-- Home por modo (placeholder; se llena en fase siguiente) -->
+
+
+    <fragment
+        android:id="@+id/superadminHomeFragment"
+        android:name="com.costumi.app.ui.superadmin.SuperAdminHomeFragment"
+        android:label="Plataforma" />
+</navigation>

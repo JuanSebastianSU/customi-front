@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mismos estados en tema oscuro: fondo apagado, letra clara (ver values/colors.xml). -->
+    <color name="estado_exito_fondo">#1E4430</color>
+    <color name="estado_exito_texto">#B6E5C3</color>
+    <color name="estado_alerta_fondo">#4A3714</color>
+    <color name="estado_alerta_texto">#F3D9A4</color>
+</resources>

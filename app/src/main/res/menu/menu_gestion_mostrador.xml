@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Barra inferior de MOSTRADOR / ATENCION: sus pantallas de a diario a un toque (vender, rentar,
+     clientes) en vez de hundidas en "Mas" (H3). Los ids = destinos del nav_gestion. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/ventasFragment"
+        android:icon="@drawable/ic_ventas"
+        android:title="Ventas" />
+    <item
+        android:id="@+id/rentasFragment"
+        android:icon="@drawable/ic_calendario"
+        android:title="Rentas" />
+    <item
+        android:id="@+id/clientesFragment"
+        android:icon="@drawable/ic_clientes"
+        android:title="Clientes" />
+    <item
+        android:id="@+id/masFragment"
+        android:icon="@drawable/ic_mas"
+        android:title="Mas" />
+</menu>

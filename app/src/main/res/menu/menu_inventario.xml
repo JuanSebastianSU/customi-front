@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/accionCategorias"
+        android:title="Categorias"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/accionTiposEtiqueta"
+        android:title="Tipos de etiqueta"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/accionDisfraces"
+        android:title="Disfraces"
+        app:showAsAction="never" />
+</menu>

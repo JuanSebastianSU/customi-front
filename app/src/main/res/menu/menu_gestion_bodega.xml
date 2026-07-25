@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Barra inferior de BODEGA: su trabajo es el inventario/stock; el resto (permitido) vive en "Mas". -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/inventarioFragment"
+        android:icon="@drawable/ic_inventario"
+        android:title="Inventario" />
+    <item
+        android:id="@+id/masFragment"
+        android:icon="@drawable/ic_mas"
+        android:title="Mas" />
+</menu>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Selector del periodo de renta, UNICO en la app: boton que abre el calendario de rango + la linea que
+  dice que quedo elegido. Reemplaza los dos campos "AAAA-MM-DD" que habia en armar renta, donde un
+  dedazo daba "fecha invalida" y nada mostraba cuantos dias eran. Se enlaza con SelectorDePeriodo.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/boton"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Elegir fechas de renta"
+        app:icon="@drawable/ic_calendario" />
+
+    <TextView
+        android:id="@+id/texto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:visibility="gone"
+        tools:text="01 sep → 04 sep  ·  3 dias"
+        tools:visibility="visible" />
+</LinearLayout>

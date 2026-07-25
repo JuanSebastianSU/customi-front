@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.AppCustomi2" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.AppCustomi2" parent="Base.Theme.AppCustomi2" />
+
+    <!-- Divisor fino entre opciones dentro de una tarjeta (Configuracion). -->
+    <style name="DivisorConfig">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginVertical">12dp</item>
+        <item name="android:background">?attr/colorOutlineVariant</item>
+    </style>
+</resources>

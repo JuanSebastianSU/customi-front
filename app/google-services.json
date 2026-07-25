@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "606574337200",
+    "project_id": "customi-9c781",
+    "storage_bucket": "customi-9c781.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606574337200:android:e5577ddbe2674d97d86f75",
+        "android_client_info": {
+          "package_name": "com.costumi.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChD86IpPsT7e6BlANrwZ6KsqGZx45h7ds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

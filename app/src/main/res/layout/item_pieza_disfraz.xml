@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Una pieza del disfraz en la lista de armado.
+
+  Reemplaza a la seccion con carrusel embebido: antes cada pieza mostraba TODAS sus opciones en
+  linea, asi que la pantalla crecia sin control y no se veia de un vistazo que faltaba. Ahora cada
+  pieza es una fila que muestra lo YA elegido (miniatura + nombre + talla) o invita a elegir.
+-->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tarjetaPieza"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginBottom="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <!-- Miniatura de la prenda elegida; si no hay, se muestra el marcador de vacio. -->
+        <ImageView
+            android:id="@+id/miniatura"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_imagen"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_imagen_placeholder" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nombrePieza"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                tools:text="Sombrero" />
+
+            <TextView
+                android:id="@+id/detallePieza"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="Tricornio negro" />
+
+            <!-- Talla/color de lo elegido: distingue variantes que por nombre se ven iguales (M vs L). -->
+            <TextView
+                android:id="@+id/etiquetasPieza"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorPrimary"
+                android:visibility="gone"
+                tools:text="Talla M · Blanco"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <!-- Marca de elegida. Se oculta cuando la pieza esta pendiente. -->
+        <TextView
+            android:id="@+id/marcaElegida"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/bg_circulo"
+            android:gravity="center"
+            android:text="✓"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorOnPrimaryContainer" />
+
+        <!-- Invitacion a elegir. Se oculta cuando la pieza ya tiene prenda. -->
+        <TextView
+            android:id="@+id/accionElegir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Elegir ›"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?attr/colorPrimary"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

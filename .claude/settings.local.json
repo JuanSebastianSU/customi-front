@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew.bat :app:compileDebugKotlin -q)",
+      "Bash(./gradlew.bat :app:compileDebugKotlin :app:processDebugResources -q)",
+      "Bash(./gradlew.bat :app:processDebugResources :app:compileDebugKotlin -q)",
+      "Bash(./gradlew.bat :app:assembleDebug -q)",
+      "Bash(ps -W)",
+      "Bash([ -f \"$MEM\" ])",
+      "Bash(git -C \"C:/Users/User/AndroidStudioProjects/AppCustomi2\" rev-parse --is-inside-work-tree)",
+      "Bash(git -C \"C:/Users/User/AndroidStudioProjects/AppCustomi2\" remote -v)",
+      "Bash(git -C \"C:/Users/User/AndroidStudioProjects/AppCustomi2\" log -1 --oneline)",
+      "Bash(git -C \"C:/Users/User/AndroidStudioProjects/AppCustomi2\" status --porcelain)",
+      "Read(//c/Users/User/AndroidStudioProjects/costumi-backend/**)",
+      "Bash(git -C \"C:/Users/User/AndroidStudioProjects/costumi-backend\" remote -v)",
+      "Bash(exit 1)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

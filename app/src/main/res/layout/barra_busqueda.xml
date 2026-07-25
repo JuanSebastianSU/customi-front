@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Caja de busqueda comun a las listas de gestion. Se incluye con <include layout="@layout/barra_busqueda"/>
+  y se engancha con `binding.editBuscar.alBuscar { ... }`, que ya trae el retardo para no disparar una
+  consulta por cada tecla.
+-->
+<com.google.android.material.textfield.TextInputLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tilBuscar"
+    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="4dp"
+    android:hint="Buscar"
+    app:endIconMode="clear_text"
+    app:startIconDrawable="@drawable/ic_buscar">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/editBuscar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1" />
+</com.google.android.material.textfield.TextInputLayout>

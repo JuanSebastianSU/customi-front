@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_cliente"
+    app:startDestination="@id/explorarFragment">
+
+    <!-- Pestañas del bottom nav -->
+    <fragment
+        android:id="@+id/explorarFragment"
+        android:name="com.costumi.app.ui.cliente.explorar.ExplorarFragment"
+        android:label="Explorar tiendas" />
+
+    <fragment
+        android:id="@+id/misCarritosFragment"
+        android:name="com.costumi.app.ui.cliente.carrito.MisCarritosFragment"
+        android:label="Mis carritos" />
+
+    <fragment
+        android:id="@+id/misPedidosFragment"
+        android:name="com.costumi.app.ui.cliente.pedidos.MisPedidosFragment"
+        android:label="Mis pedidos" />
+
+    <fragment
+        android:id="@+id/perfilFragment"
+        android:name="com.costumi.app.ui.cliente.perfil.PerfilFragment"
+        android:label="Perfil" />
+
+    <!-- Flujo de compra (se abre encima; el bottom nav se oculta) -->
+    <fragment
+        android:id="@+id/tiendaFragment"
+        android:name="com.costumi.app.ui.cliente.tienda.TiendaFragment"
+        android:label="Tienda" />
+
+    <fragment
+        android:id="@+id/detallePrendaFragment"
+        android:name="com.costumi.app.ui.cliente.detalle.DetallePrendaFragment"
+        android:label="Detalle" />
+
+    <fragment
+        android:id="@+id/detalleDisfrazFragment"
+        android:name="com.costumi.app.ui.cliente.detalle.DetalleDisfrazFragment"
+        android:label="Disfraz" />
+
+    <fragment
+        android:id="@+id/pagoFragment"
+        android:name="com.costumi.app.ui.cliente.pago.PagoFragment"
+        android:label="Pago" />
+
+    <fragment
+        android:id="@+id/carritoFragment"
+        android:name="com.costumi.app.ui.cliente.carrito.CarritoFragment"
+        android:label="Carrito" />
+
+    <fragment
+        android:id="@+id/misDeudasFragment"
+        android:name="com.costumi.app.ui.cliente.deudas.MisDeudasFragment"
+        android:label="Mis multas" />
+
+    <fragment
+        android:id="@+id/favoritosFragment"
+        android:name="com.costumi.app.ui.cliente.favoritos.FavoritosFragment"
+        android:label="Mis guardados" />
+</navigation>

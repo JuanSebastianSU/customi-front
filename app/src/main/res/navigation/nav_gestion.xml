@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_gestion"
+    app:startDestination="@id/dashboardFragment">
+
+    <!-- Pestañas del bottom nav -->
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.costumi.app.ui.gestion.dashboard.DashboardFragment"
+        android:label="Panel" />
+
+    <fragment
+        android:id="@+id/inventarioFragment"
+        android:name="com.costumi.app.ui.gestion.inventario.InventarioFragment"
+        android:label="Inventario" />
+
+    <fragment
+        android:id="@+id/prendaFormFragment"
+        android:name="com.costumi.app.ui.gestion.inventario.PrendaFormFragment"
+        android:label="Prenda" />
+
+    <fragment
+        android:id="@+id/gruposStockFragment"
+        android:name="com.costumi.app.ui.gestion.inventario.GruposStockFragment"
+        android:label="Grupos de stock" />
+
+    <fragment
+        android:id="@+id/categoriasFragment"
+        android:name="com.costumi.app.ui.gestion.taxonomia.CategoriasFragment"
+        android:label="Categorias" />
+
+    <fragment
+        android:id="@+id/tiposEtiquetaFragment"
+        android:name="com.costumi.app.ui.gestion.taxonomia.TiposEtiquetaFragment"
+        android:label="Tipos de etiqueta" />
+
+    <fragment
+        android:id="@+id/valoresFragment"
+        android:name="com.costumi.app.ui.gestion.taxonomia.ValoresFragment"
+        android:label="Valores" />
+
+    <fragment
+        android:id="@+id/disfracesFragment"
+        android:name="com.costumi.app.ui.gestion.disfraces.DisfracesFragment"
+        android:label="Disfraces" />
+
+    <fragment
+        android:id="@+id/categoriasDisfrazFragment"
+        android:name="com.costumi.app.ui.gestion.disfraces.CategoriasDisfrazFragment"
+        android:label="Categorias de disfraz" />
+
+    <fragment
+        android:id="@+id/disfrazFormFragment"
+        android:name="com.costumi.app.ui.gestion.disfraces.DisfrazFormFragment"
+        android:label="Nuevo disfraz" />
+
+    <fragment
+        android:id="@+id/disfrazAsignarFragment"
+        android:name="com.costumi.app.ui.gestion.disfraces.DisfrazAsignarFragment"
+        android:label="Asignar disfraz" />
+
+    <fragment
+        android:id="@+id/pedidoDisfracesFragment"
+        android:name="com.costumi.app.ui.gestion.disfraces.PedidoDisfracesFragment"
+        android:label="Pedido de varios disfraces" />
+
+    <fragment
+        android:id="@+id/ventasFragment"
+        android:name="com.costumi.app.ui.gestion.ventas.VentasFragment"
+        android:label="Ventas" />
+
+    <fragment
+        android:id="@+id/ventaPosFragment"
+        android:name="com.costumi.app.ui.gestion.ventas.VentaPosFragment"
+        android:label="Nueva venta" />
+
+    <fragment
+        android:id="@+id/rentasFragment"
+        android:name="com.costumi.app.ui.gestion.rentas.RentasFragment"
+        android:label="Rentas" />
+
+    <fragment
+        android:id="@+id/rentaFormFragment"
+        android:name="com.costumi.app.ui.gestion.rentas.RentaFormFragment"
+        android:label="Nueva renta" />
+
+    <fragment
+        android:id="@+id/devolucionesFragment"
+        android:name="com.costumi.app.ui.gestion.devoluciones.DevolucionesFragment"
+        android:label="Devoluciones" />
+
+    <fragment
+        android:id="@+id/devolucionFormFragment"
+        android:name="com.costumi.app.ui.gestion.devoluciones.DevolucionFormFragment"
+        android:label="Registrar devolucion" />
+
+    <fragment
+        android:id="@+id/pagosFragment"
+        android:name="com.costumi.app.ui.gestion.pagos.PagosFragment"
+        android:label="Pagos y cobros" />
+
+    <fragment
+        android:id="@+id/pagoConceptoFragment"
+        android:name="com.costumi.app.ui.gestion.pagos.PagoConceptoFragment"
+        android:label="Cobros" />
+
+    <fragment
+        android:id="@+id/cajaFragment"
+        android:name="com.costumi.app.ui.gestion.caja.CajaFragment"
+        android:label="Caja / Turno" />
+
+    <fragment
+        android:id="@+id/turnoDetalleFragment"
+        android:name="com.costumi.app.ui.gestion.caja.TurnoDetalleFragment"
+        android:label="Turno" />
+
+    <fragment
+        android:id="@+id/reembolsosFragment"
+        android:name="com.costumi.app.ui.gestion.reembolsos.ReembolsosFragment"
+        android:label="Reembolsos" />
+
+    <fragment
+        android:id="@+id/solicitarReembolsoFragment"
+        android:name="com.costumi.app.ui.gestion.reembolsos.SolicitarReembolsoFragment"
+        android:label="Nueva solicitud" />
+
+    <fragment
+        android:id="@+id/reportesFragment"
+        android:name="com.costumi.app.ui.gestion.reportes.ReportesFragment"
+        android:label="Reportes" />
+
+    <fragment
+        android:id="@+id/empleadosFragment"
+        android:name="com.costumi.app.ui.gestion.empleados.EmpleadosFragment"
+        android:label="Empleados" />
+
+    <fragment
+        android:id="@+id/permisosEmpleadoFragment"
+        android:name="com.costumi.app.ui.gestion.empleados.PermisosEmpleadoFragment"
+        android:label="Permisos" />
+
+    <fragment
+        android:id="@+id/sucursalesFragment"
+        android:name="com.costumi.app.ui.gestion.sucursales.SucursalesFragment"
+        android:label="Sucursales" />
+
+    <fragment
+        android:id="@+id/configuracionFragment"
+        android:name="com.costumi.app.ui.gestion.config.ConfiguracionFragment"
+        android:label="Configuracion" />
+
+    <fragment
+        android:id="@+id/notificacionesFragment"
+        android:name="com.costumi.app.ui.gestion.notificaciones.NotificacionesFragment"
+        android:label="Notificaciones" />
+
+    <fragment
+        android:id="@+id/auditoriaFragment"
+        android:name="com.costumi.app.ui.gestion.auditoria.AuditoriaFragment"
+        android:label="Auditoria" />
+
+    <fragment
+        android:id="@+id/plantillasFragment"
+        android:name="com.costumi.app.ui.gestion.plantillas.PlantillasFragment"
+        android:label="Mensajes automaticos" />
+
+    <fragment
+        android:id="@+id/clientesFragment"
+        android:name="com.costumi.app.ui.gestion.clientes.ClientesFragment"
+        android:label="Clientes" />
+
+    <fragment
+        android:id="@+id/clienteFichaFragment"
+        android:name="com.costumi.app.ui.gestion.clientes.ClienteFichaFragment"
+        android:label="Cliente" />
+
+    <fragment
+        android:id="@+id/clienteHistorialFragment"
+        android:name="com.costumi.app.ui.gestion.clientes.ClienteHistorialFragment"
+        android:label="Historial" />
+
+    <fragment
+        android:id="@+id/masFragment"
+        android:name="com.costumi.app.ui.gestion.MasFragment"
+        android:label="Mas" />
+
+    <!-- Destino generico para las secciones abiertas desde "Mas" -->
+    <fragment
+        android:id="@+id/proximamenteFragment"
+        android:name="com.costumi.app.ui.gestion.ProximamenteFragment"
+        android:label="Gestion">
+        <argument
+            android:name="titulo"
+            app:argType="string"
+            android:defaultValue="Seccion" />
+    </fragment>
+</navigation>

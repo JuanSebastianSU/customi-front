@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!--
+      Colores de estado. La paleta de Material solo trae "error" y contenedores de marca: el rosa de
+      tertiaryContainer sobre una renta al dia se leia como problema. Verde = todo en orden,
+      ambar = requiere atencion pronto. Ver ui/common/Pastilla.kt.
+    -->
+    <color name="estado_exito_fondo">#D8F0DC</color>
+    <color name="estado_exito_texto">#12512F</color>
+    <color name="estado_alerta_fondo">#FBEACA</color>
+    <color name="estado_alerta_texto">#6E4A00</color>
+</resources>
