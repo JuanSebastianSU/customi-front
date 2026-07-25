@@ -15,6 +15,7 @@ import com.costumi.apiclient.models.ValorEtiquetaResponse
 
 interface TipoEtiquetaControllerApi {
     /**
+     * POST api/v1/tipos-etiqueta/{tipoId}/activar
      * 
      * 
      * Responses:
@@ -28,6 +29,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun activarTipo(@Path("tipoId") tipoId: java.util.UUID): Response<TipoEtiquetaResponse>
 
     /**
+     * POST api/v1/tipos-etiqueta/{tipoId}/valores/{valorId}/activar
      * 
      * 
      * Responses:
@@ -42,6 +44,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun activarValor(@Path("tipoId") tipoId: java.util.UUID, @Path("valorId") valorId: java.util.UUID): Response<ValorEtiquetaResponse>
 
     /**
+     * POST api/v1/tipos-etiqueta/{tipoId}/valores
      * 
      * 
      * Responses:
@@ -56,6 +59,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun agregarValor(@Path("tipoId") tipoId: java.util.UUID, @Body agregarValorRequest: AgregarValorRequest): Response<ValorEtiquetaResponse>
 
     /**
+     * POST api/v1/tipos-etiqueta/{tipoId}/archivar
      * 
      * 
      * Responses:
@@ -69,6 +73,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun archivarTipo(@Path("tipoId") tipoId: java.util.UUID): Response<TipoEtiquetaResponse>
 
     /**
+     * POST api/v1/tipos-etiqueta/{tipoId}/valores/{valorId}/archivar
      * 
      * 
      * Responses:
@@ -83,6 +88,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun archivarValor(@Path("tipoId") tipoId: java.util.UUID, @Path("valorId") valorId: java.util.UUID): Response<ValorEtiquetaResponse>
 
     /**
+     * POST api/v1/tipos-etiqueta
      * 
      * 
      * Responses:
@@ -96,6 +102,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun crear(@Body crearTipoEtiquetaRequest: CrearTipoEtiquetaRequest): Response<TipoEtiquetaResponse>
 
     /**
+     * GET api/v1/tipos-etiqueta
      * 
      * 
      * Responses:
@@ -108,6 +115,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun listar1(): Response<kotlin.collections.List<TipoEtiquetaResponse>>
 
     /**
+     * GET api/v1/tipos-etiqueta/{tipoId}/valores
      * 
      * 
      * Responses:
@@ -121,6 +129,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun listarValores(@Path("tipoId") tipoId: java.util.UUID): Response<kotlin.collections.List<ValorEtiquetaResponse>>
 
     /**
+     * PATCH api/v1/tipos-etiqueta/{tipoId}
      * 
      * 
      * Responses:
@@ -135,6 +144,7 @@ interface TipoEtiquetaControllerApi {
     suspend fun renombrar(@Path("tipoId") tipoId: java.util.UUID, @Body renombrarRequest: RenombrarRequest): Response<TipoEtiquetaResponse>
 
     /**
+     * PATCH api/v1/tipos-etiqueta/{tipoId}/valores/{valorId}
      * 
      * 
      * Responses:

@@ -12,6 +12,7 @@ import com.costumi.apiclient.models.ProblemDetail
 
 interface PlantillaNotificacionControllerApi {
     /**
+     * PUT api/v1/notificaciones/plantillas/{tipo}
      * 
      * 
      * Responses:
@@ -26,6 +27,7 @@ interface PlantillaNotificacionControllerApi {
     suspend fun actualizar1(@Path("tipo") tipo: kotlin.String, @Body actualizarPlantillaRequest: ActualizarPlantillaRequest): Response<PlantillaResponse>
 
     /**
+     * GET api/v1/notificaciones/plantillas
      * 
      * 
      * Responses:

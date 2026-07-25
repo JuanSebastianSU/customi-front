@@ -14,6 +14,7 @@ import com.costumi.apiclient.models.TurnoResponse
 
 interface CajaControllerApi {
     /**
+     * POST api/v1/caja/turnos
      * 
      * 
      * Responses:
@@ -27,6 +28,7 @@ interface CajaControllerApi {
     suspend fun abrir(@Body abrirTurnoRequest: AbrirTurnoRequest): Response<TurnoResponse>
 
     /**
+     * POST api/v1/caja/turnos/{turnoId}/cerrar
      * 
      * 
      * Responses:
@@ -41,6 +43,7 @@ interface CajaControllerApi {
     suspend fun cerrar1(@Path("turnoId") turnoId: java.util.UUID, @Body cerrarTurnoRequest: CerrarTurnoRequest): Response<TurnoResponse>
 
     /**
+     * GET api/v1/caja/turnos
      * 
      * 
      * Responses:
@@ -53,6 +56,7 @@ interface CajaControllerApi {
     suspend fun listar16(): Response<kotlin.collections.List<TurnoResponse>>
 
     /**
+     * POST api/v1/caja/turnos/{turnoId}/movimientos
      * 
      * 
      * Responses:

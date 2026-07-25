@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -23,6 +31,11 @@ import com.google.gson.annotations.SerializedName
  *
  * @param id 
  * @param nombre 
+ * @param logoUrl 
+ * @param portadaUrl 
+ * @param ciudad 
+ * @param descripcion 
+ * @param disfracesCount 
  */
 
 
@@ -32,7 +45,22 @@ data class EmpresaVitrinaResponse (
     val id: java.util.UUID? = null,
 
     @SerializedName("nombre")
-    val nombre: kotlin.String? = null
+    val nombre: kotlin.String? = null,
+
+    @SerializedName("logoUrl")
+    val logoUrl: kotlin.String? = null,
+
+    @SerializedName("portadaUrl")
+    val portadaUrl: kotlin.String? = null,
+
+    @SerializedName("ciudad")
+    val ciudad: kotlin.String? = null,
+
+    @SerializedName("descripcion")
+    val descripcion: kotlin.String? = null,
+
+    @SerializedName("disfracesCount")
+    val disfracesCount: kotlin.Long? = null
 
 ) {
 

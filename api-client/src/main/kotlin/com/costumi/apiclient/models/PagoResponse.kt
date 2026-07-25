@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -31,6 +39,7 @@ import com.google.gson.annotations.SerializedName
  * @param metodo 
  * @param referencia 
  * @param fecha 
+ * @param codigoRetiro 
  */
 
 
@@ -64,7 +73,10 @@ data class PagoResponse (
     val referencia: kotlin.String? = null,
 
     @SerializedName("fecha")
-    val fecha: java.time.OffsetDateTime? = null
+    val fecha: java.time.OffsetDateTime? = null,
+
+    @SerializedName("codigoRetiro")
+    val codigoRetiro: kotlin.String? = null
 
 ) {
 

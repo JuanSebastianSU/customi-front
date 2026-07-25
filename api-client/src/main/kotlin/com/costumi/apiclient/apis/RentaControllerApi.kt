@@ -11,9 +11,11 @@ import com.costumi.apiclient.models.ExtenderRentaRequest
 import com.costumi.apiclient.models.ProblemDetail
 import com.costumi.apiclient.models.RentaResponse
 import com.costumi.apiclient.models.RespuestaPaginadaRentaResponse
+import com.costumi.apiclient.models.ResumenDeRentasResponse
 
 interface RentaControllerApi {
     /**
+     * POST api/v1/rentas/{id}/cancelar
      * 
      * 
      * Responses:
@@ -27,6 +29,7 @@ interface RentaControllerApi {
     suspend fun cancelar(@Path("id") id: java.util.UUID): Response<RentaResponse>
 
     /**
+     * POST api/v1/rentas/{id}/cerrar
      * 
      * 
      * Responses:
@@ -40,6 +43,7 @@ interface RentaControllerApi {
     suspend fun cerrar(@Path("id") id: java.util.UUID): Response<RentaResponse>
 
     /**
+     * GET api/v1/rentas/{id}/contrato.pdf
      * 
      * 
      * Responses:
@@ -53,6 +57,7 @@ interface RentaControllerApi {
     suspend fun contrato(@Path("id") id: java.util.UUID): Response<kotlin.ByteArray>
 
     /**
+     * POST api/v1/rentas
      * 
      * 
      * Responses:
@@ -66,6 +71,7 @@ interface RentaControllerApi {
     suspend fun crear1(@Body crearRentaRequest: CrearRentaRequest): Response<RentaResponse>
 
     /**
+     * POST api/v1/rentas/{id}/devolver
      * 
      * 
      * Responses:
@@ -79,6 +85,7 @@ interface RentaControllerApi {
     suspend fun devolver1(@Path("id") id: java.util.UUID): Response<RentaResponse>
 
     /**
+     * POST api/v1/rentas/{id}/entregar
      * 
      * 
      * Responses:
@@ -92,6 +99,7 @@ interface RentaControllerApi {
     suspend fun entregar(@Path("id") id: java.util.UUID): Response<RentaResponse>
 
     /**
+     * POST api/v1/rentas/{id}/extender
      * 
      * 
      * Responses:
@@ -106,6 +114,7 @@ interface RentaControllerApi {
     suspend fun extender(@Path("id") id: java.util.UUID, @Body extenderRentaRequest: ExtenderRentaRequest): Response<RentaResponse>
 
     /**
+     * GET api/v1/rentas
      * 
      * 
      * Responses:
@@ -114,14 +123,16 @@ interface RentaControllerApi {
      *
      * @param clienteId  (optional)
      * @param buscar  (optional)
+     * @param filtro  (optional)
      * @param pagina  (optional)
      * @param tamano  (optional)
      * @return [RespuestaPaginadaRentaResponse]
      */
     @GET("api/v1/rentas")
-    suspend fun listar2(@Query("clienteId") clienteId: java.util.UUID? = null, @Query("buscar") buscar: kotlin.String? = null, @Query("pagina") pagina: kotlin.Int? = null, @Query("tamano") tamano: kotlin.Int? = null): Response<RespuestaPaginadaRentaResponse>
+    suspend fun listar2(@Query("clienteId") clienteId: java.util.UUID? = null, @Query("buscar") buscar: kotlin.String? = null, @Query("filtro") filtro: kotlin.String? = null, @Query("pagina") pagina: kotlin.Int? = null, @Query("tamano") tamano: kotlin.Int? = null): Response<RespuestaPaginadaRentaResponse>
 
     /**
+     * GET api/v1/rentas/{id}
      * 
      * 
      * Responses:
@@ -133,5 +144,18 @@ interface RentaControllerApi {
      */
     @GET("api/v1/rentas/{id}")
     suspend fun porId1(@Path("id") id: java.util.UUID): Response<RentaResponse>
+
+    /**
+     * GET api/v1/rentas/resumen
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @return [ResumenDeRentasResponse]
+     */
+    @GET("api/v1/rentas/resumen")
+    suspend fun resumen(): Response<ResumenDeRentasResponse>
 
 }

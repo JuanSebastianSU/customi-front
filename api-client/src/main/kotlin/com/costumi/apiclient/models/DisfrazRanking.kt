@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -23,6 +31,7 @@ import com.google.gson.annotations.SerializedName
  *
  * @param disfrazId 
  * @param nombre 
+ * @param fotoUrl 
  * @param unidades 
  * @param monto 
  */
@@ -35,6 +44,9 @@ data class DisfrazRanking (
 
     @SerializedName("nombre")
     val nombre: kotlin.String? = null,
+
+    @SerializedName("fotoUrl")
+    val fotoUrl: kotlin.String? = null,
 
     @SerializedName("unidades")
     val unidades: kotlin.Long? = null,

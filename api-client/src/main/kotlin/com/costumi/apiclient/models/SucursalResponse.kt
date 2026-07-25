@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -27,6 +35,10 @@ import com.google.gson.annotations.SerializedName
  * @param direccion 
  * @param ubicacionMaps 
  * @param archivada 
+ * @param descripcion 
+ * @param latitud 
+ * @param longitud 
+ * @param fotoUrl 
  */
 
 
@@ -48,7 +60,19 @@ data class SucursalResponse (
     val ubicacionMaps: kotlin.String? = null,
 
     @SerializedName("archivada")
-    val archivada: kotlin.Boolean? = null
+    val archivada: kotlin.Boolean? = null,
+
+    @SerializedName("descripcion")
+    val descripcion: kotlin.String? = null,
+
+    @SerializedName("latitud")
+    val latitud: kotlin.Double? = null,
+
+    @SerializedName("longitud")
+    val longitud: kotlin.Double? = null,
+
+    @SerializedName("fotoUrl")
+    val fotoUrl: kotlin.String? = null
 
 ) {
 

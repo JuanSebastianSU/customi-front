@@ -275,7 +275,7 @@ class DisfrazRepository @Inject constructor(
 
     suspend fun crearCategoriaDisfraz(nombre: String): RespuestaRed<CategoriaDeDisfrazResponse> =
         withContext(dispatchers.io) {
-            ejecutarLlamada(gson) { categoriaDisfrazApi.crear6(CategoriaDeDisfrazRequest(nombre)) }
+            ejecutarLlamada(gson) { categoriaDisfrazApi.crear5(CategoriaDeDisfrazRequest(nombre)) }
         }
 
     suspend fun renombrarCategoriaDisfraz(id: UUID, nombre: String): RespuestaRed<CategoriaDeDisfrazResponse> =
@@ -294,7 +294,7 @@ class DisfrazRepository @Inject constructor(
         }
 
     suspend fun crear(req: CrearDisfrazRequest): RespuestaRed<DisfrazResponse> =
-        withContext(dispatchers.io) { ejecutarLlamada(gson) { disfrazApi.crear5(req) } }
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { disfrazApi.crear4(req) } }
 
     suspend fun editar(id: UUID, req: CrearDisfrazRequest): RespuestaRed<DisfrazResponse> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { disfrazApi.editar1(id, req) } }

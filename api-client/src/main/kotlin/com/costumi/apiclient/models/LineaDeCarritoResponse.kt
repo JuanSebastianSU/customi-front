@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -32,6 +40,7 @@ import com.google.gson.annotations.SerializedName
  * @param fechaDevolucion 
  * @param precioUnitario 
  * @param subtotal 
+ * @param deposito 
  * @param motivoNoDisponible 
  * @param selecciones 
  */
@@ -68,6 +77,9 @@ data class LineaDeCarritoResponse (
 
     @SerializedName("subtotal")
     val subtotal: java.math.BigDecimal? = null,
+
+    @SerializedName("deposito")
+    val deposito: java.math.BigDecimal? = null,
 
     @SerializedName("motivoNoDisponible")
     val motivoNoDisponible: kotlin.String? = null,

@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -22,6 +30,7 @@ import com.google.gson.annotations.SerializedName
  * 
  *
  * @param empresaId 
+ * @param sucursalId 
  * @param empresaNombre 
  * @param rentaId 
  * @param codigoRetiro 
@@ -42,6 +51,9 @@ data class MiDeudaResponse (
 
     @SerializedName("empresaId")
     val empresaId: java.util.UUID? = null,
+
+    @SerializedName("sucursalId")
+    val sucursalId: java.util.UUID? = null,
 
     @SerializedName("empresaNombre")
     val empresaNombre: kotlin.String? = null,

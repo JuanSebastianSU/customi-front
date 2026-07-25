@@ -12,13 +12,14 @@ import com.costumi.apiclient.apis.EmpleadoControllerApi
 import com.costumi.apiclient.apis.PermisosEmpleadoControllerApi
 import com.costumi.apiclient.apis.SucursalControllerApi
 import com.costumi.apiclient.models.ActividadResponse
-import com.costumi.apiclient.models.AltaDeEmpleadoRequest
 import com.costumi.apiclient.models.AsignarSucursalesRequest
 import com.costumi.apiclient.models.CambiarRolRequest
+import com.costumi.apiclient.models.CapacidadDto
 import com.costumi.apiclient.models.EmpleadoDetalleResponse
 import com.costumi.apiclient.models.EmpleadoResponse
 import com.costumi.apiclient.models.EstablecerPermisoRequest
-import com.costumi.apiclient.models.PermisoDto
+import com.costumi.apiclient.models.InvitacionResponse
+import com.costumi.apiclient.models.InvitarEmpleadoRequest
 import com.costumi.apiclient.models.SucursalResponse
 import com.google.gson.Gson
 import kotlinx.coroutines.withContext
@@ -43,9 +44,16 @@ class EmpleadoRepository @Inject constructor(
                 .mapear { it.contenido.orEmpty() }
         }
 
-    suspend fun crear(email: String, password: String, rol: AltaDeEmpleadoRequest.Rol): RespuestaRed<EmpleadoResponse> =
+    /** Alta = invitación (Fase B): invita por email; el enlace de aceptación viene en la respuesta. */
+    suspend fun invitar(
+        email: String,
+        rol: InvitarEmpleadoRequest.Rol,
+        sucursalIds: List<UUID> = emptyList(),
+    ): RespuestaRed<InvitacionResponse> =
         withContext(dispatchers.io) {
-            ejecutarLlamada(gson) { empleadoApi.crear4(AltaDeEmpleadoRequest(rol = rol, email = email, password = password)) }
+            ejecutarLlamada(gson) {
+                empleadoApi.invitar(InvitarEmpleadoRequest(email = email, rol = rol, sucursalIds = sucursalIds))
+            }
         }
 
     suspend fun cambiarRol(id: UUID, rol: CambiarRolRequest.Rol): RespuestaRed<EmpleadoResponse> =
@@ -60,17 +68,16 @@ class EmpleadoRepository @Inject constructor(
     suspend fun asignarSucursales(id: UUID, sucursalIds: List<UUID>): RespuestaRed<List<UUID>> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.asignarSucursales(id, AsignarSucursalesRequest(sucursalIds)) } }
 
-    /** Matriz de permisos del empleado (sección × acción VER/ACCION, con concedido). */
-    suspend fun permisos(id: UUID): RespuestaRed<List<PermisoDto>> =
+    /** Matriz de capacidades del empleado (catálogo completo con `concedido`), Fase B paso 5. */
+    suspend fun permisos(id: UUID): RespuestaRed<List<CapacidadDto>> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { permisosApi.matriz(id) } }
 
     suspend fun establecerPermiso(
         id: UUID,
-        seccion: EstablecerPermisoRequest.Seccion,
-        accion: EstablecerPermisoRequest.Accion,
+        capacidad: EstablecerPermisoRequest.Capacidad,
         concedido: Boolean,
     ): RespuestaRed<Unit> = withContext(dispatchers.io) {
-        ejecutarLlamada(gson) { permisosApi.establecer(id, EstablecerPermisoRequest(seccion, accion, concedido)) }
+        ejecutarLlamada(gson) { permisosApi.establecer(id, EstablecerPermisoRequest(capacidad, concedido)) }
     }
 
     /** Actividad del empleado (ventas y total vendido). */

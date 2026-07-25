@@ -16,6 +16,7 @@ import com.costumi.apiclient.models.ResultadoDePrueba
 
 interface NotificacionControllerApi {
     /**
+     * POST api/v1/notificaciones/avisar-stock-bajo
      * 
      * 
      * Responses:
@@ -28,6 +29,7 @@ interface NotificacionControllerApi {
     suspend fun avisarStockBajo(): Response<RecordatorioResponse>
 
     /**
+     * POST api/v1/notificaciones
      * 
      * 
      * Responses:
@@ -41,6 +43,7 @@ interface NotificacionControllerApi {
     suspend fun enviar(@Body enviarNotificacionRequest: EnviarNotificacionRequest): Response<NotificacionResponse>
 
     /**
+     * GET api/v1/notificaciones/estado-canales
      * 
      * 
      * Responses:
@@ -53,6 +56,7 @@ interface NotificacionControllerApi {
     suspend fun estadoDeCanales(): Response<EstadoDeCanales>
 
     /**
+     * GET api/v1/notificaciones
      * 
      * 
      * Responses:
@@ -68,6 +72,7 @@ interface NotificacionControllerApi {
     suspend fun listar7(@Query("buscar") buscar: kotlin.String? = null, @Query("pagina") pagina: kotlin.Int? = null, @Query("tamano") tamano: kotlin.Int? = null): Response<RespuestaPaginadaNotificacionResponse>
 
     /**
+     * POST api/v1/notificaciones/probar-push/{clienteId}
      * 
      * 
      * Responses:
@@ -81,6 +86,7 @@ interface NotificacionControllerApi {
     suspend fun probarPush(@Path("clienteId") clienteId: java.util.UUID): Response<ResultadoDePrueba>
 
     /**
+     * POST api/v1/notificaciones/recordar-proximas
      * 
      * 
      * Responses:
@@ -93,6 +99,7 @@ interface NotificacionControllerApi {
     suspend fun recordarProximas(): Response<RecordatorioResponse>
 
     /**
+     * POST api/v1/notificaciones/recordar-vencidas
      * 
      * 
      * Responses:

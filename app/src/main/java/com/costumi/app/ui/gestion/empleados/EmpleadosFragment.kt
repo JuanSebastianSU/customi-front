@@ -15,7 +15,7 @@ import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.alBuscar
 import com.costumi.app.ui.observar
-import com.costumi.apiclient.models.AltaDeEmpleadoRequest
+import com.costumi.apiclient.models.InvitarEmpleadoRequest
 import com.costumi.apiclient.models.CambiarRolRequest
 import com.costumi.apiclient.models.EmpleadoDetalleResponse
 import com.costumi.apiclient.models.SucursalResponse
@@ -60,8 +60,23 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
                 is EventoEmpleado.Info -> mostrarMensaje(evento.mensaje)
                 is EventoEmpleado.Error -> mostrarMensaje(evento.mensaje)
                 is EventoEmpleado.Actividad -> mostrarActividad(evento)
+                is EventoEmpleado.Invitacion -> mostrarInvitacion(evento)
             }
         }
+    }
+
+    /** Muestra el enlace de invitación para compartir (copiar al portapapeles). */
+    private fun mostrarInvitacion(inv: EventoEmpleado.Invitacion) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Invitación a ${inv.email}")
+            .setMessage("Compartí este enlace para que acepte y se una:\n\n${inv.enlace}")
+            .setPositiveButton("Copiar enlace") { _, _ ->
+                val cb = requireContext().getSystemService(android.content.ClipboardManager::class.java)
+                cb?.setPrimaryClip(android.content.ClipData.newPlainText("Invitación Costumi", inv.enlace))
+                mostrarMensaje("Enlace copiado")
+            }
+            .setNegativeButton("Cerrar", null)
+            .show()
     }
 
     private fun mostrarActividad(a: EventoEmpleado.Actividad) {
@@ -95,15 +110,13 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
         d.dropRol.setSimpleItems(roles.map { it.first }.toTypedArray())
         d.dropRol.setText(roles.first().first, false)
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Nuevo empleado")
+            .setTitle("Invitar empleado")
             .setView(d.root)
-            .setPositiveButton("Dar de alta") { _, _ ->
+            .setPositiveButton("Invitar") { _, _ ->
                 val email = d.editEmail.text?.toString()?.trim().orEmpty()
-                val pass = d.editPassword.text?.toString().orEmpty()
                 if (email.isBlank() || !email.contains("@")) { mostrarMensaje("Correo invalido"); return@setPositiveButton }
-                if (pass.length < 6) { mostrarMensaje("La contrasena debe tener al menos 6 caracteres"); return@setPositiveButton }
                 val rol = roles.firstOrNull { it.first == d.dropRol.text?.toString() }?.second ?: roles.first().second
-                vm.crear(email, pass, AltaDeEmpleadoRequest.Rol.valueOf(rol))
+                vm.invitar(email, InvitarEmpleadoRequest.Rol.valueOf(rol))
             }
             .setNegativeButton("Cancelar", null)
             .show()

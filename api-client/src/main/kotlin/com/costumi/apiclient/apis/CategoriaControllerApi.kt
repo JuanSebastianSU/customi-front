@@ -13,6 +13,7 @@ import com.costumi.apiclient.models.RenombrarRequest
 
 interface CategoriaControllerApi {
     /**
+     * POST api/v1/categorias/{id}/activar
      * 
      * 
      * Responses:
@@ -26,6 +27,7 @@ interface CategoriaControllerApi {
     suspend fun activar6(@Path("id") id: java.util.UUID): Response<CategoriaResponse>
 
     /**
+     * POST api/v1/categorias/{id}/archivar
      * 
      * 
      * Responses:
@@ -39,6 +41,7 @@ interface CategoriaControllerApi {
     suspend fun archivar5(@Path("id") id: java.util.UUID): Response<CategoriaResponse>
 
     /**
+     * POST api/v1/categorias
      * 
      * 
      * Responses:
@@ -49,9 +52,10 @@ interface CategoriaControllerApi {
      * @return [CategoriaResponse]
      */
     @POST("api/v1/categorias")
-    suspend fun crear8(@Body crearCategoriaRequest: CrearCategoriaRequest): Response<CategoriaResponse>
+    suspend fun crear7(@Body crearCategoriaRequest: CrearCategoriaRequest): Response<CategoriaResponse>
 
     /**
+     * GET api/v1/categorias
      * 
      * 
      * Responses:
@@ -64,6 +68,7 @@ interface CategoriaControllerApi {
     suspend fun listar15(): Response<kotlin.collections.List<CategoriaResponse>>
 
     /**
+     * PATCH api/v1/categorias/{id}
      * 
      * 
      * Responses:

@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -33,6 +41,7 @@ import com.google.gson.annotations.SerializedName
  * @param tasaImpuesto 
  * @param baseImponible 
  * @param impuesto 
+ * @param pendiente 
  */
 
 
@@ -66,7 +75,10 @@ data class ComprobanteResponse (
     val baseImponible: java.math.BigDecimal? = null,
 
     @SerializedName("impuesto")
-    val impuesto: java.math.BigDecimal? = null
+    val impuesto: java.math.BigDecimal? = null,
+
+    @SerializedName("pendiente")
+    val pendiente: java.math.BigDecimal? = null
 
 ) {
 

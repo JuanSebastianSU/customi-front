@@ -37,7 +37,7 @@ class TaxonomiaRepository @Inject constructor(
 
     suspend fun crearCategoria(nombre: String): RespuestaRed<CategoriaResponse> =
         withContext(dispatchers.io) {
-            ejecutarLlamada(gson) { categoriaApi.crear8(CrearCategoriaRequest(nombre)) }
+            ejecutarLlamada(gson) { categoriaApi.crear7(CrearCategoriaRequest(nombre)) }
         }
 
     suspend fun renombrarCategoria(id: UUID, nombre: String): RespuestaRed<CategoriaResponse> =

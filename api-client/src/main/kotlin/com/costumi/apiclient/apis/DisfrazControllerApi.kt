@@ -6,6 +6,7 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.google.gson.annotations.SerializedName
 
+import com.costumi.apiclient.models.ConteoPorPrendaResponse
 import com.costumi.apiclient.models.CrearDisfrazRequest
 import com.costumi.apiclient.models.DisfrazResponse
 import com.costumi.apiclient.models.DisponibilidadResponse
@@ -21,6 +22,7 @@ import com.costumi.apiclient.models.VenderVariosDisfracesRequest
 
 interface DisfrazControllerApi {
     /**
+     * POST api/v1/disfraces/{disfrazId}/activar
      * 
      * 
      * Responses:
@@ -34,6 +36,7 @@ interface DisfrazControllerApi {
     suspend fun activar3(@Path("disfrazId") disfrazId: java.util.UUID): Response<DisfrazResponse>
 
     /**
+     * POST api/v1/disfraces/{disfrazId}/archivar
      * 
      * 
      * Responses:
@@ -47,6 +50,21 @@ interface DisfrazControllerApi {
     suspend fun archivar2(@Path("disfrazId") disfrazId: java.util.UUID): Response<DisfrazResponse>
 
     /**
+     * GET api/v1/disfraces/conteo-por-prenda/{prendaId}
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @param prendaId 
+     * @return [ConteoPorPrendaResponse]
+     */
+    @GET("api/v1/disfraces/conteo-por-prenda/{prendaId}")
+    suspend fun conteoPorPrenda(@Path("prendaId") prendaId: java.util.UUID): Response<ConteoPorPrendaResponse>
+
+    /**
+     * POST api/v1/disfraces
      * 
      * 
      * Responses:
@@ -57,9 +75,10 @@ interface DisfrazControllerApi {
      * @return [DisfrazResponse]
      */
     @POST("api/v1/disfraces")
-    suspend fun crear5(@Body crearDisfrazRequest: CrearDisfrazRequest): Response<DisfrazResponse>
+    suspend fun crear4(@Body crearDisfrazRequest: CrearDisfrazRequest): Response<DisfrazResponse>
 
     /**
+     * GET api/v1/disfraces/{disfrazId}/disponibilidad
      * 
      * 
      * Responses:
@@ -74,6 +93,7 @@ interface DisfrazControllerApi {
     suspend fun disponibilidad(@Path("disfrazId") disfrazId: java.util.UUID, @Query("empresaId") empresaId: java.util.UUID? = null): Response<DisponibilidadResponse>
 
     /**
+     * PUT api/v1/disfraces/{disfrazId}
      * 
      * 
      * Responses:
@@ -88,6 +108,7 @@ interface DisfrazControllerApi {
     suspend fun editar1(@Path("disfrazId") disfrazId: java.util.UUID, @Body crearDisfrazRequest: CrearDisfrazRequest): Response<DisfrazResponse>
 
     /**
+     * GET api/v1/disfraces
      * 
      * 
      * Responses:
@@ -104,6 +125,7 @@ interface DisfrazControllerApi {
     suspend fun listar11(@Query("categoriaId") categoriaId: java.util.UUID? = null, @Query("buscar") buscar: kotlin.String? = null, @Query("pagina") pagina: kotlin.Int? = null, @Query("tamano") tamano: kotlin.Int? = null): Response<RespuestaPaginadaDisfrazResponse>
 
     /**
+     * POST api/v1/disfraces/{disfrazId}/rentar
      * 
      * 
      * Responses:
@@ -118,6 +140,7 @@ interface DisfrazControllerApi {
     suspend fun rentar(@Path("disfrazId") disfrazId: java.util.UUID, @Body rentarDisfrazRequest: RentarDisfrazRequest): Response<RentarDisfrazResponse>
 
     /**
+     * POST api/v1/disfraces/rentar-varios
      * 
      * 
      * Responses:
@@ -131,6 +154,7 @@ interface DisfrazControllerApi {
     suspend fun rentarVarios(@Body rentarVariosDisfracesRequest: RentarVariosDisfracesRequest): Response<RentarDisfrazResponse>
 
     /**
+     * POST api/v1/disfraces/{disfrazId}/foto
      * 
      * 
      * Responses:
@@ -142,9 +166,10 @@ interface DisfrazControllerApi {
      * @return [DisfrazResponse]
      */
     @POST("api/v1/disfraces/{disfrazId}/foto")
-    suspend fun subirFoto1(@Path("disfrazId") disfrazId: java.util.UUID, @Body subirFotoRequest: SubirFotoRequest? = null): Response<DisfrazResponse>
+    suspend fun subirFoto3(@Path("disfrazId") disfrazId: java.util.UUID, @Body subirFotoRequest: SubirFotoRequest? = null): Response<DisfrazResponse>
 
     /**
+     * POST api/v1/disfraces/{disfrazId}/vender
      * 
      * 
      * Responses:
@@ -159,6 +184,7 @@ interface DisfrazControllerApi {
     suspend fun vender(@Path("disfrazId") disfrazId: java.util.UUID, @Body venderDisfrazRequest: VenderDisfrazRequest): Response<VenderDisfrazResponse>
 
     /**
+     * POST api/v1/disfraces/vender-varios
      * 
      * 
      * Responses:

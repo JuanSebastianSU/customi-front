@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -32,6 +40,7 @@ import com.google.gson.annotations.SerializedName
  * @param archivada 
  * @param saldoPendiente 
  * @param multaTotal 
+ * @param tieneRentaEnCurso 
  */
 
 
@@ -68,7 +77,10 @@ data class ClienteResponse (
     val saldoPendiente: java.math.BigDecimal? = null,
 
     @SerializedName("multaTotal")
-    val multaTotal: java.math.BigDecimal? = null
+    val multaTotal: java.math.BigDecimal? = null,
+
+    @SerializedName("tieneRentaEnCurso")
+    val tieneRentaEnCurso: kotlin.Boolean? = null
 
 ) {
 

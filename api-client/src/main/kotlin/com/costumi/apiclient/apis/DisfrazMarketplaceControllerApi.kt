@@ -13,6 +13,7 @@ import com.costumi.apiclient.models.SlotOpcionesResponse
 
 interface DisfrazMarketplaceControllerApi {
     /**
+     * GET api/v1/marketplace/empresas/{empresaId}/disfraces/{disfrazId}
      * 
      * 
      * Responses:
@@ -27,6 +28,7 @@ interface DisfrazMarketplaceControllerApi {
     suspend fun detalle(@Path("empresaId") empresaId: java.util.UUID, @Path("disfrazId") disfrazId: java.util.UUID): Response<DisfrazDetalleResponse>
 
     /**
+     * GET api/v1/marketplace/empresas/{empresaId}/disfraces
      * 
      * 
      * Responses:
@@ -40,6 +42,7 @@ interface DisfrazMarketplaceControllerApi {
     suspend fun listar18(@Path("empresaId") empresaId: java.util.UUID): Response<kotlin.collections.List<DisfrazResponse>>
 
     /**
+     * GET api/v1/marketplace/empresas/{empresaId}/disfraces/{disfrazId}/slots/{orden}/opciones
      * 
      * 
      * Responses:

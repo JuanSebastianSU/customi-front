@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -26,6 +34,7 @@ import com.google.gson.annotations.SerializedName
  * @param nombre 
  * @param telefono 
  * @param nombreParaMostrar 
+ * @param fotoUrl 
  * @param rol 
  * @param empresaId 
  */
@@ -47,6 +56,9 @@ data class PerfilResponse (
 
     @SerializedName("nombreParaMostrar")
     val nombreParaMostrar: kotlin.String? = null,
+
+    @SerializedName("fotoUrl")
+    val fotoUrl: kotlin.String? = null,
 
     @SerializedName("rol")
     val rol: kotlin.String? = null,

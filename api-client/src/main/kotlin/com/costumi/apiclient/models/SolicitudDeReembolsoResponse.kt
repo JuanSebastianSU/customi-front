@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -25,6 +33,7 @@ import com.google.gson.annotations.SerializedName
  * @param tipoConcepto 
  * @param conceptoId 
  * @param solicitanteClienteId 
+ * @param solicitanteNombre 
  * @param monto 
  * @param motivoSolicitud 
  * @param estado 
@@ -49,6 +58,9 @@ data class SolicitudDeReembolsoResponse (
 
     @SerializedName("solicitanteClienteId")
     val solicitanteClienteId: java.util.UUID? = null,
+
+    @SerializedName("solicitanteNombre")
+    val solicitanteNombre: kotlin.String? = null,
 
     @SerializedName("monto")
     val monto: java.math.BigDecimal? = null,

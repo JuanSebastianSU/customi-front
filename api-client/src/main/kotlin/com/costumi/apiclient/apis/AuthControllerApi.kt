@@ -17,6 +17,7 @@ import com.costumi.apiclient.models.UsuarioActualResponse
 
 interface AuthControllerApi {
     /**
+     * POST api/v1/auth/login
      * 
      * 
      * Responses:
@@ -30,6 +31,7 @@ interface AuthControllerApi {
     suspend fun login(@Body loginRequest: LoginRequest): Response<TokenResponse>
 
     /**
+     * POST api/v1/auth/logout
      * 
      * 
      * Responses:
@@ -43,6 +45,7 @@ interface AuthControllerApi {
     suspend fun logout(@Body refreshRequest: RefreshRequest): Response<Unit>
 
     /**
+     * GET api/v1/auth/me
      * 
      * 
      * Responses:
@@ -55,6 +58,7 @@ interface AuthControllerApi {
     suspend fun me(): Response<UsuarioActualResponse>
 
     /**
+     * POST api/v1/auth/olvide
      * 
      * 
      * Responses:
@@ -68,6 +72,7 @@ interface AuthControllerApi {
     suspend fun olvide(@Body olvideRequest: OlvideRequest): Response<Unit>
 
     /**
+     * POST api/v1/auth/refresh
      * 
      * 
      * Responses:
@@ -81,6 +86,7 @@ interface AuthControllerApi {
     suspend fun refrescar(@Body refreshRequest: RefreshRequest): Response<TokenResponse>
 
     /**
+     * POST api/v1/auth/registro
      * 
      * 
      * Responses:
@@ -94,6 +100,7 @@ interface AuthControllerApi {
     suspend fun registro(@Body registroRequest: RegistroRequest): Response<TokenResponse>
 
     /**
+     * POST api/v1/auth/restablecer
      * 
      * 
      * Responses:

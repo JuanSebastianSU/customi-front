@@ -13,6 +13,7 @@ import com.costumi.apiclient.models.RespuestaPaginadaDevolucionResponse
 
 interface DevolucionControllerApi {
     /**
+     * GET api/v1/devoluciones
      * 
      * 
      * Responses:
@@ -28,6 +29,7 @@ interface DevolucionControllerApi {
     suspend fun listar13(@Query("buscar") buscar: kotlin.String? = null, @Query("pagina") pagina: kotlin.Int? = null, @Query("tamano") tamano: kotlin.Int? = null): Response<RespuestaPaginadaDevolucionResponse>
 
     /**
+     * POST api/v1/devoluciones
      * 
      * 
      * Responses:

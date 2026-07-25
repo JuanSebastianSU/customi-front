@@ -21,6 +21,7 @@ import com.costumi.apiclient.models.WebhookPagoRequest
 
 interface PagoControllerApi {
     /**
+     * GET api/v1/pagos/comprobante
      * 
      * 
      * Responses:
@@ -34,6 +35,7 @@ interface PagoControllerApi {
     suspend fun comprobante(@Query("conceptoId") conceptoId: java.util.UUID): Response<ComprobanteResponse>
 
     /**
+     * GET api/v1/pagos/comprobante.pdf
      * 
      * 
      * Responses:
@@ -47,6 +49,7 @@ interface PagoControllerApi {
     suspend fun comprobantePdf(@Query("conceptoId") conceptoId: java.util.UUID): Response<kotlin.ByteArray>
 
     /**
+     * GET api/v1/pagos/deposito
      * 
      * 
      * Responses:
@@ -60,6 +63,7 @@ interface PagoControllerApi {
     suspend fun deposito(@Query("conceptoId") conceptoId: java.util.UUID): Response<EstadoDeposito>
 
     /**
+     * POST api/v1/pagos/intento
      * 
      * 
      * Responses:
@@ -73,6 +77,7 @@ interface PagoControllerApi {
     suspend fun intento(@Body intentoDePagoRequest: IntentoDePagoRequest): Response<IntentoDePagoResponse>
 
     /**
+     * POST api/v1/pagos/intento/cliente
      * 
      * 
      * Responses:
@@ -86,6 +91,7 @@ interface PagoControllerApi {
     suspend fun intentoDeCliente(@Body intentoDePagoDeClienteRequest: IntentoDePagoDeClienteRequest): Response<IntentoDePagoResponse>
 
     /**
+     * GET api/v1/pagos
      * 
      * 
      * Responses:
@@ -99,6 +105,7 @@ interface PagoControllerApi {
     suspend fun listar6(@Query("conceptoId") conceptoId: java.util.UUID): Response<kotlin.collections.List<PagoResponse>>
 
     /**
+     * POST api/v1/pagos
      * 
      * 
      * Responses:
@@ -112,6 +119,7 @@ interface PagoControllerApi {
     suspend fun registrar1(@Body registrarPagoRequest: RegistrarPagoRequest): Response<PagoResponse>
 
     /**
+     * POST api/v1/pagos/mixto
      * 
      * 
      * Responses:
@@ -125,6 +133,7 @@ interface PagoControllerApi {
     suspend fun registrarMixto(@Body registrarCobroMixtoRequest: RegistrarCobroMixtoRequest): Response<CobroMixtoResponse>
 
     /**
+     * GET api/v1/pagos/saldo
      * 
      * 
      * Responses:
@@ -138,6 +147,7 @@ interface PagoControllerApi {
     suspend fun saldo(@Query("conceptoId") conceptoId: java.util.UUID): Response<SaldoResponse>
 
     /**
+     * POST api/v1/pagos/webhook
      * 
      * 
      * Responses:

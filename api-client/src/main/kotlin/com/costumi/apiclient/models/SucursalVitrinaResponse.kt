@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -24,6 +32,11 @@ import com.google.gson.annotations.SerializedName
  * @param id 
  * @param nombre 
  * @param direccion 
+ * @param ubicacionMaps 
+ * @param descripcion 
+ * @param latitud 
+ * @param longitud 
+ * @param fotoUrl 
  */
 
 
@@ -36,7 +49,22 @@ data class SucursalVitrinaResponse (
     val nombre: kotlin.String? = null,
 
     @SerializedName("direccion")
-    val direccion: kotlin.String? = null
+    val direccion: kotlin.String? = null,
+
+    @SerializedName("ubicacionMaps")
+    val ubicacionMaps: kotlin.String? = null,
+
+    @SerializedName("descripcion")
+    val descripcion: kotlin.String? = null,
+
+    @SerializedName("latitud")
+    val latitud: kotlin.Double? = null,
+
+    @SerializedName("longitud")
+    val longitud: kotlin.Double? = null,
+
+    @SerializedName("fotoUrl")
+    val fotoUrl: kotlin.String? = null
 
 ) {
 

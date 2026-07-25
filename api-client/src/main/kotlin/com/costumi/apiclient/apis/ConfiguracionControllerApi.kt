@@ -12,6 +12,7 @@ import com.costumi.apiclient.models.ProblemDetail
 
 interface ConfiguracionControllerApi {
     /**
+     * PUT api/v1/configuracion
      * 
      * 
      * Responses:
@@ -25,6 +26,7 @@ interface ConfiguracionControllerApi {
     suspend fun actualizar2(@Body configuracionRequest: ConfiguracionRequest): Response<ConfiguracionResponse>
 
     /**
+     * GET api/v1/configuracion/export
      * 
      * 
      * Responses:
@@ -37,6 +39,7 @@ interface ConfiguracionControllerApi {
     suspend fun exportar(): Response<ConfiguracionResponse>
 
     /**
+     * POST api/v1/configuracion/import
      * 
      * 
      * Responses:
@@ -50,6 +53,7 @@ interface ConfiguracionControllerApi {
     suspend fun importar(@Body configuracionRequest: ConfiguracionRequest): Response<ConfiguracionResponse>
 
     /**
+     * GET api/v1/configuracion
      * 
      * 
      * Responses:

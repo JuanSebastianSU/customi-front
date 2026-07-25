@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -31,6 +39,8 @@ import com.google.gson.annotations.SerializedName
  * @param corte 
  * @param diferenciaEfectivo 
  * @param movimientos 
+ * @param abiertoEn 
+ * @param cerradoEn 
  */
 
 
@@ -61,7 +71,13 @@ data class TurnoResponse (
     val diferenciaEfectivo: java.math.BigDecimal? = null,
 
     @SerializedName("movimientos")
-    val movimientos: kotlin.collections.List<MovimientoResponse>? = null
+    val movimientos: kotlin.collections.List<MovimientoResponse>? = null,
+
+    @SerializedName("abiertoEn")
+    val abiertoEn: java.time.OffsetDateTime? = null,
+
+    @SerializedName("cerradoEn")
+    val cerradoEn: java.time.OffsetDateTime? = null
 
 ) {
 

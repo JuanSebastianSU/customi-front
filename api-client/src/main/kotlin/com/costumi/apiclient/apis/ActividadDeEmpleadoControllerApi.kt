@@ -11,6 +11,7 @@ import com.costumi.apiclient.models.ProblemDetail
 
 interface ActividadDeEmpleadoControllerApi {
     /**
+     * GET api/v1/empleados/{usuarioId}/actividad
      * 
      * 
      * Responses:

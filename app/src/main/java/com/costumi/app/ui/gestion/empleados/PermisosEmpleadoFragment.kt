@@ -19,7 +19,7 @@ class PermisosEmpleadoFragment : Fragment(R.layout.fragment_permisos_empleado) {
     private val vm: PermisosEmpleadoViewModel by viewModels()
     private var _binding: FragmentPermisosEmpleadoBinding? = null
     private val binding get() = _binding!!
-    private val adapter = PermisoAdapter { seccion, esVer, concedido -> vm.establecer(seccion.seccion, esVer, concedido) }
+    private val adapter = PermisoAdapter { clave, concedido -> vm.establecer(clave, concedido) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentPermisosEmpleadoBinding.bind(view)

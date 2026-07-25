@@ -10,9 +10,11 @@ import com.costumi.apiclient.models.ActualizarPerfilRequest
 import com.costumi.apiclient.models.CambiarContrasenaRequest
 import com.costumi.apiclient.models.PerfilResponse
 import com.costumi.apiclient.models.ProblemDetail
+import com.costumi.apiclient.models.SubirFotoRequest
 
 interface PerfilControllerApi {
     /**
+     * PUT api/v1/perfil
      * 
      * 
      * Responses:
@@ -26,6 +28,7 @@ interface PerfilControllerApi {
     suspend fun actualizar(@Body actualizarPerfilRequest: ActualizarPerfilRequest): Response<PerfilResponse>
 
     /**
+     * POST api/v1/perfil/contrasena
      * 
      * 
      * Responses:
@@ -39,6 +42,21 @@ interface PerfilControllerApi {
     suspend fun cambiarContrasena(@Body cambiarContrasenaRequest: CambiarContrasenaRequest): Response<Unit>
 
     /**
+     * POST api/v1/perfil/foto
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @param subirFotoRequest  (optional)
+     * @return [PerfilResponse]
+     */
+    @POST("api/v1/perfil/foto")
+    suspend fun subirFoto1(@Body subirFotoRequest: SubirFotoRequest? = null): Response<PerfilResponse>
+
+    /**
+     * GET api/v1/perfil
      * 
      * 
      * Responses:

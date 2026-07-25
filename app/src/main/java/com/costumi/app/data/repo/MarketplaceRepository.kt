@@ -51,7 +51,7 @@ class MarketplaceRepository @Inject constructor(
         when (val r = ejecutarLlamada(gson) { api.empresas(filtro) }) {
             is RespuestaRed.Fallo -> r
             is RespuestaRed.Exito -> {
-                empresaDao.reemplazar(r.data.mapNotNull { it.aEntity() })
+                empresaDao.reemplazar(r.data.contenido.orEmpty().mapNotNull { it.aEntity() })
                 RespuestaRed.Exito(Unit)
             }
         }
@@ -65,7 +65,7 @@ class MarketplaceRepository @Inject constructor(
     suspend fun buscarEmpresas(texto: String): RespuestaRed<List<EmpresaEntity>> =
         withContext(dispatchers.io) {
             ejecutarLlamada(gson) { api.empresas(texto.trim()) }
-                .mapear { lista -> lista.mapNotNull { it.aEntity() } }
+                .mapear { pag -> pag.contenido.orEmpty().mapNotNull { it.aEntity() } }
         }
 
     /** Catalogo (prendas en vitrina) de una tienda; opcionalmente filtrado por categoria. */

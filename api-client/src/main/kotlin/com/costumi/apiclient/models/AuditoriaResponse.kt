@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -22,6 +30,7 @@ import com.google.gson.annotations.SerializedName
  * 
  *
  * @param id 
+ * @param actorUsuarioId 
  * @param accion 
  * @param detalle 
  * @param fecha 
@@ -32,6 +41,9 @@ data class AuditoriaResponse (
 
     @SerializedName("id")
     val id: java.util.UUID? = null,
+
+    @SerializedName("actorUsuarioId")
+    val actorUsuarioId: java.util.UUID? = null,
 
     @SerializedName("accion")
     val accion: kotlin.String? = null,

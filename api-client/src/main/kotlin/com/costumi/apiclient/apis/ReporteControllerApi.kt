@@ -8,10 +8,12 @@ import com.google.gson.annotations.SerializedName
 
 import com.costumi.apiclient.models.ArticuloRanking
 import com.costumi.apiclient.models.DepositosActivosResponse
+import com.costumi.apiclient.models.DevolucionesPorCerrarResponse
 import com.costumi.apiclient.models.DisfrazRanking
 import com.costumi.apiclient.models.EmpleadoVentas
 import com.costumi.apiclient.models.GananciaResponse
 import com.costumi.apiclient.models.GrupoInventario
+import com.costumi.apiclient.models.IngresoDelDia
 import com.costumi.apiclient.models.IngresosPorMetodo
 import com.costumi.apiclient.models.IngresosResponse
 import com.costumi.apiclient.models.ProblemDetail
@@ -21,6 +23,7 @@ import com.costumi.apiclient.models.ValorEtiquetaRanking
 
 interface ReporteControllerApi {
     /**
+     * GET api/v1/reportes/depositos-activos
      * 
      * 
      * Responses:
@@ -34,6 +37,21 @@ interface ReporteControllerApi {
     suspend fun depositosActivos(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<DepositosActivosResponse>
 
     /**
+     * GET api/v1/reportes/devoluciones-por-cerrar
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @param sucursalId  (optional)
+     * @return [DevolucionesPorCerrarResponse]
+     */
+    @GET("api/v1/reportes/devoluciones-por-cerrar")
+    suspend fun devolucionesPorCerrar(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<DevolucionesPorCerrarResponse>
+
+    /**
+     * GET api/v1/reportes/disfraces-mas-rentados
      * 
      * 
      * Responses:
@@ -50,6 +68,7 @@ interface ReporteControllerApi {
     suspend fun disfracesMasRentados(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("desde") desde: java.time.LocalDate? = null, @Query("hasta") hasta: java.time.LocalDate? = null, @Query("limite") limite: kotlin.Int? = 10): Response<kotlin.collections.List<DisfrazRanking>>
 
     /**
+     * GET api/v1/reportes/disfraces-mas-vendidos
      * 
      * 
      * Responses:
@@ -64,6 +83,7 @@ interface ReporteControllerApi {
     suspend fun disfracesMasVendidos(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("limite") limite: kotlin.Int? = 10): Response<kotlin.collections.List<DisfrazRanking>>
 
     /**
+     * GET api/v1/reportes/export/inventario-tablero.csv
      * 
      * 
      * Responses:
@@ -77,6 +97,7 @@ interface ReporteControllerApi {
     suspend fun exportInventarioTablero(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<kotlin.String>
 
     /**
+     * GET api/v1/reportes/export/inventario-tablero.pdf
      * 
      * 
      * Responses:
@@ -90,6 +111,7 @@ interface ReporteControllerApi {
     suspend fun exportInventarioTableroPdf(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<kotlin.ByteArray>
 
     /**
+     * GET api/v1/reportes/export/rentas-vencidas.csv
      * 
      * 
      * Responses:
@@ -103,6 +125,7 @@ interface ReporteControllerApi {
     suspend fun exportRentasVencidas(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<kotlin.String>
 
     /**
+     * GET api/v1/reportes/export/rentas-vencidas.pdf
      * 
      * 
      * Responses:
@@ -116,6 +139,7 @@ interface ReporteControllerApi {
     suspend fun exportRentasVencidasPdf(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<kotlin.ByteArray>
 
     /**
+     * GET api/v1/reportes/ganancia
      * 
      * 
      * Responses:
@@ -123,12 +147,15 @@ interface ReporteControllerApi {
      *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
      *
      * @param sucursalId  (optional)
+     * @param desde  (optional)
+     * @param hasta  (optional)
      * @return [GananciaResponse]
      */
     @GET("api/v1/reportes/ganancia")
-    suspend fun ganancia(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<GananciaResponse>
+    suspend fun ganancia(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("desde") desde: java.time.LocalDate? = null, @Query("hasta") hasta: java.time.LocalDate? = null): Response<GananciaResponse>
 
     /**
+     * GET api/v1/reportes/ingresos
      * 
      * 
      * Responses:
@@ -136,12 +163,31 @@ interface ReporteControllerApi {
      *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
      *
      * @param sucursalId  (optional)
+     * @param desde  (optional)
+     * @param hasta  (optional)
      * @return [IngresosResponse]
      */
     @GET("api/v1/reportes/ingresos")
-    suspend fun ingresos(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<IngresosResponse>
+    suspend fun ingresos(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("desde") desde: java.time.LocalDate? = null, @Query("hasta") hasta: java.time.LocalDate? = null): Response<IngresosResponse>
 
     /**
+     * GET api/v1/reportes/ingresos-por-dia
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @param sucursalId  (optional)
+     * @param desde  (optional)
+     * @param hasta  (optional)
+     * @return [kotlin.collections.List<IngresoDelDia>]
+     */
+    @GET("api/v1/reportes/ingresos-por-dia")
+    suspend fun ingresosPorDia(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("desde") desde: java.time.LocalDate? = null, @Query("hasta") hasta: java.time.LocalDate? = null): Response<kotlin.collections.List<IngresoDelDia>>
+
+    /**
+     * GET api/v1/reportes/ingresos-por-metodo
      * 
      * 
      * Responses:
@@ -157,6 +203,7 @@ interface ReporteControllerApi {
     suspend fun ingresosPorMetodo(@Query("desde") desde: java.time.LocalDate? = null, @Query("hasta") hasta: java.time.LocalDate? = null, @Query("sucursalId") sucursalId: java.util.UUID? = null): Response<IngresosPorMetodo>
 
     /**
+     * GET api/v1/reportes/mas-rentados
      * 
      * 
      * Responses:
@@ -173,6 +220,7 @@ interface ReporteControllerApi {
     suspend fun masRentados(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("desde") desde: java.time.LocalDate? = null, @Query("hasta") hasta: java.time.LocalDate? = null, @Query("limite") limite: kotlin.Int? = 10): Response<kotlin.collections.List<ArticuloRanking>>
 
     /**
+     * GET api/v1/reportes/mas-vendidos
      * 
      * 
      * Responses:
@@ -187,6 +235,23 @@ interface ReporteControllerApi {
     suspend fun masVendidos(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("limite") limite: kotlin.Int? = 10): Response<kotlin.collections.List<ArticuloRanking>>
 
     /**
+     * GET api/v1/reportes/rentas-por-dia
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @param sucursalId  (optional)
+     * @param desde  (optional)
+     * @param hasta  (optional)
+     * @return [kotlin.collections.List<IngresoDelDia>]
+     */
+    @GET("api/v1/reportes/rentas-por-dia")
+    suspend fun rentasPorDia(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("desde") desde: java.time.LocalDate? = null, @Query("hasta") hasta: java.time.LocalDate? = null): Response<kotlin.collections.List<IngresoDelDia>>
+
+    /**
+     * GET api/v1/reportes/rentas-vencidas
      * 
      * 
      * Responses:
@@ -200,6 +265,7 @@ interface ReporteControllerApi {
     suspend fun rentasVencidas(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<kotlin.collections.List<RentaVencidaResponse>>
 
     /**
+     * GET api/v1/reportes/inventario/resumen
      * 
      * 
      * Responses:
@@ -212,6 +278,7 @@ interface ReporteControllerApi {
     suspend fun resumenDeInventario(): Response<ResumenInventario>
 
     /**
+     * GET api/v1/reportes/inventario/tablero
      * 
      * 
      * Responses:
@@ -225,6 +292,23 @@ interface ReporteControllerApi {
     suspend fun tableroDeInventario(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<kotlin.collections.List<GrupoInventario>>
 
     /**
+     * GET api/v1/reportes/ventas-por-dia
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @param sucursalId  (optional)
+     * @param desde  (optional)
+     * @param hasta  (optional)
+     * @return [kotlin.collections.List<IngresoDelDia>]
+     */
+    @GET("api/v1/reportes/ventas-por-dia")
+    suspend fun ventasPorDia(@Query("sucursalId") sucursalId: java.util.UUID? = null, @Query("desde") desde: java.time.LocalDate? = null, @Query("hasta") hasta: java.time.LocalDate? = null): Response<kotlin.collections.List<IngresoDelDia>>
+
+    /**
+     * GET api/v1/reportes/ventas-por-empleado
      * 
      * 
      * Responses:
@@ -238,6 +322,7 @@ interface ReporteControllerApi {
     suspend fun ventasPorEmpleado(@Query("sucursalId") sucursalId: java.util.UUID? = null): Response<kotlin.collections.List<EmpleadoVentas>>
 
     /**
+     * GET api/v1/reportes/ventas-por-etiqueta
      * 
      * 
      * Responses:

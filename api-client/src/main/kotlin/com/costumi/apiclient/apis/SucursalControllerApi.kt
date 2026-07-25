@@ -9,10 +9,12 @@ import com.google.gson.annotations.SerializedName
 import com.costumi.apiclient.models.EditarSucursalRequest
 import com.costumi.apiclient.models.ProblemDetail
 import com.costumi.apiclient.models.RegistrarSucursalRequest
+import com.costumi.apiclient.models.SubirFotoRequest
 import com.costumi.apiclient.models.SucursalResponse
 
 interface SucursalControllerApi {
     /**
+     * POST api/v1/empresas/{empresaId}/sucursales/{id}/activar
      * 
      * 
      * Responses:
@@ -27,6 +29,7 @@ interface SucursalControllerApi {
     suspend fun activar1(@Path("empresaId") empresaId: java.util.UUID, @Path("id") id: java.util.UUID): Response<SucursalResponse>
 
     /**
+     * POST api/v1/empresas/{empresaId}/sucursales/{id}/archivar
      * 
      * 
      * Responses:
@@ -41,6 +44,7 @@ interface SucursalControllerApi {
     suspend fun archivar1(@Path("empresaId") empresaId: java.util.UUID, @Path("id") id: java.util.UUID): Response<SucursalResponse>
 
     /**
+     * PATCH api/v1/empresas/{empresaId}/sucursales/{id}
      * 
      * 
      * Responses:
@@ -56,6 +60,7 @@ interface SucursalControllerApi {
     suspend fun editar3(@Path("empresaId") empresaId: java.util.UUID, @Path("id") id: java.util.UUID, @Body editarSucursalRequest: EditarSucursalRequest): Response<SucursalResponse>
 
     /**
+     * GET api/v1/empresas/{empresaId}/sucursales
      * 
      * 
      * Responses:
@@ -69,6 +74,7 @@ interface SucursalControllerApi {
     suspend fun listar9(@Path("empresaId") empresaId: java.util.UUID): Response<kotlin.collections.List<SucursalResponse>>
 
     /**
+     * POST api/v1/empresas/{empresaId}/sucursales
      * 
      * 
      * Responses:
@@ -81,5 +87,21 @@ interface SucursalControllerApi {
      */
     @POST("api/v1/empresas/{empresaId}/sucursales")
     suspend fun registrar3(@Path("empresaId") empresaId: java.util.UUID, @Body registrarSucursalRequest: RegistrarSucursalRequest): Response<SucursalResponse>
+
+    /**
+     * POST api/v1/empresas/{empresaId}/sucursales/{id}/foto
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @param empresaId 
+     * @param id 
+     * @param subirFotoRequest  (optional)
+     * @return [SucursalResponse]
+     */
+    @POST("api/v1/empresas/{empresaId}/sucursales/{id}/foto")
+    suspend fun subirFoto2(@Path("empresaId") empresaId: java.util.UUID, @Path("id") id: java.util.UUID, @Body subirFotoRequest: SubirFotoRequest? = null): Response<SucursalResponse>
 
 }

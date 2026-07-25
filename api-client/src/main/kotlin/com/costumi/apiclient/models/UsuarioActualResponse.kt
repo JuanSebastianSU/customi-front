@@ -8,13 +8,22 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
 
+import com.costumi.apiclient.models.MembresiaActiva
 
 import com.google.gson.annotations.SerializedName
 
@@ -25,6 +34,7 @@ import com.google.gson.annotations.SerializedName
  * @param email 
  * @param rol 
  * @param empresaId 
+ * @param membresiaActiva 
  */
 
 
@@ -40,7 +50,10 @@ data class UsuarioActualResponse (
     val rol: kotlin.String? = null,
 
     @SerializedName("empresaId")
-    val empresaId: kotlin.String? = null
+    val empresaId: kotlin.String? = null,
+
+    @SerializedName("membresiaActiva")
+    val membresiaActiva: MembresiaActiva? = null
 
 ) {
 

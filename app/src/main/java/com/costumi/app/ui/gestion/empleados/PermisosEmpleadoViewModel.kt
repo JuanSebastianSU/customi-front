@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.UiState
 import com.costumi.app.data.repo.EmpleadoRepository
+import com.costumi.apiclient.models.CapacidadDto
 import com.costumi.apiclient.models.EstablecerPermisoRequest
-import com.costumi.apiclient.models.PermisoDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,15 +17,22 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
-/** Una sección con sus dos permisos (VER = puede ver la sección; ACCION = puede operar en ella). */
-data class PermisoSeccion(
-    val seccion: PermisoDto.Seccion,
-    val nombre: String,
-    val ver: Boolean,
-    val accion: Boolean,
-)
+/** Una fila de la matriz de permisos: un encabezado de sección o una capacidad con su toggle. */
+sealed interface PermisoFila {
+    val id: String
 
-/** Matriz de permisos de un empleado: sección × acción (VER/ACCION). */
+    /** Encabezado de una sección (agrupa sus capacidades). */
+    data class Encabezado(val nombre: String) : PermisoFila {
+        override val id: String get() = "H:$nombre"
+    }
+
+    /** Una capacidad configurable: qué habilita (descripción) y si está concedida. */
+    data class Capacidad(val clave: String, val descripcion: String, val concedido: Boolean) : PermisoFila {
+        override val id: String get() = clave
+    }
+}
+
+/** Matriz de capacidades de un empleado (Fase B, paso 5): catálogo agrupado por sección con un toggle c/u. */
 @HiltViewModel
 class PermisosEmpleadoViewModel @Inject constructor(
     private val repo: EmpleadoRepository,
@@ -35,7 +42,7 @@ class PermisosEmpleadoViewModel @Inject constructor(
     private val empleadoId: UUID = UUID.fromString(estado[PermisosEmpleadoFragment.ARG_ID]!!)
     val email: String = estado.get<String>(PermisosEmpleadoFragment.ARG_EMAIL) ?: "Empleado"
 
-    private val _estado = MutableStateFlow<UiState<List<PermisoSeccion>>>(UiState.Loading)
+    private val _estado = MutableStateFlow<UiState<List<PermisoFila>>>(UiState.Loading)
     val estado = _estado.asStateFlow()
 
     private val _error = MutableSharedFlow<String>(extraBufferCapacity = 1)
@@ -49,17 +56,17 @@ class PermisosEmpleadoViewModel @Inject constructor(
         viewModelScope.launch {
             _estado.value = UiState.Loading
             _estado.value = when (val r = repo.permisos(empleadoId)) {
-                is RespuestaRed.Exito -> UiState.Success(agrupar(r.data))
+                is RespuestaRed.Exito -> UiState.Success(aFilas(r.data))
                 is RespuestaRed.Fallo -> UiState.Error(r.error.mensaje) { cargar() }
             }
         }
     }
 
-    /** Setea un permiso (optimista; si falla, recarga para volver al estado real). */
-    fun establecer(seccion: PermisoDto.Seccion, esVer: Boolean, concedido: Boolean) {
+    /** Concede/niega una capacidad (optimista; si falla, recarga para volver al estado real). */
+    fun establecer(clave: String, concedido: Boolean) {
         viewModelScope.launch {
-            val accion = if (esVer) EstablecerPermisoRequest.Accion.VER else EstablecerPermisoRequest.Accion.ACCION
-            val r = repo.establecerPermiso(empleadoId, EstablecerPermisoRequest.Seccion.valueOf(seccion.value), accion, concedido)
+            val capacidad = runCatching { EstablecerPermisoRequest.Capacidad.valueOf(clave) }.getOrNull() ?: return@launch
+            val r = repo.establecerPermiso(empleadoId, capacidad, concedido)
             if (r is RespuestaRed.Fallo) {
                 _error.tryEmit(r.error.mensaje)
                 cargar()
@@ -67,33 +74,44 @@ class PermisosEmpleadoViewModel @Inject constructor(
         }
     }
 
-    private fun agrupar(dtos: List<PermisoDto>): List<PermisoSeccion> {
+    /** Aplana el catálogo en filas: por cada sección (en orden), un encabezado y sus capacidades. */
+    private fun aFilas(dtos: List<CapacidadDto>): List<PermisoFila> {
         val porSeccion = dtos.groupBy { it.seccion }
-        return ORDEN.mapNotNull { (seccion, nombre) ->
-            val entradas = porSeccion[seccion] ?: return@mapNotNull null
-            PermisoSeccion(
-                seccion = seccion,
-                nombre = nombre,
-                ver = entradas.firstOrNull { it.accion == PermisoDto.Accion.VER }?.concedido == true,
-                accion = entradas.firstOrNull { it.accion == PermisoDto.Accion.ACCION }?.concedido == true,
-            )
+        val filas = mutableListOf<PermisoFila>()
+        for ((seccion, nombre) in ORDEN) {
+            val caps = porSeccion[seccion].orEmpty()
+            if (caps.isEmpty()) continue
+            filas += PermisoFila.Encabezado(nombre)
+            caps.forEach { c ->
+                filas += PermisoFila.Capacidad(
+                    clave = c.capacidad.orEmpty(),
+                    descripcion = c.descripcion ?: c.capacidad.orEmpty(),
+                    concedido = c.concedido == true,
+                )
+            }
         }
+        return filas
     }
 
     private companion object {
         val ORDEN = listOf(
-            PermisoDto.Seccion.INVENTARIO to "Inventario",
-            PermisoDto.Seccion.DISFRACES to "Disfraces",
-            PermisoDto.Seccion.VENTAS to "Ventas",
-            PermisoDto.Seccion.RENTAS to "Rentas",
-            PermisoDto.Seccion.DEVOLUCIONES to "Devoluciones",
-            PermisoDto.Seccion.PAGOS to "Pagos",
-            PermisoDto.Seccion.CAJA to "Caja",
-            PermisoDto.Seccion.REPORTES to "Reportes",
-            PermisoDto.Seccion.CLIENTES to "Clientes",
-            PermisoDto.Seccion.CONFIGURACION to "Configuracion",
-            PermisoDto.Seccion.NOTIFICACIONES to "Notificaciones",
-            PermisoDto.Seccion.EMPLEADOS to "Empleados",
+            "INVENTARIO" to "Inventario",
+            "CATALOGO" to "Catálogo",
+            "DISFRACES" to "Disfraces",
+            "VENTAS" to "Ventas",
+            "RENTAS" to "Rentas",
+            "DEVOLUCIONES" to "Devoluciones",
+            "PAGOS" to "Pagos",
+            "CAJA" to "Caja",
+            "REEMBOLSOS" to "Reembolsos",
+            "CLIENTES" to "Clientes",
+            "REPORTES" to "Reportes",
+            "AUDITORIA" to "Auditoría",
+            "CONFIGURACION" to "Configuración",
+            "SUCURSALES" to "Sucursales",
+            "IDENTIDAD_TIENDA" to "Identidad de la tienda",
+            "NOTIFICACIONES" to "Notificaciones",
+            "EMPLEADOS" to "Personal",
         )
     }
 }

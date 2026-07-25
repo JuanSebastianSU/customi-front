@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -25,6 +33,12 @@ import com.google.gson.annotations.SerializedName
  * @param nombre 
  * @param estado 
  * @param fechaRegistro 
+ * @param descripcion 
+ * @param ciudad 
+ * @param ubicacion 
+ * @param contacto 
+ * @param logoUrl 
+ * @param portadaUrl 
  */
 
 
@@ -40,7 +54,25 @@ data class EmpresaResponse (
     val estado: kotlin.String? = null,
 
     @SerializedName("fechaRegistro")
-    val fechaRegistro: java.time.OffsetDateTime? = null
+    val fechaRegistro: java.time.OffsetDateTime? = null,
+
+    @SerializedName("descripcion")
+    val descripcion: kotlin.String? = null,
+
+    @SerializedName("ciudad")
+    val ciudad: kotlin.String? = null,
+
+    @SerializedName("ubicacion")
+    val ubicacion: kotlin.String? = null,
+
+    @SerializedName("contacto")
+    val contacto: kotlin.String? = null,
+
+    @SerializedName("logoUrl")
+    val logoUrl: kotlin.String? = null,
+
+    @SerializedName("portadaUrl")
+    val portadaUrl: kotlin.String? = null
 
 ) {
 

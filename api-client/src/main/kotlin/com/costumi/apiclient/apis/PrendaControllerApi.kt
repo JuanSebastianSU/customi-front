@@ -16,6 +16,7 @@ import com.costumi.apiclient.models.SubirFotoRequest
 
 interface PrendaControllerApi {
     /**
+     * POST api/v1/prendas/{id}/activar
      * 
      * 
      * Responses:
@@ -29,6 +30,7 @@ interface PrendaControllerApi {
     suspend fun activar(@Path("id") id: java.util.UUID): Response<PrendaResponse>
 
     /**
+     * POST api/v1/prendas/{id}/archivar
      * 
      * 
      * Responses:
@@ -42,6 +44,7 @@ interface PrendaControllerApi {
     suspend fun archivar(@Path("id") id: java.util.UUID): Response<PrendaResponse>
 
     /**
+     * GET api/v1/prendas/catalogo
      * 
      * 
      * Responses:
@@ -56,6 +59,7 @@ interface PrendaControllerApi {
     suspend fun catalogo(@Query("categoriaId") categoriaId: java.util.UUID? = null, @Query("etiqueta") etiqueta: @JvmSuppressWildcards kotlin.collections.List<kotlin.String>? = null): Response<kotlin.collections.List<PrendaDeCatalogoResponse>>
 
     /**
+     * POST api/v1/prendas
      * 
      * 
      * Responses:
@@ -69,6 +73,7 @@ interface PrendaControllerApi {
     suspend fun crear2(@Body crearPrendaRequest: CrearPrendaRequest): Response<PrendaResponse>
 
     /**
+     * PUT api/v1/prendas/{id}
      * 
      * 
      * Responses:
@@ -83,6 +88,7 @@ interface PrendaControllerApi {
     suspend fun editar(@Path("id") id: java.util.UUID, @Body editarPrendaRequest: EditarPrendaRequest): Response<PrendaResponse>
 
     /**
+     * GET api/v1/prendas
      * 
      * 
      * Responses:
@@ -98,6 +104,7 @@ interface PrendaControllerApi {
     suspend fun listar4(@Query("buscar") buscar: kotlin.String? = null, @Query("pagina") pagina: kotlin.Int? = null, @Query("tamano") tamano: kotlin.Int? = null): Response<RespuestaPaginadaPrendaResponse>
 
     /**
+     * POST api/v1/prendas/{id}/foto
      * 
      * 
      * Responses:

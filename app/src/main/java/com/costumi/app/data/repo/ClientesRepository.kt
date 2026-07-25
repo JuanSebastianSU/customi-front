@@ -38,7 +38,7 @@ class ClientesRepository @Inject constructor(
         ).flow
 
     suspend fun crear(req: CrearClienteRequest): RespuestaRed<ClienteResponse> =
-        withContext(dispatchers.io) { ejecutarLlamada(gson) { api.crear7(req) } }
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { api.crear6(req) } }
 
     suspend fun editar(id: UUID, req: EditarClienteRequest): RespuestaRed<ClienteResponse> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { api.editar2(id, req) } }

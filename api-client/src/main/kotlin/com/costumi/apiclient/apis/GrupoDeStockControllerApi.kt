@@ -16,6 +16,7 @@ import com.costumi.apiclient.models.TransferirStockRequest
 
 interface GrupoDeStockControllerApi {
     /**
+     * POST api/v1/grupos-stock/{grupoId}/ajuste
      * 
      * 
      * Responses:
@@ -30,6 +31,7 @@ interface GrupoDeStockControllerApi {
     suspend fun ajustar(@Path("grupoId") grupoId: java.util.UUID, @Body ajusteDeStockRequest: AjusteDeStockRequest): Response<GrupoDeStockResponse>
 
     /**
+     * POST api/v1/prendas/{prendaId}/grupos-stock
      * 
      * 
      * Responses:
@@ -44,6 +46,7 @@ interface GrupoDeStockControllerApi {
     suspend fun crear3(@Path("prendaId") prendaId: java.util.UUID, @Body crearGrupoDeStockRequest: CrearGrupoDeStockRequest): Response<GrupoDeStockResponse>
 
     /**
+     * DELETE api/v1/grupos-stock/{grupoId}
      * 
      * 
      * Responses:
@@ -57,6 +60,7 @@ interface GrupoDeStockControllerApi {
     suspend fun eliminar(@Path("grupoId") grupoId: java.util.UUID): Response<Unit>
 
     /**
+     * GET api/v1/prendas/{prendaId}/grupos-stock
      * 
      * 
      * Responses:
@@ -70,6 +74,7 @@ interface GrupoDeStockControllerApi {
     suspend fun listar5(@Path("prendaId") prendaId: java.util.UUID): Response<kotlin.collections.List<GrupoDeStockResponse>>
 
     /**
+     * POST api/v1/grupos-stock/{grupoId}/mover
      * 
      * 
      * Responses:
@@ -84,6 +89,7 @@ interface GrupoDeStockControllerApi {
     suspend fun mover(@Path("grupoId") grupoId: java.util.UUID, @Body moverUnidadesRequest: MoverUnidadesRequest): Response<GrupoDeStockResponse>
 
     /**
+     * POST api/v1/grupos-stock/{grupoId}/entrada
      * 
      * 
      * Responses:
@@ -98,6 +104,7 @@ interface GrupoDeStockControllerApi {
     suspend fun reabastecer(@Path("grupoId") grupoId: java.util.UUID, @Body entradaDeStockRequest: EntradaDeStockRequest): Response<GrupoDeStockResponse>
 
     /**
+     * GET api/v1/grupos-stock/stock-bajo
      * 
      * 
      * Responses:
@@ -111,6 +118,7 @@ interface GrupoDeStockControllerApi {
     suspend fun stockBajo(@Query("umbral") umbral: kotlin.Int? = 1): Response<kotlin.collections.List<GrupoDeStockResponse>>
 
     /**
+     * POST api/v1/grupos-stock/{grupoId}/transferir
      * 
      * 
      * Responses:

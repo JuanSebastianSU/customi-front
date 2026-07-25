@@ -12,10 +12,12 @@ import com.costumi.apiclient.models.CarritoResponse
 import com.costumi.apiclient.models.CheckoutRentaResponse
 import com.costumi.apiclient.models.CheckoutRequest
 import com.costumi.apiclient.models.CheckoutResponse
+import com.costumi.apiclient.models.EditarCantidadRequest
 import com.costumi.apiclient.models.ProblemDetail
 
 interface CarritoControllerApi {
     /**
+     * POST api/v1/carritos/items
      * 
      * 
      * Responses:
@@ -29,6 +31,7 @@ interface CarritoControllerApi {
     suspend fun agregarItem(@Body agregarItemRequest: AgregarItemRequest): Response<CarritoResponse>
 
     /**
+     * POST api/v1/carritos/checkout
      * 
      * 
      * Responses:
@@ -42,6 +45,7 @@ interface CarritoControllerApi {
     suspend fun checkout(@Body checkoutRequest: CheckoutRequest): Response<CheckoutResponse>
 
     /**
+     * POST api/v1/carritos/checkout-renta
      * 
      * 
      * Responses:
@@ -55,6 +59,22 @@ interface CarritoControllerApi {
     suspend fun checkoutRenta(@Body checkoutRequest: CheckoutRequest): Response<CheckoutRentaResponse>
 
     /**
+     * PUT api/v1/carritos/items/{lineaId}
+     * 
+     * 
+     * Responses:
+     *  - 200: OK
+     *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
+     *
+     * @param lineaId 
+     * @param editarCantidadRequest 
+     * @return [CarritoResponse]
+     */
+    @PUT("api/v1/carritos/items/{lineaId}")
+    suspend fun editarCantidad(@Path("lineaId") lineaId: java.util.UUID, @Body editarCantidadRequest: EditarCantidadRequest): Response<CarritoResponse>
+
+    /**
+     * GET api/v1/carritos/mios
      * 
      * 
      * Responses:
@@ -76,6 +96,7 @@ interface CarritoControllerApi {
     }
 
     /**
+     * GET api/v1/carritos
      * 
      * 
      * Responses:
@@ -101,6 +122,7 @@ interface CarritoControllerApi {
     }
 
     /**
+     * DELETE api/v1/carritos/items/{lineaId}
      * 
      * 
      * Responses:

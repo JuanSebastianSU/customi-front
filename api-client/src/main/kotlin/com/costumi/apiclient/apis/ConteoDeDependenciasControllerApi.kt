@@ -11,6 +11,7 @@ import com.costumi.apiclient.models.ProblemDetail
 
 interface ConteoDeDependenciasControllerApi {
     /**
+     * GET api/v1/categorias/{categoriaId}/prendas/conteo
      * 
      * 
      * Responses:
@@ -24,6 +25,7 @@ interface ConteoDeDependenciasControllerApi {
     suspend fun deCategoria(@Path("categoriaId") categoriaId: java.util.UUID): Response<ConteoDeDependenciasResponse>
 
     /**
+     * GET api/v1/tipos-etiqueta/{tipoId}/prendas/conteo
      * 
      * 
      * Responses:
@@ -37,6 +39,7 @@ interface ConteoDeDependenciasControllerApi {
     suspend fun deTipoEtiqueta(@Path("tipoId") tipoId: java.util.UUID): Response<ConteoDeDependenciasResponse>
 
     /**
+     * GET api/v1/tipos-etiqueta/{tipoId}/valores/{valorId}/prendas/conteo
      * 
      * 
      * Responses:

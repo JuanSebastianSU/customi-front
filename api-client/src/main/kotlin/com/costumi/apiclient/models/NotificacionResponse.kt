@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -23,6 +31,7 @@ import com.google.gson.annotations.SerializedName
  *
  * @param id 
  * @param clienteId 
+ * @param clienteNombre 
  * @param canal 
  * @param mensaje 
  * @param estado 
@@ -37,6 +46,9 @@ data class NotificacionResponse (
 
     @SerializedName("clienteId")
     val clienteId: java.util.UUID? = null,
+
+    @SerializedName("clienteNombre")
+    val clienteNombre: kotlin.String? = null,
 
     @SerializedName("canal")
     val canal: kotlin.String? = null,

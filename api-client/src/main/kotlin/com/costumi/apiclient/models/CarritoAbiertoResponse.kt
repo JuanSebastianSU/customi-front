@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -27,6 +35,7 @@ import com.google.gson.annotations.SerializedName
  * @param sucursalNombre 
  * @param tipo 
  * @param articulos 
+ * @param creadoEn 
  */
 
 
@@ -48,7 +57,10 @@ data class CarritoAbiertoResponse (
     val tipo: CarritoAbiertoResponse.Tipo? = null,
 
     @SerializedName("articulos")
-    val articulos: kotlin.Int? = null
+    val articulos: kotlin.Int? = null,
+
+    @SerializedName("creadoEn")
+    val creadoEn: java.time.OffsetDateTime? = null
 
 ) {
 

@@ -6,12 +6,13 @@ import retrofit2.Response
 import okhttp3.RequestBody
 import com.google.gson.annotations.SerializedName
 
+import com.costumi.apiclient.models.CapacidadDto
 import com.costumi.apiclient.models.EstablecerPermisoRequest
-import com.costumi.apiclient.models.PermisoDto
 import com.costumi.apiclient.models.ProblemDetail
 
 interface PermisosEmpleadoControllerApi {
     /**
+     * PUT api/v1/empleados/{usuarioId}/permisos
      * 
      * 
      * Responses:
@@ -26,6 +27,7 @@ interface PermisosEmpleadoControllerApi {
     suspend fun establecer(@Path("usuarioId") usuarioId: java.util.UUID, @Body establecerPermisoRequest: EstablecerPermisoRequest): Response<Unit>
 
     /**
+     * GET api/v1/empleados/{usuarioId}/permisos
      * 
      * 
      * Responses:
@@ -33,9 +35,9 @@ interface PermisosEmpleadoControllerApi {
      *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
      *
      * @param usuarioId 
-     * @return [kotlin.collections.List<PermisoDto>]
+     * @return [kotlin.collections.List<CapacidadDto>]
      */
     @GET("api/v1/empleados/{usuarioId}/permisos")
-    suspend fun matriz(@Path("usuarioId") usuarioId: java.util.UUID): Response<kotlin.collections.List<PermisoDto>>
+    suspend fun matriz(@Path("usuarioId") usuarioId: java.util.UUID): Response<kotlin.collections.List<CapacidadDto>>
 
 }

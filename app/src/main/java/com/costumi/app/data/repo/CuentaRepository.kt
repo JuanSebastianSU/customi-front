@@ -4,6 +4,7 @@ import com.costumi.app.core.DispatcherProvider
 import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.ErrorApi
 import com.costumi.app.core.TipoError
+import com.costumi.app.core.mapear
 import com.costumi.app.data.remote.ejecutarLlamada
 import com.costumi.apiclient.apis.ClienteControllerApi
 import com.costumi.apiclient.apis.EmpresaControllerApi
@@ -31,7 +32,7 @@ class CuentaRepository @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) {
     suspend fun miHistorial(): RespuestaRed<List<HistorialItem>> = withContext(dispatchers.io) {
-        ejecutarLlamada(gson) { clienteApi.miHistorial() }
+        ejecutarLlamada(gson) { clienteApi.miHistorial() }.mapear { it.contenido.orEmpty() }
     }
 
     /** Solicita el reembolso de una operación propia (RF-18.9): la tienda la aprueba/rechaza. */

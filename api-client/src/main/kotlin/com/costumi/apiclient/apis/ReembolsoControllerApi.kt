@@ -15,6 +15,7 @@ import com.costumi.apiclient.models.SolicitudDeReembolsoResponse
 
 interface ReembolsoControllerApi {
     /**
+     * POST api/v1/reembolsos/{id}/aprobar
      * 
      * 
      * Responses:
@@ -29,6 +30,7 @@ interface ReembolsoControllerApi {
     suspend fun aprobar(@Path("id") id: java.util.UUID, @Body decisionReembolsoRequest: DecisionReembolsoRequest): Response<SolicitudDeReembolsoResponse>
 
     /**
+     * GET api/v1/reembolsos
      * 
      * 
      * Responses:
@@ -36,14 +38,16 @@ interface ReembolsoControllerApi {
      *  - 0: Error de la API en formato RFC 7807 (application/problem+json).
      *
      * @param buscar  (optional)
+     * @param filtro  (optional)
      * @param pagina  (optional)
      * @param tamano  (optional)
      * @return [RespuestaPaginadaSolicitudDeReembolsoResponse]
      */
     @GET("api/v1/reembolsos")
-    suspend fun listar3(@Query("buscar") buscar: kotlin.String? = null, @Query("pagina") pagina: kotlin.Int? = null, @Query("tamano") tamano: kotlin.Int? = null): Response<RespuestaPaginadaSolicitudDeReembolsoResponse>
+    suspend fun listar3(@Query("buscar") buscar: kotlin.String? = null, @Query("filtro") filtro: kotlin.String? = null, @Query("pagina") pagina: kotlin.Int? = null, @Query("tamano") tamano: kotlin.Int? = null): Response<RespuestaPaginadaSolicitudDeReembolsoResponse>
 
     /**
+     * POST api/v1/reembolsos/{id}/rechazar
      * 
      * 
      * Responses:
@@ -58,6 +62,7 @@ interface ReembolsoControllerApi {
     suspend fun rechazar(@Path("id") id: java.util.UUID, @Body decisionReembolsoRequest: DecisionReembolsoRequest): Response<SolicitudDeReembolsoResponse>
 
     /**
+     * POST api/v1/reembolsos
      * 
      * 
      * Responses:
@@ -71,6 +76,7 @@ interface ReembolsoControllerApi {
     suspend fun solicitar(@Body solicitarReembolsoRequest: SolicitarReembolsoRequest): Response<SolicitudDeReembolsoResponse>
 
     /**
+     * POST api/v1/reembolsos/cliente
      * 
      * 
      * Responses:

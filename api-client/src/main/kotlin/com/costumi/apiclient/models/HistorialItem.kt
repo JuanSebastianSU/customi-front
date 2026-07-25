@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package com.costumi.apiclient.models
@@ -27,6 +35,8 @@ import com.google.gson.annotations.SerializedName
  * @param codigoRetiro 
  * @param monto 
  * @param estado 
+ * @param saldoPendiente 
+ * @param estadoPago 
  * @param fecha 
  * @param empresaId 
  * @param empresaNombre 
@@ -50,6 +60,12 @@ data class HistorialItem (
 
     @SerializedName("estado")
     val estado: kotlin.String? = null,
+
+    @SerializedName("saldoPendiente")
+    val saldoPendiente: java.math.BigDecimal? = null,
+
+    @SerializedName("estadoPago")
+    val estadoPago: kotlin.String? = null,
 
     @SerializedName("fecha")
     val fecha: java.time.LocalDate? = null,

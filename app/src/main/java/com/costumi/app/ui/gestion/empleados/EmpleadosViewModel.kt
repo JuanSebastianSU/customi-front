@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.UiState
 import com.costumi.app.data.repo.EmpleadoRepository
-import com.costumi.apiclient.models.AltaDeEmpleadoRequest
 import com.costumi.apiclient.models.CambiarRolRequest
+import com.costumi.apiclient.models.InvitarEmpleadoRequest
 import com.costumi.apiclient.models.EmpleadoDetalleResponse
 import com.costumi.apiclient.models.SucursalResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +22,8 @@ sealed interface EventoEmpleado {
     data class Info(val mensaje: String) : EventoEmpleado
     data class Error(val mensaje: String) : EventoEmpleado
     data class Actividad(val email: String, val ventas: Long, val total: java.math.BigDecimal?) : EventoEmpleado
+    /** Invitación creada: el enlace de aceptación para compartir con la persona (Fase B). */
+    data class Invitacion(val email: String, val enlace: String) : EventoEmpleado
 }
 
 /** Gestión de personal: lista, alta, cambiar rol, baja/reactivación y asignar sucursales. */
@@ -74,8 +76,18 @@ class EmpleadosViewModel @Inject constructor(
         }
     }
 
-    fun crear(email: String, password: String, rol: AltaDeEmpleadoRequest.Rol) =
-        ejecutar("Empleado dado de alta.") { repo.crear(email, password, rol) }
+    /** Alta = invitación (Fase B): invita por email y emite el enlace de aceptación para compartir. */
+    fun invitar(email: String, rol: InvitarEmpleadoRequest.Rol) {
+        if (_procesando.value) return
+        viewModelScope.launch {
+            _procesando.value = true
+            when (val r = repo.invitar(email, rol)) {
+                is RespuestaRed.Exito -> _eventos.tryEmit(EventoEmpleado.Invitacion(email, r.data.enlace.orEmpty()))
+                is RespuestaRed.Fallo -> _eventos.tryEmit(EventoEmpleado.Error(r.error.mensaje))
+            }
+            _procesando.value = false
+        }
+    }
 
     fun cambiarRol(id: UUID, rol: CambiarRolRequest.Rol) =
         ejecutar("Rol actualizado.") { repo.cambiarRol(id, rol) }

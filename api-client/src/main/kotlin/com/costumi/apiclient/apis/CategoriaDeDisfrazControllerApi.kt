@@ -12,6 +12,7 @@ import com.costumi.apiclient.models.ProblemDetail
 
 interface CategoriaDeDisfrazControllerApi {
     /**
+     * POST api/v1/disfraces/categorias/{id}/activar
      * 
      * 
      * Responses:
@@ -25,6 +26,7 @@ interface CategoriaDeDisfrazControllerApi {
     suspend fun activar4(@Path("id") id: java.util.UUID): Response<CategoriaDeDisfrazResponse>
 
     /**
+     * POST api/v1/disfraces/categorias/{id}/archivar
      * 
      * 
      * Responses:
@@ -38,6 +40,7 @@ interface CategoriaDeDisfrazControllerApi {
     suspend fun archivar3(@Path("id") id: java.util.UUID): Response<CategoriaDeDisfrazResponse>
 
     /**
+     * POST api/v1/disfraces/categorias
      * 
      * 
      * Responses:
@@ -48,9 +51,10 @@ interface CategoriaDeDisfrazControllerApi {
      * @return [CategoriaDeDisfrazResponse]
      */
     @POST("api/v1/disfraces/categorias")
-    suspend fun crear6(@Body categoriaDeDisfrazRequest: CategoriaDeDisfrazRequest): Response<CategoriaDeDisfrazResponse>
+    suspend fun crear5(@Body categoriaDeDisfrazRequest: CategoriaDeDisfrazRequest): Response<CategoriaDeDisfrazResponse>
 
     /**
+     * GET api/v1/disfraces/categorias
      * 
      * 
      * Responses:
@@ -63,6 +67,7 @@ interface CategoriaDeDisfrazControllerApi {
     suspend fun listar12(): Response<kotlin.collections.List<CategoriaDeDisfrazResponse>>
 
     /**
+     * PATCH api/v1/disfraces/categorias/{id}
      * 
      * 
      * Responses:
