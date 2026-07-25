@@ -60,6 +60,8 @@ data class ReporteCompleto(
     val rentasVencidas: List<RentaVencidaResponse>,
     val ventasPorEmpleado: List<EmpleadoVentas>,
     val tablero: List<GrupoInventario>,
+    /** Serie de ingresos por día (A9), para ver la evolución en el rango elegido. */
+    val serie: List<com.costumi.apiclient.models.IngresoDelDia> = emptyList(),
 )
 
 /**
@@ -126,6 +128,7 @@ class ReporteRepository @Inject constructor(
             val vencidasD = async { ejecutarLlamada(gson) { reporteApi.rentasVencidas(sucursalId) } }
             val empleadoD = async { ejecutarLlamada(gson) { reporteApi.ventasPorEmpleado(sucursalId) } }
             val tableroD = async { ejecutarLlamada(gson) { reporteApi.tableroDeInventario(sucursalId) } }
+            val serieD = async { ejecutarLlamada(gson) { reporteApi.ingresosPorDia(sucursalId, desde, hasta) } }
 
             val ingresos = ingresosD.await()
             if (ingresos is RespuestaRed.Fallo) return@coroutineScope ingresos
@@ -142,6 +145,7 @@ class ReporteRepository @Inject constructor(
                     rentasVencidas = vencidasD.await().datoONull().orEmpty(),
                     ventasPorEmpleado = empleadoD.await().datoONull().orEmpty(),
                     tablero = tableroD.await().datoONull().orEmpty(),
+                    serie = serieD.await().datoONull().orEmpty(),
                 ),
             )
         }

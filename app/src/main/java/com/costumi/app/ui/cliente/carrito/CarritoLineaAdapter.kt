@@ -17,6 +17,7 @@ import java.time.temporal.ChronoUnit
 class CarritoLineaAdapter(
     private val esRenta: Boolean,
     private val alQuitar: (LineaDeCarritoResponse) -> Unit,
+    private val alEditarCantidad: (LineaDeCarritoResponse) -> Unit = {},
 ) : ListAdapter<LineaDeCarritoResponse, CarritoLineaAdapter.VH>(DIFF) {
 
     inner class VH(val binding: ItemLineaCarritoBinding) : RecyclerView.ViewHolder(binding.root)
@@ -57,6 +58,8 @@ class CarritoLineaAdapter(
         holder.binding.aviso.text = motivo.orEmpty()
 
         holder.binding.botonQuitar.setOnClickListener { alQuitar(linea) }
+        // Tocar la línea permite cambiar la cantidad (A10).
+        holder.binding.root.setOnClickListener { alEditarCantidad(linea) }
     }
 
     /** "12 ago → 15 ago · 3 dias" con las fechas de la propia linea; null si la linea no las tiene. */

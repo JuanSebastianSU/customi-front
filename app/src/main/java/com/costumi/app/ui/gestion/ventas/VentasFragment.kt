@@ -19,6 +19,10 @@ import com.costumi.app.ui.gestion.pagos.PagoConceptoFragment
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.alBuscar
 import com.costumi.app.ui.observar
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 import com.costumi.apiclient.models.LineaADevolver
 import com.costumi.apiclient.models.VentaResponse
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -70,6 +74,11 @@ class VentasFragment : Fragment(R.layout.fragment_ventas) {
         setFragmentResultListener(VentaPosFragment.RESULT_REGISTRADA) { _, _ -> adapter.refresh() }
         setFragmentResultListener(PagoConceptoFragment.RESULT_COBRADO) { _, _ -> adapter.refresh() }
         binding.fabNueva.setOnClickListener { findNavController().navigate(R.id.ventaPosFragment) }
+
+        // Filtro por período (A8): en el menú del toolbar.
+        binding.toolbar.menu.add("Filtrar por fecha").setOnMenuItemClickListener { mostrarRango(); true }
+        binding.toolbar.menu.add("Quitar filtro de fecha").setOnMenuItemClickListener { vm.fijarRango(null, null); true }
+        observar(vm.rango) { r -> binding.toolbar.subtitle = r?.let { "${it.first} → ${it.second}" } }
 
         observar(vm.ventas) { adapter.submitData(viewLifecycleOwner.lifecycle, it) }
         observar(adapter.loadStateFlow) { estados -> pintarEstado(estados.refresh) }
@@ -126,6 +135,17 @@ class VentasFragment : Fragment(R.layout.fragment_ventas) {
             ),
         )
     }
+
+    private fun mostrarRango() {
+        val picker = MaterialDatePicker.Builder.dateRangePicker().setTitleText("Rango de fechas").build()
+        picker.addOnPositiveButtonClickListener { seleccion ->
+            vm.fijarRango(aLocalDate(seleccion.first), aLocalDate(seleccion.second))
+        }
+        picker.show(childFragmentManager, "rango")
+    }
+
+    private fun aLocalDate(millis: Long?): LocalDate? =
+        millis?.let { Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate() }
 
     private fun pintarEstado(refresh: LoadState) {
         when (refresh) {

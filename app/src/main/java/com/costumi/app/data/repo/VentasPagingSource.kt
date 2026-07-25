@@ -14,11 +14,16 @@ class VentasPagingSource(
     private val gson: Gson,
     /** Codigo de retiro que escribio el usuario; null o vacio = sin filtrar. */
     private val buscar: String? = null,
+    /** Rango de fechas (A8); null = sin acotar. */
+    private val desde: java.time.LocalDate? = null,
+    private val hasta: java.time.LocalDate? = null,
 ) : PagingSource<Int, VentaResponse>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, VentaResponse> {
         val pagina = params.key ?: 0
-        return when (val r = ejecutarLlamada(gson) { api.listar(buscar = buscar?.ifBlank { null }, pagina = pagina, tamano = params.loadSize) }) {
+        return when (val r = ejecutarLlamada(gson) {
+            api.listar(buscar = buscar?.ifBlank { null }, desde = desde, hasta = hasta, pagina = pagina, tamano = params.loadSize)
+        }) {
             is RespuestaRed.Fallo -> LoadResult.Error(RuntimeException(r.error.mensaje))
             is RespuestaRed.Exito -> {
                 val contenido = r.data.contenido.orEmpty()

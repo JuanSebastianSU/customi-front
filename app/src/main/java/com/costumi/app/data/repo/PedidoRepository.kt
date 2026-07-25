@@ -11,6 +11,7 @@ import com.costumi.apiclient.apis.CarritoControllerApi
 import com.costumi.apiclient.apis.MarketplaceControllerApi
 import com.costumi.apiclient.models.AgregarItemRequest
 import com.costumi.apiclient.models.CarritoResponse
+import com.costumi.apiclient.models.EditarCantidadRequest
 import com.costumi.apiclient.models.CheckoutRentaResponse
 import com.costumi.apiclient.models.CheckoutRequest
 import com.costumi.apiclient.models.CheckoutResponse
@@ -126,6 +127,26 @@ class PedidoRepository @Inject constructor(
         val suc = sucursalId.aUuid()
             ?: return@withContext RespuestaRed.Fallo(ErrorApi(TipoError.DESCONOCIDO, "Sucursal no valida."))
         ejecutarLlamada(gson) { carritoApi.quitarItem(linea, suc, tipo, empresaId.aUuid()) }
+    }
+
+    /** Cambia la cantidad de una línea del carrito (RF-A7). */
+    suspend fun editarCantidad(
+        lineaId: String,
+        cantidad: Int,
+        sucursalId: String,
+        tipo: EditarCantidadRequest.Tipo,
+        empresaId: String,
+    ): RespuestaRed<CarritoResponse> = withContext(dispatchers.io) {
+        val linea = lineaId.aUuid()
+            ?: return@withContext RespuestaRed.Fallo(ErrorApi(TipoError.DESCONOCIDO, "Articulo no valido."))
+        val suc = sucursalId.aUuid()
+            ?: return@withContext RespuestaRed.Fallo(ErrorApi(TipoError.DESCONOCIDO, "Sucursal no valida."))
+        ejecutarLlamada(gson) {
+            carritoApi.editarCantidad(
+                linea,
+                EditarCantidadRequest(sucursalId = suc, tipo = tipo, empresaId = empresaId.aUuid(), cantidad = cantidad),
+            )
+        }
     }
 
     suspend fun checkoutVenta(empresaId: String, sucursalId: String): RespuestaRed<CheckoutResponse> =

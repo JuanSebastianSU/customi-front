@@ -38,9 +38,13 @@ class VentaRepository @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) {
     /** [buscar] filtra por codigo de retiro (el que el cliente muestra en la tienda). */
-    fun ventas(buscar: String? = null): Flow<PagingData<VentaResponse>> = Pager(
+    fun ventas(
+        buscar: String? = null,
+        desde: java.time.LocalDate? = null,
+        hasta: java.time.LocalDate? = null,
+    ): Flow<PagingData<VentaResponse>> = Pager(
         config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-        pagingSourceFactory = { VentasPagingSource(ventaApi, gson, buscar) },
+        pagingSourceFactory = { VentasPagingSource(ventaApi, gson, buscar, desde, hasta) },
     ).flow
 
     suspend fun sucursales(): RespuestaRed<List<SucursalResponse>> = withContext(dispatchers.io) {

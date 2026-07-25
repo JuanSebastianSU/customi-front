@@ -26,7 +26,9 @@ class CarritoFragment : Fragment(R.layout.fragment_carrito) {
     private val vm: CarritoViewModel by viewModels()
     private var _binding: FragmentCarritoBinding? = null
     private val binding get() = _binding!!
-    private val adapter by lazy { CarritoLineaAdapter(vm.esRenta) { confirmarQuitar(it) } }
+    private val adapter by lazy {
+        CarritoLineaAdapter(vm.esRenta, { confirmarQuitar(it) }, { dialogoCantidad(it) })
+    }
 
     /** Hay lineas que dejaron de poder cumplirse: no se finaliza hasta quitarlas. */
     private var checkoutBloqueado = false
@@ -81,6 +83,24 @@ class CarritoFragment : Fragment(R.layout.fragment_carrito) {
                 is EventoCheckout.Error -> mostrarMensaje(evento.mensaje)
             }
         }
+    }
+
+    /** Cambiar la cantidad de una línea (A10): input numérico, mínimo 1. */
+    private fun dialogoCantidad(linea: com.costumi.apiclient.models.LineaDeCarritoResponse) {
+        val input = android.widget.EditText(requireContext()).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText((linea.cantidad ?: 1).toString())
+            setPadding(48, 32, 48, 32)
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Cantidad de \"${linea.nombre ?: "este articulo"}\"")
+            .setView(input)
+            .setNegativeButton("Cancelar", null)
+            .setPositiveButton("Guardar") { _, _ ->
+                val n = input.text?.toString()?.toIntOrNull()
+                if (n != null && n >= 1) vm.cambiarCantidad(linea, n) else mostrarMensaje("Cantidad no valida")
+            }
+            .show()
     }
 
     /** Quitar es destructivo y no se puede deshacer: se confirma antes. */

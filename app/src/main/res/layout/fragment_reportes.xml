@@ -147,6 +147,21 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Serie de ingresos por día (A9). -->
+                <TextView
+                    android:id="@+id/tituloSerie"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Ingresos por día"
+                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                <LinearLayout
+                    android:id="@+id/contenedorSerie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
                 <TextView
                     android:id="@+id/tituloVendidos"
                     android:layout_width="wrap_content"

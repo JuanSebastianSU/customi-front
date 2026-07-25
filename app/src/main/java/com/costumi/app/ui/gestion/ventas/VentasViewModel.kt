@@ -27,15 +27,28 @@ class VentasViewModel @Inject constructor(
     private val repo: VentaRepository,
 ) : ViewModel() {
 
-    /** Texto de busqueda; al cambiar se vuelve a pedir la primera pagina. */
-    private val _buscar = MutableStateFlow<String?>(null)
+    /** Filtros del listado (A8): búsqueda por código + rango de fechas. Al cambiar, se re-pagina. */
+    private data class Filtros(
+        val buscar: String? = null,
+        val desde: java.time.LocalDate? = null,
+        val hasta: java.time.LocalDate? = null,
+    )
 
-    /** El usuario escribio en la caja de busqueda. */
+    private val _filtros = MutableStateFlow(Filtros())
+
+    /** Rango de fechas activo (para reflejarlo en la UI); null = sin acotar. */
+    val rango = MutableStateFlow<Pair<java.time.LocalDate, java.time.LocalDate>?>(null)
+
     fun buscar(texto: String) {
-        _buscar.value = texto.trim().ifBlank { null }
+        _filtros.value = _filtros.value.copy(buscar = texto.trim().ifBlank { null })
     }
 
-    val ventas = _buscar.flatMapLatest { repo.ventas(it) }.cachedIn(viewModelScope)
+    fun fijarRango(desde: java.time.LocalDate?, hasta: java.time.LocalDate?) {
+        _filtros.value = _filtros.value.copy(desde = desde, hasta = hasta)
+        rango.value = if (desde != null && hasta != null) desde to hasta else null
+    }
+
+    val ventas = _filtros.flatMapLatest { repo.ventas(it.buscar, it.desde, it.hasta) }.cachedIn(viewModelScope)
 
     private val _eventos = MutableSharedFlow<EventoVenta>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()

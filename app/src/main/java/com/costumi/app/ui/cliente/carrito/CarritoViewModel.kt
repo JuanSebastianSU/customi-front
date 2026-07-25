@@ -111,6 +111,23 @@ class CarritoViewModel @Inject constructor(
         }
     }
 
+    /** Cambia la cantidad de una línea (A10). Mínimo 1; recarga el carrito con los totales recalculados. */
+    fun cambiarCantidad(linea: com.costumi.apiclient.models.LineaDeCarritoResponse, cantidad: Int) {
+        val lineaId = linea.id ?: return
+        if (cantidad < 1) return
+        viewModelScope.launch {
+            val tipo = if (esRenta) {
+                com.costumi.apiclient.models.EditarCantidadRequest.Tipo.RENTA
+            } else {
+                com.costumi.apiclient.models.EditarCantidadRequest.Tipo.VENTA
+            }
+            when (val r = repo.editarCantidad(lineaId.toString(), cantidad, sucursalId, tipo, empresaId)) {
+                is RespuestaRed.Exito -> cargar()
+                is RespuestaRed.Fallo -> _eventos.tryEmit(EventoCheckout.Error(r.error.mensaje))
+            }
+        }
+    }
+
     fun finalizar() {
         if (_procesando.value) return
         viewModelScope.launch {

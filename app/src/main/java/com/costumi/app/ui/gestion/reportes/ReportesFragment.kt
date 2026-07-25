@@ -21,6 +21,7 @@ import com.costumi.app.data.repo.ReporteCompleto
 import com.costumi.apiclient.models.ArticuloRanking
 import com.costumi.apiclient.models.DisfrazRanking
 import com.costumi.apiclient.models.EmpleadoVentas
+import com.costumi.apiclient.models.IngresoDelDia
 import com.costumi.apiclient.models.GrupoInventario
 import com.costumi.apiclient.models.RentaVencidaResponse
 import com.costumi.apiclient.models.SucursalResponse
@@ -110,6 +111,7 @@ class ReportesFragment : Fragment(R.layout.fragment_reportes) {
 
         binding.depositos.text = "Depositos activos: ${r.depositos?.total.comoPrecio() ?: "$0"}"
 
+        pintarSerie(binding.contenedorSerie, binding.tituloSerie, r.serie)
         pintarRanking(binding.contenedorVendidos, binding.tituloVendidos, r.masVendidos)
         pintarRanking(binding.contenedorRentados, binding.tituloRentados, r.masRentados)
         pintarRankingDisfraces(binding.contenedorDisfracesVendidos, binding.tituloDisfracesVendidos,
@@ -165,6 +167,17 @@ class ReportesFragment : Fragment(R.layout.fragment_reportes) {
 
     private fun aLocalDate(millis: Long?): LocalDate? =
         millis?.let { Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate() }
+
+    /** Serie de ingresos por día (A9): una fila por día con barra proporcional al monto. */
+    private fun pintarSerie(contenedor: ViewGroup, titulo: View, serie: List<IngresoDelDia>) {
+        contenedor.removeAllViews()
+        titulo.isVisible = serie.isNotEmpty()
+        contenedor.isVisible = serie.isNotEmpty()
+        val max = serie.mapNotNull { it.monto }.maxOrNull()
+        serie.forEach { d ->
+            fila(contenedor, d.fecha?.toString() ?: "-", d.monto.comoPrecio() ?: "-", fraccion = fraccionDe(d.monto, max))
+        }
+    }
 
     private fun pintarRanking(contenedor: ViewGroup, titulo: View, items: List<ArticuloRanking>) {
         contenedor.removeAllViews()
