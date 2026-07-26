@@ -28,12 +28,14 @@ class DevolucionesViewModel @Inject constructor(
     private val _estado = MutableStateFlow<UiState<List<DevolucionUi>>>(UiState.Loading)
     val estado = _estado.asStateFlow()
 
+    /** Texto de busqueda vigente; null = sin filtrar. */
+    private var buscar: String? = null
+
+    // El init va DESPUÉS de declarar el estado y `buscar`: su inicializador debe correr antes de que
+    // cargar() lo use (si no, un cargar() síncrono lo encontraría sin inicializar).
     init {
         cargar()
     }
-
-    /** Texto de busqueda vigente; null = sin filtrar. */
-    private var buscar: String? = null
 
     /** El usuario escribio en la caja de busqueda: se guarda y se recarga la lista. */
     fun buscar(texto: String) {

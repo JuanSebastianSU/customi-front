@@ -59,10 +59,10 @@ class ReembolsosViewModelTest {
     private fun solicitud(estado: SolicitudDeReembolsoResponse.Estado, tipo: SolicitudDeReembolsoResponse.TipoConcepto = SolicitudDeReembolsoResponse.TipoConcepto.VENTA) =
         SolicitudDeReembolsoResponse(id = UUID.randomUUID(), conceptoId = UUID.randomUUID(), tipoConcepto = tipo, estado = estado)
 
-    /** Puebla `todas` post-construcción (las props se declaran tras el init, ver chip de fragilidad). */
     private fun vmCon(lista: List<SolicitudDeReembolsoResponse>): ReembolsosViewModel {
         coEvery { repo.bandeja(any()) } returns RespuestaRed.Exito(lista)
-        return vm().also { it.cargar() }
+        // Sin workaround: las props se declaran antes del init{}, así que el cargar() del init puebla `todas`.
+        return vm()
     }
 
     @Test

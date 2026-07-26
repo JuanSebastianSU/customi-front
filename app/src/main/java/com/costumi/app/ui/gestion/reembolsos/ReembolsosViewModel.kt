@@ -46,10 +46,6 @@ class ReembolsosViewModel @Inject constructor(
     private val _eventos = MutableSharedFlow<EventoReembolso>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()
 
-    init {
-        cargar()
-    }
-
     /** Texto de busqueda vigente; null = sin filtrar. */
     private var buscar: String? = null
 
@@ -59,6 +55,12 @@ class ReembolsosViewModel @Inject constructor(
 
     /** Lo último que trajo el backend, sin filtrar; se re-filtra sin volver a pedir. */
     private var todas: List<SolicitudDeReembolsoResponse> = emptyList()
+
+    // El init va DESPUÉS de declarar el estado y los filtros: sus inicializadores deben correr antes de que
+    // cargar()/publicar() los usen (si no, un cargar() síncrono los encontraría sin inicializar).
+    init {
+        cargar()
+    }
 
     /** El usuario escribio en la caja de busqueda: se guarda y se recarga la lista. */
     fun buscar(texto: String) {

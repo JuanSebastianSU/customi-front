@@ -25,10 +25,6 @@ class AuditoriaViewModel @Inject constructor(
     private val _categorias = MutableStateFlow<List<String>>(emptyList())
     val categorias = _categorias.asStateFlow()
 
-    init {
-        cargar()
-    }
-
     /** Texto de busqueda vigente; null = sin filtrar. */
     private var buscar: String? = null
 
@@ -37,6 +33,12 @@ class AuditoriaViewModel @Inject constructor(
 
     /** Lo último traído, sin filtrar por categoría (el buscar sí va al servidor). */
     private var todas: List<AuditoriaResponse> = emptyList()
+
+    // El init va DESPUÉS de declarar el estado y los filtros: sus inicializadores deben correr antes de que
+    // cargar()/publicar() los usen (si no, un cargar() síncrono los encontraría sin inicializar).
+    init {
+        cargar()
+    }
 
     fun buscar(texto: String) {
         buscar = texto.trim().ifBlank { null }
