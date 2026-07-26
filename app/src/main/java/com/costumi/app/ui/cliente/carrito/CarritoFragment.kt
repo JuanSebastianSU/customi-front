@@ -6,7 +6,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.core.os.bundleOf
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.costumi.app.R
 import com.costumi.app.core.comoPrecio
@@ -43,7 +42,7 @@ class CarritoFragment : Fragment(R.layout.fragment_carrito) {
         binding.toolbar.title = if (vm.esRenta) "Tu renta" else "Tu carrito"
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
         binding.lista.adapter = adapter
-        binding.botonFinalizar.setOnClickListener { vm.finalizar() }
+        binding.botonFinalizar.setOnClickListener { vm.irAPago() }
 
         observar(vm.retiro) { retiro ->
             binding.cabeceraTienda.isVisible = !retiro.isNullOrBlank()
@@ -85,7 +84,6 @@ class CarritoFragment : Fragment(R.layout.fragment_carrito) {
         observar(vm.eventos) { evento ->
             when (evento) {
                 is EventoCheckout.IrAPago -> irAPago(evento)
-                is EventoCheckout.Exito -> mostrarExito(evento.mensaje)
                 is EventoCheckout.Error -> mostrarMensaje(evento.mensaje)
             }
         }
@@ -120,28 +118,16 @@ class CarritoFragment : Fragment(R.layout.fragment_carrito) {
     }
 
     private fun irAPago(evento: EventoCheckout.IrAPago) {
+        // No se popea el carrito: como todavía no se creó ninguna orden, si el cliente vuelve desde Pago
+        // sin confirmar, el carrito sigue tal cual (con sus artículos). El flujo se limpia recién al pagar.
         findNavController().navigate(
             R.id.pagoFragment,
             bundleOf(
                 PagoFragment.ARG_TIPO to evento.tipo,
-                PagoFragment.ARG_CONCEPTO_ID to evento.conceptoId,
                 PagoFragment.ARG_EMPRESA_ID to evento.empresaId,
                 PagoFragment.ARG_SUCURSAL_ID to evento.sucursalId,
             ),
-            // Al pagar se limpia el flujo de compra hasta Explorar.
-            NavOptions.Builder().setPopUpTo(R.id.carritoFragment, true).build(),
         )
-    }
-
-    private fun mostrarExito(mensaje: String) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("¡Listo!")
-            .setMessage(mensaje)
-            .setCancelable(false)
-            .setPositiveButton("Entendido") { _, _ ->
-                findNavController().popBackStack(R.id.explorarFragment, false)
-            }
-            .show()
     }
 
     override fun onDestroyView() {

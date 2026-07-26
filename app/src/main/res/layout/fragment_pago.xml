@@ -68,60 +68,25 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- El código de retiro es el héroe de la pantalla: es lo que el cliente muestra en el
-                     mostrador. Centrado, grande y monoespaciado para que se lea y se dicte sin error. -->
+                <!-- El código de retiro NO se muestra aquí: recién existe cuando el cliente confirma el
+                     pago (con tarjeta se paga en línea; en efectivo, al tocar "pagar en la tienda"). Antes
+                     de eso no hay orden creada, así que solo se explica qué va a pasar. -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="20dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tu código de retiro"
-                            android:textAppearance="?attr/textAppearanceLabelLarge"
-                            android:textColor="?attr/colorOnSecondaryContainer" />
-
-                        <TextView
-                            android:id="@+id/codigo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:fontFamily="monospace"
-                            android:letterSpacing="0.15"
-                            android:textAppearance="?attr/textAppearanceDisplaySmall"
-                            android:textColor="?attr/colorOnSecondaryContainer"
-                            android:textStyle="bold"
-                            tools:text="R-1A2B3C4D" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            android:text="Muéstralo en la tienda al retirar tu pedido."
-                            android:textAppearance="?attr/textAppearanceBodySmall"
-                            android:textColor="?attr/colorOnSecondaryContainer" />
-                    </LinearLayout>
+                        android:padding="16dp"
+                        android:text="Tu código de retiro aparece cuando confirmes el pago. Elige cómo pagar abajo."
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
                 </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Tienes 24 horas para completar el pago o el pedido se cancela."
-                    android:textAppearance="?attr/textAppearanceBodySmall"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

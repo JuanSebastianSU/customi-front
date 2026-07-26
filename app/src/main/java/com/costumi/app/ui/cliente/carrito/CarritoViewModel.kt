@@ -17,18 +17,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** Evento de una sola vez del checkout. */
+/** Evento de una sola vez del carrito. */
 sealed interface EventoCheckout {
-    /** El pedido se creó y hay un único concepto que pagar: se va a la pantalla de pago. */
+    /**
+     * Ir a la pantalla de pago. NO se crea nada todavía: la orden y el código de retiro se materializan
+     * recién al confirmar el pago allí. Así, si el cliente entra a pagar y vuelve, el carrito sigue intacto.
+     */
     data class IrAPago(
         val tipo: String, // "RENTA" o "VENTA"
-        val conceptoId: String,
         val empresaId: String,
         val sucursalId: String,
     ) : EventoCheckout
 
-    /** El pedido quedó reservado (varias rentas): se paga en la tienda. */
-    data class Exito(val mensaje: String) : EventoCheckout
     data class Error(val mensaje: String) : EventoCheckout
 }
 
@@ -128,42 +128,17 @@ class CarritoViewModel @Inject constructor(
         }
     }
 
-    fun finalizar() {
-        if (_procesando.value) return
-        viewModelScope.launch {
-            _procesando.value = true
-            val resultado = if (esRenta) {
-                when (val r = repo.checkoutRenta(empresaId, sucursalId)) {
-                    is RespuestaRed.Exito -> {
-                        val rentas = r.data.rentaIds.orEmpty()
-                        when {
-                            rentas.size == 1 -> EventoCheckout.IrAPago(
-                                "RENTA", rentas.first().toString(), empresaId, sucursalId,
-                            )
-                            // Varias rentas (varios periodos): se reservan y se pagan en la tienda.
-                            rentas.isNotEmpty() -> EventoCheckout.Exito(
-                                "¡Rentas reservadas! Pasa por la tienda a pagar y retirar con tu codigo.",
-                            )
-                            else -> EventoCheckout.Error("No se creo ninguna renta.")
-                        }
-                    }
-                    is RespuestaRed.Fallo -> EventoCheckout.Error(r.error.mensaje)
-                }
-            } else {
-                when (val r = repo.checkoutVenta(empresaId, sucursalId)) {
-                    is RespuestaRed.Exito -> {
-                        val ventaId = r.data.ventaId
-                        if (ventaId != null) {
-                            EventoCheckout.IrAPago("VENTA", ventaId.toString(), empresaId, sucursalId)
-                        } else {
-                            EventoCheckout.Error("No se creo la venta.")
-                        }
-                    }
-                    is RespuestaRed.Fallo -> EventoCheckout.Error(r.error.mensaje)
-                }
-            }
-            _eventos.tryEmit(resultado)
-            _procesando.value = false
+    /**
+     * "Finalizar" solo lleva a la pantalla de pago; NO hace checkout todavía. El pedido y su código se
+     * crean allí al confirmar el pago. Antes, esto llamaba al checkout aquí y creaba la renta/venta apenas
+     * el cliente entraba a pagar: si se iba sin pagar, el carrito quedaba vacío y aparecía un pedido "por
+     * retirar" sin pagar. Ahora el carrito sobrevive intacto hasta que realmente se paga.
+     */
+    fun irAPago() {
+        if (empresaId.isBlank() || sucursalId.isBlank()) {
+            _eventos.tryEmit(EventoCheckout.Error("No se pudo identificar la tienda."))
+            return
         }
+        _eventos.tryEmit(EventoCheckout.IrAPago(if (esRenta) "RENTA" else "VENTA", empresaId, sucursalId))
     }
 }

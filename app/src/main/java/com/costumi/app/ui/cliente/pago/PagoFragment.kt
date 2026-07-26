@@ -35,10 +35,14 @@ class PagoFragment : Fragment(R.layout.fragment_pago) {
         binding.botonEfectivo.setOnClickListener { vm.pagarEnTienda() }
 
         observar(vm.estado) { estado ->
-            binding.stateView.mostrar(estado, vacio = "No encontramos tu pedido.") { ui ->
-                binding.resumen.text = listOfNotNull(ui.tipoTexto, ui.tienda).joinToString("  ·  ")
+            binding.stateView.mostrar(estado, vacio = "Tu carrito esta vacio.") { ui ->
+                val deposito = ui.deposito?.takeIf { it.signum() > 0 }
+                binding.resumen.text = if (deposito != null) {
+                    "${ui.tipoTexto}  ·  incluye depósito ${deposito.comoPrecio()}"
+                } else {
+                    ui.tipoTexto
+                }
                 binding.total.text = ui.total.comoPrecio() ?: "Total no disponible"
-                binding.codigo.text = ui.codigoRetiro ?: "—"
             }
         }
         observar(vm.cargando) { cargando ->
@@ -49,7 +53,7 @@ class PagoFragment : Fragment(R.layout.fragment_pago) {
         observar(vm.eventos) { evento ->
             when (evento) {
                 is EventoPago.AbrirCheckout -> abrirCheckout(evento.url)
-                is EventoPago.PagoEnTienda -> confirmarEfectivo()
+                is EventoPago.Reservado -> confirmarEfectivo(evento.codigo)
                 is EventoPago.Error -> mostrarMensaje(evento.mensaje)
             }
         }
@@ -65,10 +69,20 @@ class PagoFragment : Fragment(R.layout.fragment_pago) {
         }
     }
 
-    private fun confirmarEfectivo() {
+    /** El pedido se creó recién ahora (al confirmar): por eso el código se muestra en este momento. */
+    private fun confirmarEfectivo(codigo: String?) {
+        val mensaje = buildString {
+            append("Tu pedido quedó reservado. ")
+            if (codigo != null) {
+                append("Tu código de retiro es:\n\n$codigo\n\n")
+            } else {
+                append("Revisa tu código en Mis Pedidos. ")
+            }
+            append("Pasa por la tienda con tu código a pagar y retirar. Tienes 24 horas.")
+        }
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Pago en la tienda")
-            .setMessage("Tu pedido quedó reservado. Pasa por la tienda con tu código a pagar y retirar. Tienes 24 horas.")
+            .setMessage(mensaje)
             .setPositiveButton("Entendido") { _, _ -> irAMisPedidos() }
             .setCancelable(false)
             .show()
@@ -89,7 +103,6 @@ class PagoFragment : Fragment(R.layout.fragment_pago) {
 
     companion object {
         const val ARG_TIPO = "tipo"
-        const val ARG_CONCEPTO_ID = "conceptoId"
         const val ARG_EMPRESA_ID = "empresaId"
         const val ARG_SUCURSAL_ID = "sucursalId"
     }
