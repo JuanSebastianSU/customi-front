@@ -91,6 +91,20 @@ class VentasFragment : Fragment(R.layout.fragment_ventas) {
         setFragmentResultListener(PagoConceptoFragment.RESULT_COBRADO) { _, _ -> adapter.refresh() }
         binding.fabNueva.setOnClickListener { findNavController().navigate(R.id.ventaPosFragment) }
 
+        // Toggle Ventas/Rentas: Ventas es esta pantalla; tocar Rentas abre su gestión.
+        binding.toggleTipo.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked && checkedId == R.id.botonRentas) {
+                findNavController().navigate(
+                    R.id.rentasFragment,
+                    null,
+                    androidx.navigation.navOptions {
+                        launchSingleTop = true
+                        popUpTo(R.id.ventasFragment) { inclusive = false }
+                    },
+                )
+            }
+        }
+
         pintarChipsEstado()
 
         // Filtro por período (A8): en el menú del toolbar.

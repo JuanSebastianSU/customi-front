@@ -64,6 +64,20 @@ class RentasFragment : Fragment(R.layout.fragment_rentas) {
         setFragmentResultListener(PagoConceptoFragment.RESULT_COBRADO) { _, _ -> adapter.refresh() }
         binding.fabNueva.setOnClickListener { findNavController().navigate(R.id.rentaFormFragment) }
 
+        // Toggle Ventas/Rentas: Rentas es esta pantalla; tocar Ventas vuelve a Ventas.
+        binding.toggleTipo.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked && checkedId == R.id.botonVentas) {
+                findNavController().navigate(
+                    R.id.ventasFragment,
+                    null,
+                    androidx.navigation.navOptions {
+                        launchSingleTop = true
+                        popUpTo(R.id.ventasFragment) { inclusive = false }
+                    },
+                )
+            }
+        }
+
         pintarChipsEstado()
 
         observar(vm.rentas) { adapter.submitData(viewLifecycleOwner.lifecycle, it) }

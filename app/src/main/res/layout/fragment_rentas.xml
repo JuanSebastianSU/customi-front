@@ -18,6 +18,37 @@
             app:title="Rentas"
             app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
 
+        <!-- Mismo toggle que en Ventas; aquí arranca en Rentas. saveEnabled=false (ver nota en Ventas). -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleTipo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:saveEnabled="false"
+            app:checkedButton="@+id/botonRentas"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonVentas"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:saveEnabled="false"
+                android:text="Ventas" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonRentas"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:saveEnabled="false"
+                android:text="Rentas" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
         <include
             android:id="@+id/barraBusqueda"
             layout="@layout/barra_busqueda" />
