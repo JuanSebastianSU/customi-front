@@ -57,6 +57,8 @@ class RentasFragment : Fragment(R.layout.fragment_rentas) {
         setFragmentResultListener(PagoConceptoFragment.RESULT_COBRADO) { _, _ -> adapter.refresh() }
         binding.fabNueva.setOnClickListener { findNavController().navigate(R.id.rentaFormFragment) }
 
+        pintarChipsEstado()
+
         observar(vm.rentas) { adapter.submitData(viewLifecycleOwner.lifecycle, it) }
         observar(adapter.loadStateFlow) { estados -> pintarEstado(estados.refresh) }
         observar(vm.eventos) { evento ->
@@ -65,6 +67,28 @@ class RentasFragment : Fragment(R.layout.fragment_rentas) {
                 is EventoRenta.Error -> mostrarMensaje(evento.mensaje)
                 is EventoRenta.Contrato -> abrirPdf(evento.bytes)
             }
+        }
+    }
+
+    /** Chips de filtro por bandeja/estado (server-side): Todas / Por entregar / Activas / Vencidas / Cerradas. */
+    private fun pintarChipsEstado() {
+        val bandejas = listOf(
+            "Todas" to null,
+            "Por entregar" to "POR_ENTREGAR",
+            "Activas" to "ACTIVAS",
+            "Vencidas" to "VENCIDAS",
+            "Cerradas" to "CERRADAS",
+        )
+        val grupo = binding.chipsEstado
+        bandejas.forEachIndexed { i, (etiqueta, filtro) ->
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = etiqueta
+                isCheckable = true
+                isChecked = i == 0
+                setEnsureMinTouchTargetSize(false)
+                setOnClickListener { vm.filtrarBandeja(filtro); adapter.refresh() }
+            }
+            grupo.addView(chip)
         }
     }
 

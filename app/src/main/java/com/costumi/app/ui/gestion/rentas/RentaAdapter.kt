@@ -12,6 +12,7 @@ import com.costumi.app.core.comoPrecio
 import com.costumi.app.databinding.ItemRentaBinding
 import com.costumi.app.ui.cargarFoto
 import com.costumi.app.ui.common.colorDeTexto
+import com.costumi.app.ui.common.comoFechaHora
 import com.costumi.app.ui.common.periodoLegible
 import com.costumi.app.ui.common.pintarPastilla
 import com.costumi.apiclient.models.RentaResponse
@@ -49,6 +50,11 @@ class RentaAdapter(
             val periodo = periodoLegible(r.fechaRetiro, r.fechaDevolucion)
             binding.periodo.isVisible = periodo != null
             binding.periodo.text = periodo.orEmpty()
+
+            // Cuándo se REGISTRÓ la renta (recencia), distinto del período de retiro/devolución.
+            val registrada = r.creadaEn?.comoFechaHora()
+            binding.registrada.isVisible = registrada != null
+            binding.registrada.text = registrada?.let { "Registrada $it" }.orEmpty()
 
             val tono = CicloDeRenta.tono(r)
             binding.chipEstado.pintarPastilla(CicloDeRenta.etiqueta(r), tono)

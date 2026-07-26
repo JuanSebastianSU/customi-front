@@ -91,6 +91,8 @@ class VentasFragment : Fragment(R.layout.fragment_ventas) {
         setFragmentResultListener(PagoConceptoFragment.RESULT_COBRADO) { _, _ -> adapter.refresh() }
         binding.fabNueva.setOnClickListener { findNavController().navigate(R.id.ventaPosFragment) }
 
+        pintarChipsEstado()
+
         // Filtro por período (A8): en el menú del toolbar.
         binding.toolbar.menu.add("Filtrar por fecha").setOnMenuItemClickListener { mostrarRango(); true }
         binding.toolbar.menu.add("Quitar filtro de fecha").setOnMenuItemClickListener { vm.fijarRango(null, null); true }
@@ -103,6 +105,27 @@ class VentasFragment : Fragment(R.layout.fragment_ventas) {
                 is EventoVenta.Info -> { mostrarMensaje(evento.mensaje); adapter.refresh() }
                 is EventoVenta.Error -> mostrarMensaje(evento.mensaje)
             }
+        }
+    }
+
+    /** Chips de filtro por estado (server-side): Todas + los estados posibles de una venta. */
+    private fun pintarChipsEstado() {
+        val estados = listOf<Pair<String, com.costumi.apiclient.apis.VentaControllerApi.EstadoListar?>>(
+            "Todas" to null,
+            "Confirmada" to com.costumi.apiclient.apis.VentaControllerApi.EstadoListar.CONFIRMADA,
+            "Devuelta en parte" to com.costumi.apiclient.apis.VentaControllerApi.EstadoListar.PARCIALMENTE_DEVUELTA,
+            "Devuelta" to com.costumi.apiclient.apis.VentaControllerApi.EstadoListar.DEVUELTA,
+        )
+        val grupo = binding.chipsEstado
+        estados.forEachIndexed { i, (etiqueta, estado) ->
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = etiqueta
+                isCheckable = true
+                isChecked = i == 0
+                setEnsureMinTouchTargetSize(false)
+                setOnClickListener { vm.filtrarEstado(estado); adapter.refresh() }
+            }
+            grupo.addView(chip)
         }
     }
 

@@ -14,6 +14,8 @@ class VentasPagingSource(
     private val gson: Gson,
     /** Codigo de retiro que escribio el usuario; null o vacio = sin filtrar. */
     private val buscar: String? = null,
+    /** Estado por el que filtrar (chip); null = todos. */
+    private val estado: VentaControllerApi.EstadoListar? = null,
     /** Rango de fechas (A8); null = sin acotar. */
     private val desde: java.time.LocalDate? = null,
     private val hasta: java.time.LocalDate? = null,
@@ -22,7 +24,7 @@ class VentasPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, VentaResponse> {
         val pagina = params.key ?: 0
         return when (val r = ejecutarLlamada(gson) {
-            api.listar(buscar = buscar?.ifBlank { null }, desde = desde, hasta = hasta, pagina = pagina, tamano = params.loadSize)
+            api.listar(buscar = buscar?.ifBlank { null }, estado = estado, desde = desde, hasta = hasta, pagina = pagina, tamano = params.loadSize)
         }) {
             is RespuestaRed.Fallo -> LoadResult.Error(RuntimeException(r.error.mensaje))
             is RespuestaRed.Exito -> {

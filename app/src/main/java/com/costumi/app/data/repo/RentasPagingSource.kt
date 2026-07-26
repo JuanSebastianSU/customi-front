@@ -14,11 +14,13 @@ class RentasPagingSource(
     private val gson: Gson,
     /** Codigo de retiro que escribio el usuario; null o vacio = sin filtrar. */
     private val buscar: String? = null,
+    /** Bandeja/estado (chip): POR_ENTREGAR, ACTIVAS, VENCIDAS, CERRADAS; null = todas. */
+    private val filtro: String? = null,
 ) : PagingSource<Int, RentaResponse>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RentaResponse> {
         val pagina = params.key ?: 0
-        return when (val r = ejecutarLlamada(gson) { api.listar2(clienteId = null, buscar = buscar?.ifBlank { null }, pagina = pagina, tamano = params.loadSize) }) {
+        return when (val r = ejecutarLlamada(gson) { api.listar2(clienteId = null, buscar = buscar?.ifBlank { null }, filtro = filtro, pagina = pagina, tamano = params.loadSize) }) {
             is RespuestaRed.Fallo -> LoadResult.Error(RuntimeException(r.error.mensaje))
             is RespuestaRed.Exito -> {
                 val contenido = r.data.contenido.orEmpty()

@@ -1,6 +1,7 @@
 package com.costumi.app.ui.gestion.rentas
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,12 +32,22 @@ class RentasViewModel @Inject constructor(
     /** Texto de busqueda; al cambiar se vuelve a pedir la primera pagina. */
     private val _buscar = MutableStateFlow<String?>(null)
 
+    /** Bandeja/estado (chip): POR_ENTREGAR, ACTIVAS, VENCIDAS, CERRADAS; null = todas. */
+    private val _filtro = MutableStateFlow<String?>(null)
+
     /** El usuario escribio en la caja de busqueda. */
     fun buscar(texto: String) {
         _buscar.value = texto.trim().ifBlank { null }
     }
 
-    val rentas = _buscar.flatMapLatest { repo.rentas(it) }.cachedIn(viewModelScope)
+    /** Filtra por bandeja (chip); server-side, así que pagina bien. */
+    fun filtrarBandeja(filtro: String?) {
+        _filtro.value = filtro
+    }
+
+    val rentas = combine(_buscar, _filtro) { buscar, filtro -> buscar to filtro }
+        .flatMapLatest { (buscar, filtro) -> repo.rentas(buscar, filtro) }
+        .cachedIn(viewModelScope)
 
     private val _eventos = MutableSharedFlow<EventoRenta>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()

@@ -10,6 +10,7 @@ import com.costumi.app.core.comoPrecio
 import com.costumi.app.databinding.ItemVentaBinding
 import com.costumi.app.ui.cargarFoto
 import com.costumi.app.ui.common.colorDeTexto
+import com.costumi.app.ui.common.comoFechaHora
 import com.costumi.app.ui.common.pintarPastilla
 import com.costumi.apiclient.models.VentaResponse
 
@@ -40,6 +41,11 @@ class VentaAdapter(
                 v.codigoRetiro?.takeIf { it.isNotBlank() },
                 if (articulos == 1) "1 articulo" else "$articulos articulos",
             ).joinToString("  ·  ").ifBlank { "Sin codigo de retiro" }
+
+            // Cuándo se hizo la venta (recencia): la lista ya viene más reciente primero.
+            val fecha = v.creadaEn?.comoFechaHora()
+            binding.fecha.isVisible = fecha != null
+            binding.fecha.text = fecha.orEmpty()
 
             // Lo devuelto se muestra solo si lo hay, en el tono del estado (ámbar/gris).
             val devuelto = v.montoReembolsado?.takeIf { it.signum() > 0 }

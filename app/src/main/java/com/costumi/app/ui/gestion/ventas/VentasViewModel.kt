@@ -27,9 +27,10 @@ class VentasViewModel @Inject constructor(
     private val repo: VentaRepository,
 ) : ViewModel() {
 
-    /** Filtros del listado (A8): búsqueda por código + rango de fechas. Al cambiar, se re-pagina. */
+    /** Filtros del listado (A8): búsqueda por código + estado + rango de fechas. Al cambiar, se re-pagina. */
     private data class Filtros(
         val buscar: String? = null,
+        val estado: com.costumi.apiclient.apis.VentaControllerApi.EstadoListar? = null,
         val desde: java.time.LocalDate? = null,
         val hasta: java.time.LocalDate? = null,
     )
@@ -43,12 +44,17 @@ class VentasViewModel @Inject constructor(
         _filtros.value = _filtros.value.copy(buscar = texto.trim().ifBlank { null })
     }
 
+    /** Filtra por estado (chip); null = todas. El filtro es server-side, así que pagina bien. */
+    fun filtrarEstado(estado: com.costumi.apiclient.apis.VentaControllerApi.EstadoListar?) {
+        _filtros.value = _filtros.value.copy(estado = estado)
+    }
+
     fun fijarRango(desde: java.time.LocalDate?, hasta: java.time.LocalDate?) {
         _filtros.value = _filtros.value.copy(desde = desde, hasta = hasta)
         rango.value = if (desde != null && hasta != null) desde to hasta else null
     }
 
-    val ventas = _filtros.flatMapLatest { repo.ventas(it.buscar, it.desde, it.hasta) }.cachedIn(viewModelScope)
+    val ventas = _filtros.flatMapLatest { repo.ventas(it.buscar, it.estado, it.desde, it.hasta) }.cachedIn(viewModelScope)
 
     private val _eventos = MutableSharedFlow<EventoVenta>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()

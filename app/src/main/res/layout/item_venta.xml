@@ -63,6 +63,21 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     tools:text="V-32C0ECD9  ·  2 articulos" />
 
+                <!-- Cuando se hizo la venta (recencia): "hoy 14:30", "ayer 09:12", "12 jul 14:30". -->
+                <TextView
+                    android:id="@+id/fecha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:drawablePadding="6dp"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    app:drawableStartCompat="@drawable/ic_calendario"
+                    app:drawableTint="?attr/colorOnSurfaceVariant"
+                    tools:text="hoy 14:30" />
+
                 <TextView
                     android:id="@+id/devuelto"
                     android:layout_width="match_parent"
