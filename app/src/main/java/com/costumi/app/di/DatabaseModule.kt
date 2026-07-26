@@ -8,6 +8,7 @@ import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.FavoritoDao
 import com.costumi.app.data.local.dao.MiEmpresaDao
+import com.costumi.app.data.local.dao.PedidoDao
 import com.costumi.app.data.local.dao.PerfilDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
 import com.costumi.app.data.local.dao.SucursalDao
@@ -55,4 +56,7 @@ object DatabaseModule {
 
     @Provides
     fun provideDeudaDao(db: CostumiDatabase): DeudaDao = db.deudaDao()
+
+    @Provides
+    fun providePedidoDao(db: CostumiDatabase): PedidoDao = db.pedidoDao()
 }

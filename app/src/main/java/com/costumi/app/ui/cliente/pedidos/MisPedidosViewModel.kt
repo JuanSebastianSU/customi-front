@@ -3,6 +3,7 @@ package com.costumi.app.ui.cliente.pedidos
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.costumi.app.core.RespuestaRed
+import com.costumi.app.core.TipoError
 import com.costumi.app.core.UiState
 import com.costumi.app.data.repo.CuentaRepository
 import com.costumi.apiclient.models.HistorialItem
@@ -31,6 +32,13 @@ class MisPedidosViewModel @Inject constructor(
     private val _procesando = MutableStateFlow(false)
     val procesando = _procesando.asStateFlow()
 
+    /** true cuando se muestra caché porque el refresco falló por falta de red (aviso N4). */
+    private val _sinConexion = MutableStateFlow(false)
+    val sinConexion = _sinConexion.asStateFlow()
+
+    /** true tras el primer refresco: recién ahí una caché vacía significa "no tienes pedidos" (Empty). */
+    private var yaRefresco = false
+
     private val _eventos = MutableSharedFlow<EventoPedido>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()
 
@@ -44,7 +52,19 @@ class MisPedidosViewModel @Inject constructor(
     private var todos: List<HistorialItem> = emptyList()
 
     init {
+        // Cache-first: el historial se pinta desde Room y se actualiza solo cuando el refresco escribe.
+        observar()
         cargar()
+    }
+
+    private fun observar() {
+        viewModelScope.launch {
+            repo.observarHistorial().collect { lista ->
+                todos = lista
+                // Antes del primer refresco, una caché vacía es "cargando", no "no tienes pedidos".
+                if (lista.isNotEmpty() || yaRefresco) publicar()
+            }
+        }
     }
 
     fun filtrar(f: EstadoDePedido.Filtro) {
@@ -57,22 +77,33 @@ class MisPedidosViewModel @Inject constructor(
         viewModelScope.launch {
             _procesando.value = true
             when (val r = repo.solicitarReembolso(pedido, motivo)) {
-                is RespuestaRed.Exito -> _eventos.tryEmit(
-                    EventoPedido.Info("¡Solicitud enviada! La tienda revisara tu reembolso."),
-                )
+                is RespuestaRed.Exito -> {
+                    _eventos.tryEmit(EventoPedido.Info("¡Solicitud enviada! La tienda revisara tu reembolso."))
+                    cargar() // el estado del pedido cambió: refrescar el historial cacheado
+                }
                 is RespuestaRed.Fallo -> _eventos.tryEmit(EventoPedido.Error(r.error.mensaje))
             }
             _procesando.value = false
         }
     }
 
+    /** Refresca desde la red hacia Room. No tapa la caché con un spinner: solo Loading/Error si aún no hay datos. */
     fun cargar() {
         viewModelScope.launch {
-            _estado.value = UiState.Loading
-            when (val r = repo.miHistorial()) {
-                is RespuestaRed.Exito -> { todos = r.data; publicar() }
-                is RespuestaRed.Fallo ->
-                    _estado.value = UiState.Error(r.error.mensaje) { cargar() }
+            if (_estado.value !is UiState.Success) _estado.value = UiState.Loading
+            when (val r = repo.refrescarHistorial()) {
+                is RespuestaRed.Exito -> {
+                    yaRefresco = true
+                    _sinConexion.value = false
+                    // Si el historial quedó vacío tras refrescar, el Flow puede no re-emitir: publicá igual.
+                    publicar()
+                }
+                is RespuestaRed.Fallo -> {
+                    yaRefresco = true
+                    val hayCache = _estado.value is UiState.Success
+                    _sinConexion.value = hayCache && r.error.tipo == TipoError.SIN_CONEXION
+                    if (!hayCache) _estado.value = UiState.Error(r.error.mensaje) { cargar() }
+                }
             }
         }
     }

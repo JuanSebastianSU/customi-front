@@ -615,11 +615,19 @@ Orden acordado. El detalle de cada ítem está en `PLAN_PRODUCTO.md`.
 ### Ahora — Room / offline (ítem 7)
 Procedimiento completo en `PLAN_ROOM_OFFLINE.md`. Orden interno acordado:
 
-> **Avance 2026-07-26** (rama `feat/room-sucursales-y-tests`, aún sin mergear a `main`): se aplicaron **A3
-> Sucursales**, **A1 Catálogo**, **A2 Disfraces**, **A6 Perfil/Mi-tienda** y **A5 Mis multas** cache-first +
-> se cumplieron **B1** (logout limpia la caché) y **B2** (base v3→v8). Solo queda **A4** del Bloque A. Tests:
-> Sucursal 2/2 + Marketplace 6/6 + MiEmpresa 3/3 + Perfil 3/3 + MisDeudas 3/3 unit (17); Sucursal/Prenda/
-> Disfraz/Deuda DaoTest 3/3 c/u + CacheUnicaFilaDaoTest 3/3 instrumentado (deps mockk+coroutines-test+room-testing).
+> **Avance 2026-07-26** (rama `feat/room-sucursales-y-tests`, aún sin mergear a `main`): **Bloque A COMPLETO**
+> (A1 Catálogo, A2 Disfraces, A3 Sucursales, A4 Mis pedidos, A5 Mis multas, A6 Perfil/Mi-tienda) + **B1**
+> (logout), **B2** (base v3→v9) y **B3** (aviso N4). Solo queda B4 (se cierra) y el Bloque C (Paging3, rama
+> aparte). Tests: Sucursal 2/2 + Marketplace 6/6 + MiEmpresa 3/3 + Perfil 3/3 + MisDeudas 3/3 + Cuenta 3/3 +
+> MisDeudasViewModel 3/3 unit (23); Sucursal/Prenda/Disfraz/Deuda/Pedido DaoTest 3/3 c/u + CacheUnicaFila 3/3
+> instrumentado (deps mockk+coroutines-test+room-testing).
+>
+> **A4 detalle:** "Mis pedidos" (historial de compras/rentas) cacheado. Un pedido trae sus líneas anidadas;
+> en vez de una tabla 1-N con cascada se guarda el `HistorialItem` completo como JSON por fila (clave
+> `operacionId`, `orden` del servidor) — data inmutable de solo mostrar, el adapter usa el item entero
+> (mismo criterio que A5). `CuentaRepository.observarHistorial()`/`refrescarHistorial()`; `miHistorial()`
+> viejo intacto. `MisPedidosViewModel` cache-first (respeta el filtro en app) + aviso B3; tras un reembolso
+> refresca. Logout limpia el historial (N1).
 >
 > **A5 detalle:** multas/saldos del cliente cacheados (lista por-usuario, reemplazo de tabla completa como
 > Sucursal). Cada deuda es JSON por fila (el adapter usa el DTO completo con desglose), clave `rentaId`,
@@ -644,19 +652,19 @@ Procedimiento completo en `PLAN_ROOM_OFFLINE.md`. Orden interno acordado:
 > limpia ambos (N1).
 
 - [x] **B1** Borrado de la caché al cerrar sesión (norma de **seguridad**) — hecho (empresa/favoritos/sucursal/prendas/disfraces/mi-tienda/perfil)
-- [x] **B2** Subir `version` de `CostumiDatabase` — hecho (v8 con Deuda)
+- [x] **B2** Subir `version` de `CostumiDatabase` — hecho (v9 con Pedido)
 - [x] **A3** Sucursales por tienda — **HECHO** (entidad/DAO/repo observar-refrescar/VM observa/logout/tests)
 - [x] **A1** Catálogo de prendas por tienda — **HECHO** (índice+reemplazo por empresa, precios/etiquetas, VM cache-first, tests)
 - [x] **A2** Disfraces por tienda — **HECHO** (mismo molde; se cachea el conteo de piezas, no los slots)
 - [x] **A6** Mi perfil y mi tienda — **HECHO** (caché en memoria de MiEmpresa → Room; Perfil estrena caché; una fila JSON)
 - [x] **A5** Mis multas — **HECHO** (lista por-usuario, JSON por fila con orden; VM cache-first; N3 informativo)
-- [ ] **A4** Mis pedidos (el único que queda del Bloque A: historial 1-N pedido+líneas, el más complejo)
+- [x] **A4** Mis pedidos — **HECHO** (historial; `HistorialItem` completo con líneas como JSON por fila; VM cache-first + filtro + B3)
 - [ ] **A5** Mis multas
 - [x] **B3** Indicador de "sin conexión / datos guardados" (N4) — **HECHO** en las pantallas cache-first con lista
       (Tienda, Sucursales, Mis multas): Snackbar indefinido "Sin conexión · datos guardados / Reintentar" vía
       `Fragment.avisoDatosGuardados`, disparado por `sinConexion: StateFlow<Boolean>` (se prende solo si hay
       caché a la vista y el refresco falló por red). Perfil/Mi-tienda (formularios) quedan sin banner.
-- [~] **B4** Tests de DAOs y repositorios con caché — Sucursal/Prenda/Disfraz/Deuda/UnicaFila DAOs + Marketplace/MiEmpresa/Perfil/MisDeudas repos (17 unit); se suma por tabla
+- [x] **B4** Tests de DAOs y repositorios con caché — **HECHO para todo el Bloque A**: DAOs Sucursal/Prenda/Disfraz/Deuda/Pedido/UnicaFila + repos Marketplace/MiEmpresa/Perfil/MisDeudas/Cuenta + MisDeudasViewModel (23 unit + instrumentados)
 - [ ] **C** Inventario con Paging 3 + RemoteMediator _(rama aparte, al final)_
 
 ### Después — Bloqueantes para publicar (ítems 1-4)

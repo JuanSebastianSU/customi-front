@@ -8,6 +8,7 @@ import com.costumi.app.core.TipoError
 import com.costumi.app.data.local.dao.DeudaDao
 import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.FavoritoDao
+import com.costumi.app.data.local.dao.PedidoDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
 import com.costumi.app.data.local.dao.SucursalDao
 import com.costumi.app.data.remote.ejecutarLlamada
@@ -43,6 +44,7 @@ class AuthRepository @Inject constructor(
     private val prendasVitrina: PrendaVitrinaDao,
     private val disfracesVitrina: DisfrazVitrinaDao,
     private val deudas: DeudaDao,
+    private val pedidos: PedidoDao,
 ) {
     fun haySesion(): Boolean = sesion.haySesion()
 
@@ -123,6 +125,8 @@ class AuthRepository @Inject constructor(
         disfracesVitrina.limpiar()
         // Las multas/saldos cacheados son datos personales de la cuenta que se cierra (norma N1).
         deudas.limpiar()
+        // El historial de pedidos cacheado es de la cuenta que se cierra (norma N1).
+        pedidos.limpiar()
         RespuestaRed.Exito(Unit)
     }
 }

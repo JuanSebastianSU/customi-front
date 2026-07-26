@@ -9,11 +9,13 @@ import com.costumi.app.core.UiState
 import com.costumi.app.core.comoPrecio
 import com.costumi.app.databinding.DialogMotivoBinding
 import com.costumi.app.databinding.FragmentMisPedidosBinding
+import com.costumi.app.ui.avisoDatosGuardados
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.observar
 import com.costumi.apiclient.models.HistorialItem
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 /** "Mis Pedidos": historial de compras/rentas del cliente en todas las tiendas del marketplace. */
@@ -24,12 +26,14 @@ class MisPedidosFragment : Fragment(R.layout.fragment_mis_pedidos) {
     private var _binding: FragmentMisPedidosBinding? = null
     private val binding get() = _binding!!
     private val adapter = PedidoAdapter { pedido -> mostrarDialogoReembolso(pedido) }
+    private var avisoRed: Snackbar? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentMisPedidosBinding.bind(view)
         binding.lista.adapter = adapter
         pintarChipsFiltro()
 
+        observar(vm.sinConexion) { off -> avisoRed = avisoDatosGuardados(avisoRed, off) { vm.cargar() } }
         observar(vm.estado) { estado ->
             // Si el filtro deja la lista vacia (o hay error/carga), hay que LIMPIAR las filas previas:
             // el StateView es transparente y, sin esto, se veian las de antes debajo del "Todavia no
@@ -76,6 +80,8 @@ class MisPedidosFragment : Fragment(R.layout.fragment_mis_pedidos) {
     }
 
     override fun onDestroyView() {
+        avisoRed?.dismiss()
+        avisoRed = null
         binding.lista.adapter = null
         _binding = null
         super.onDestroyView()

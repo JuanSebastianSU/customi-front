@@ -7,6 +7,7 @@ import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.FavoritoDao
 import com.costumi.app.data.local.dao.MiEmpresaDao
+import com.costumi.app.data.local.dao.PedidoDao
 import com.costumi.app.data.local.dao.PerfilDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
 import com.costumi.app.data.local.dao.SucursalDao
@@ -15,6 +16,7 @@ import com.costumi.app.data.local.entity.DisfrazVitrinaEntity
 import com.costumi.app.data.local.entity.EmpresaEntity
 import com.costumi.app.data.local.entity.FavoritoDisfrazEntity
 import com.costumi.app.data.local.entity.MiEmpresaEntity
+import com.costumi.app.data.local.entity.PedidoEntity
 import com.costumi.app.data.local.entity.PerfilEntity
 import com.costumi.app.data.local.entity.PrendaVitrinaEntity
 import com.costumi.app.data.local.entity.SucursalEntity
@@ -33,8 +35,9 @@ import com.costumi.app.data.local.entity.SucursalEntity
         MiEmpresaEntity::class,
         PerfilEntity::class,
         DeudaEntity::class,
+        PedidoEntity::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = false,
 )
 abstract class CostumiDatabase : RoomDatabase() {
@@ -46,6 +49,7 @@ abstract class CostumiDatabase : RoomDatabase() {
     abstract fun miEmpresaDao(): MiEmpresaDao
     abstract fun perfilDao(): PerfilDao
     abstract fun deudaDao(): DeudaDao
+    abstract fun pedidoDao(): PedidoDao
 
     companion object {
         const val NOMBRE = "costumi.db"

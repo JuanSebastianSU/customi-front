@@ -5,6 +5,8 @@ import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.ErrorApi
 import com.costumi.app.core.TipoError
 import com.costumi.app.core.mapear
+import com.costumi.app.data.local.dao.PedidoDao
+import com.costumi.app.data.local.entity.PedidoEntity
 import com.costumi.app.data.remote.ejecutarLlamada
 import com.costumi.apiclient.apis.ClienteControllerApi
 import com.costumi.apiclient.apis.EmpresaControllerApi
@@ -15,6 +17,8 @@ import com.costumi.apiclient.models.RegistrarEmpresaRequest
 import com.costumi.apiclient.models.SolicitarReembolsoDeClienteRequest
 import com.costumi.apiclient.models.SolicitudDeReembolsoResponse
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,12 +32,42 @@ class CuentaRepository @Inject constructor(
     private val clienteApi: ClienteControllerApi,
     private val empresaApi: EmpresaControllerApi,
     private val reembolsoApi: ReembolsoControllerApi,
+    private val pedidoDao: PedidoDao,
     private val gson: Gson,
     private val dispatchers: DispatcherProvider,
 ) {
     suspend fun miHistorial(): RespuestaRed<List<HistorialItem>> = withContext(dispatchers.io) {
         ejecutarLlamada(gson) { clienteApi.miHistorial() }.mapear { it.contenido.orEmpty() }
     }
+
+    /**
+     * Historial cacheado (Room, `PLAN_ROOM_OFFLINE.md` A4). La UI observa esto y el repo sincroniza con
+     * [refrescarHistorial]. Reconstruye el `HistorialItem` completo (con sus líneas) desde el JSON guardado.
+     */
+    fun observarHistorial(): Flow<List<HistorialItem>> =
+        pedidoDao.observarTodos().map { lista -> lista.mapNotNull { it.aItem() } }
+
+    /** Trae el historial desde la red y **escribe en Room** (los datos llegan por el Flow). Solo devuelve el error. */
+    suspend fun refrescarHistorial(): RespuestaRed<Unit> = withContext(dispatchers.io) {
+        when (val r = ejecutarLlamada(gson) { clienteApi.miHistorial() }.mapear { it.contenido.orEmpty() }) {
+            is RespuestaRed.Fallo -> r
+            is RespuestaRed.Exito -> {
+                pedidoDao.reemplazar(r.data.mapIndexedNotNull { i, item -> item.aEntity(i) })
+                RespuestaRed.Exito(Unit)
+            }
+        }
+    }
+
+    /** Borra el historial cacheado (se llama al cerrar sesión, norma N1). */
+    suspend fun limpiarHistorial() = withContext(dispatchers.io) { pedidoDao.limpiar() }
+
+    private fun HistorialItem.aEntity(orden: Int): PedidoEntity? {
+        val id = operacionId?.toString() ?: return null
+        return PedidoEntity(operacionId = id, orden = orden, json = gson.toJson(this))
+    }
+
+    private fun PedidoEntity.aItem(): HistorialItem? =
+        runCatching { gson.fromJson(json, HistorialItem::class.java) }.getOrNull()
 
     /** Solicita el reembolso de una operación propia (RF-18.9): la tienda la aprueba/rechaza. */
     suspend fun solicitarReembolso(
