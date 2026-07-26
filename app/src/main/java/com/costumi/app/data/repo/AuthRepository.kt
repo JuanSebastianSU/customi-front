@@ -6,6 +6,7 @@ import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.Rol
 import com.costumi.app.core.TipoError
 import com.costumi.app.data.local.dao.FavoritoDao
+import com.costumi.app.data.local.dao.PrendaVitrinaDao
 import com.costumi.app.data.local.dao.SucursalDao
 import com.costumi.app.data.remote.ejecutarLlamada
 import com.costumi.app.data.remote.session.SesionLocal
@@ -36,6 +37,7 @@ class AuthRepository @Inject constructor(
     private val miEmpresa: MiEmpresaRepository,
     private val favoritos: FavoritoDao,
     private val sucursales: SucursalDao,
+    private val prendasVitrina: PrendaVitrinaDao,
 ) {
     fun haySesion(): Boolean = sesion.haySesion()
 
@@ -109,6 +111,8 @@ class AuthRepository @Inject constructor(
         favoritos.limpiar()
         // Las sucursales cacheadas son de la empresa de esta sesion (norma N1 del plan de Room).
         sucursales.limpiar()
+        // El catalogo cacheado de las tiendas visitadas tambien se borra (norma N1).
+        prendasVitrina.limpiar()
         RespuestaRed.Exito(Unit)
     }
 }

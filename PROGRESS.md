@@ -615,21 +615,28 @@ Orden acordado. El detalle de cada ítem está en `PLAN_PRODUCTO.md`.
 ### Ahora — Room / offline (ítem 7)
 Procedimiento completo en `PLAN_ROOM_OFFLINE.md`. Orden interno acordado:
 
-> **Avance 2026-07-26** (rama `feat/room-sucursales-y-tests`, aún sin mergear a `main`): se aplicó **A3
-> Sucursales** cache-first + se cumplieron **B1** (logout limpia la caché, incl. sucursales) y **B2** (base
-> v3→v4). Se estrenaron los **tests** (SucursalRepositoryTest unit 2/2 + SucursalDaoTest instrumentado 3/3;
-> deps mockk + coroutines-test + room-testing). El molde ya está: los A restantes van más rápido.
+> **Avance 2026-07-26** (rama `feat/room-sucursales-y-tests`, aún sin mergear a `main`): se aplicaron **A3
+> Sucursales** y **A1 Catálogo de prendas** cache-first + se cumplieron **B1** (logout limpia la caché) y
+> **B2** (base v3→v5). Se estrenaron los **tests** (SucursalRepositoryTest 2/2 + MarketplaceRepositoryTest
+> 3/3 unit; SucursalDaoTest 3/3 + PrendaVitrinaDaoTest 3/3 instrumentado; deps mockk + coroutines-test +
+> room-testing). El molde ya está: los A restantes van más rápido.
+>
+> **A1 detalle:** catálogo cacheado **por tienda** (índice `empresaId`), con reemplazo por-empresa
+> (`reemplazarDeEmpresa`) para no borrar el caché de otras tiendas al abrir una nueva (§9.1). Precios
+> `BigDecimal` como texto y etiquetas como JSON, sin TypeConverters. `catalogo()` con categoría se dejó
+> intacto (los usos filtrados de RentaForm/VentaPos siguen server-side). `TiendaViewModel.cargarPrendas`
+> ahora observa Room y refresca sin tapar la caché; disfraces sigue server-side hasta A2.
 
-- [x] **B1** Borrado de la caché al cerrar sesión (norma de **seguridad**) — hecho (empresa/favoritos/sucursal)
-- [x] **B2** Subir `version` de `CostumiDatabase` — hecho (v4 con SucursalEntity)
+- [x] **B1** Borrado de la caché al cerrar sesión (norma de **seguridad**) — hecho (empresa/favoritos/sucursal/prendas)
+- [x] **B2** Subir `version` de `CostumiDatabase` — hecho (v5 con PrendaVitrinaEntity)
 - [x] **A3** Sucursales por tienda — **HECHO** (entidad/DAO/repo observar-refrescar/VM observa/logout/tests)
+- [x] **A1** Catálogo de prendas por tienda — **HECHO** (índice+reemplazo por empresa, precios/etiquetas, VM cache-first, tests)
 - [ ] **A4** Mis pedidos (el mejor candidato: es historial, ya no cambia)
-- [ ] **A1** Catálogo de prendas por tienda
 - [ ] **A2** Disfraces por tienda
 - [ ] **A5** Mis multas
 - [ ] **A6** Mi perfil y mi tienda (elimina la caché en memoria de `MiEmpresaRepository`)
 - [ ] **B3** Indicador de "sin conexión / datos guardados"
-- [~] **B4** Tests de DAOs y repositorios con caché — empezado (SucursalDao + SucursalRepository); se suma por tabla
+- [~] **B4** Tests de DAOs y repositorios con caché — SucursalDao/Repository + PrendaVitrinaDao/MarketplaceRepository; se suma por tabla
 - [ ] **C** Inventario con Paging 3 + RemoteMediator _(rama aparte, al final)_
 
 ### Después — Bloqueantes para publicar (ítems 1-4)

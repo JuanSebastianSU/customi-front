@@ -41,10 +41,24 @@ class TiendaViewModel @Inject constructor(
     private val _descripcion = MutableStateFlow<String?>(null)
     val descripcion = _descripcion.asStateFlow()
 
+    /** true tras el primer refresco de prendas: recién ahí una caché vacía significa "no hay prendas" (Empty). */
+    private var yaRefrescoPrendas = false
+
     init {
         cargarDisfraces()
+        // Cache-first: las prendas se pintan desde Room y se actualizan solas cuando el refresco escribe.
+        observarPrendas()
         cargarPrendas()
         cargarDetalle()
+    }
+
+    private fun observarPrendas() {
+        viewModelScope.launch {
+            repo.observarCatalogo(empresaId).collect { lista ->
+                if (lista.isNotEmpty()) _prendas.value = UiState.Success(lista)
+                else if (yaRefrescoPrendas) _prendas.value = UiState.Empty
+            }
+        }
     }
 
     private fun cargarDetalle() {
@@ -64,12 +78,16 @@ class TiendaViewModel @Inject constructor(
         }
     }
 
+    /** Refresca el catálogo desde la red hacia Room. No tapa la caché: solo muestra Loading/Error si aún no hay datos. */
     fun cargarPrendas() {
         viewModelScope.launch {
-            _prendas.value = UiState.Loading
-            _prendas.value = when (val r = repo.catalogo(empresaId)) {
-                is RespuestaRed.Exito -> if (r.data.isEmpty()) UiState.Empty else UiState.Success(r.data)
-                is RespuestaRed.Fallo -> UiState.Error(r.error.mensaje) { cargarPrendas() }
+            if (_prendas.value !is UiState.Success) _prendas.value = UiState.Loading
+            when (val r = repo.refrescarCatalogo(empresaId)) {
+                is RespuestaRed.Exito -> yaRefrescoPrendas = true // el Flow de Room actualiza la lista
+                is RespuestaRed.Fallo -> {
+                    yaRefrescoPrendas = true
+                    if (_prendas.value !is UiState.Success) _prendas.value = UiState.Error(r.error.mensaje) { cargarPrendas() }
+                }
             }
         }
     }

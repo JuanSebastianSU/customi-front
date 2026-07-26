@@ -6,14 +6,18 @@ import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.mapear
 import com.costumi.app.core.TipoError
 import com.costumi.app.data.local.dao.EmpresaDao
+import com.costumi.app.data.local.dao.PrendaVitrinaDao
 import com.costumi.app.data.local.entity.EmpresaEntity
+import com.costumi.app.data.local.entity.PrendaVitrinaEntity
 import com.costumi.app.data.remote.ejecutarLlamada
 import com.costumi.apiclient.apis.DisfrazControllerApi
 import com.costumi.apiclient.apis.DisfrazMarketplaceControllerApi
 import com.costumi.apiclient.apis.MarketplaceControllerApi
 import com.costumi.apiclient.models.DisfrazDetalleResponse
 import com.costumi.apiclient.models.DisfrazResponse
+import com.costumi.apiclient.models.EtiquetaVitrinaDto
 import com.costumi.apiclient.models.PrendaVitrinaResponse
+import java.math.BigDecimal
 import com.costumi.apiclient.models.RentarDisfrazRequest
 import com.costumi.apiclient.models.RentarDisfrazResponse
 import com.costumi.apiclient.models.SeleccionSlotDto
@@ -23,6 +27,7 @@ import com.costumi.apiclient.models.VenderDisfrazResponse
 import java.time.LocalDate
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -39,6 +44,7 @@ class MarketplaceRepository @Inject constructor(
     private val disfrazApi: DisfrazMarketplaceControllerApi,
     private val disfrazAccionApi: DisfrazControllerApi,
     private val empresaDao: EmpresaDao,
+    private val prendaVitrinaDao: PrendaVitrinaDao,
     private val gson: Gson,
     private val dispatchers: DispatcherProvider,
 ) {
@@ -77,6 +83,31 @@ class MarketplaceRepository @Inject constructor(
                 )
             ejecutarLlamada(gson) { api.catalogo1(uuid, categoriaId) }
         }
+
+    /**
+     * Catálogo cacheado de una tienda (`PLAN_ROOM_OFFLINE.md` A1). La UI observa esto (Room como fuente de
+     * verdad) y el repo lo sincroniza con [refrescarCatalogo]. Se filtra por `empresaId` para no mezclar
+     * tiendas. El filtro por categoría/etiqueta se sigue haciendo en la app sobre esta lista, así que aquí
+     * NO se filtra por la red (guardar un subconjunto filtrado dejaría la caché incompleta, §9.1).
+     */
+    fun observarCatalogo(empresaId: String): Flow<List<PrendaVitrinaResponse>> =
+        prendaVitrinaDao.observarDeEmpresa(empresaId).map { lista -> lista.map { it.aResponse() } }
+
+    /** Trae el catálogo completo de la tienda desde la red y **escribe en Room** (reemplaza solo esa tienda). */
+    suspend fun refrescarCatalogo(empresaId: String): RespuestaRed<Unit> = withContext(dispatchers.io) {
+        val uuid = runCatching { UUID.fromString(empresaId) }.getOrNull()
+            ?: return@withContext RespuestaRed.Fallo(ErrorApi(TipoError.DESCONOCIDO, "Tienda no valida."))
+        when (val r = ejecutarLlamada(gson) { api.catalogo1(uuid, null) }) {
+            is RespuestaRed.Fallo -> r
+            is RespuestaRed.Exito -> {
+                prendaVitrinaDao.reemplazarDeEmpresa(empresaId, r.data.mapNotNull { it.aEntity(empresaId) })
+                RespuestaRed.Exito(Unit)
+            }
+        }
+    }
+
+    /** Borra la caché del catálogo (se llama al cerrar sesión, norma N1). */
+    suspend fun limpiarCacheCatalogo() = withContext(dispatchers.io) { prendaVitrinaDao.limpiar() }
 
     /** Sucursales (puntos de retiro) publicas de una tienda. */
     suspend fun sucursales(empresaId: UUID): RespuestaRed<List<com.costumi.apiclient.models.SucursalVitrinaResponse>> =
@@ -158,4 +189,35 @@ class MarketplaceRepository @Inject constructor(
         )
         ejecutarLlamada(gson) { disfrazAccionApi.vender(disfrazId, req) }
     }
+
+    // --- Mapeadores DTO <-> Entity del catálogo (UUID/precio como texto, etiquetas como JSON) ---
+
+    /** null si la prenda no trae id (sin clave primaria no se puede cachear). [empresaId] viene del contexto. */
+    private fun PrendaVitrinaResponse.aEntity(empresaId: String): PrendaVitrinaEntity? {
+        val idTexto = id?.toString() ?: return null
+        return PrendaVitrinaEntity(
+            id = idTexto,
+            empresaId = empresaId,
+            nombre = nombre,
+            tipoArticulo = tipoArticulo,
+            precioRenta = precioRenta?.toPlainString(),
+            precioVenta = precioVenta?.toPlainString(),
+            categoria = categoria,
+            fotoUrl = fotoUrl,
+            etiquetasJson = etiquetas?.takeIf { it.isNotEmpty() }?.let { gson.toJson(it) },
+        )
+    }
+
+    private fun PrendaVitrinaEntity.aResponse(): PrendaVitrinaResponse = PrendaVitrinaResponse(
+        id = runCatching { UUID.fromString(id) }.getOrNull(),
+        nombre = nombre,
+        tipoArticulo = tipoArticulo,
+        precioRenta = precioRenta?.let { runCatching { BigDecimal(it) }.getOrNull() },
+        precioVenta = precioVenta?.let { runCatching { BigDecimal(it) }.getOrNull() },
+        categoria = categoria,
+        fotoUrl = fotoUrl,
+        etiquetas = etiquetasJson?.let {
+            runCatching { gson.fromJson(it, Array<EtiquetaVitrinaDto>::class.java).toList() }.getOrNull()
+        },
+    )
 }
