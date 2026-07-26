@@ -44,7 +44,7 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
     // "Rentas" y "Reembolsos" ya NO están: Rentas se abre desde el toggle de Ventas, y Reembolsos desde
     // el toggle de Devoluciones. Se evita duplicar el acceso.
     private val secciones = listOf(
-        "Devoluciones",
+        "Devoluciones y reembolsos",
         "Pagos y cobros",
         "Caja / turnos",
         "Reportes",
@@ -60,7 +60,7 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
     /** Cada sección de «Más» → la {@code Seccion} del backend que la habilita (para el filtro por permisos). */
     private val seccionEnumDe = mapOf(
         "Rentas" to "RENTAS",
-        "Devoluciones" to "DEVOLUCIONES",
+        "Devoluciones y reembolsos" to "DEVOLUCIONES",
         "Pagos y cobros" to "PAGOS",
         "Caja / turnos" to "CAJA",
         "Reembolsos" to "REEMBOLSOS",
@@ -83,12 +83,12 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
     private fun seccionesDe(rol: Rol): Set<String> = when (rol) {
         Rol.DUENO, Rol.ENCARGADO -> secciones.toSet()
         Rol.MOSTRADOR -> setOf(
-            "Devoluciones", "Pagos y cobros", "Caja / turnos", "Notificaciones",
+            "Devoluciones y reembolsos", "Pagos y cobros", "Caja / turnos", "Notificaciones",
         )
         Rol.ATENCION -> setOf(
-            "Devoluciones", "Pagos y cobros", "Notificaciones",
+            "Devoluciones y reembolsos", "Pagos y cobros", "Notificaciones",
         )
-        Rol.BODEGA -> setOf("Devoluciones", "Notificaciones")
+        Rol.BODEGA -> setOf("Devoluciones y reembolsos", "Notificaciones")
         else -> emptySet()
     }
 
@@ -168,7 +168,7 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
         // Secciones ya implementadas: se navega a su pantalla real; el resto, al placeholder.
         val destino = when (titulo) {
             "Rentas" -> R.id.rentasFragment
-            "Devoluciones" -> R.id.devolucionesFragment
+            "Devoluciones y reembolsos" -> R.id.devolucionesFragment
             "Pagos y cobros" -> R.id.pagosFragment
             "Caja / turnos" -> R.id.cajaFragment
             "Reembolsos" -> R.id.reembolsosFragment
