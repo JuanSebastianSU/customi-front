@@ -271,7 +271,9 @@
       "PowerShell($g = Get-Command gh -ErrorAction SilentlyContinue; if \\($g\\) { $g.Source } else { \"gh NOT on PATH\" })",
       "Bash(curl -s -m 30 -w '\\\\n[HTTP %{http_code} · %{time_total}s]\\\\n' -X POST __TRACKED_VAR__/api/v1/auth/olvide -H 'Content-Type: application/json' -d '{\"email\":\"jsebastiansantacruzurgilez2005@gmail.com\"}')",
       "Bash(cd \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\" *)",
-      "Bash(grep -iE \"keystore|\\\\.jks|\\\\.properties$\")"
+      "Bash(grep -iE \"keystore|\\\\.jks|\\\\.properties$\")",
+      "Bash(python -c ' *)",
+      "Bash(xargs grep -o 'tests=\"[0-9]*\"[^>]*failures=\"[0-9]*\"[^>]*errors=\"[0-9]*\"')"
     ]
   }
 }

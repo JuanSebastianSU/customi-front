@@ -33,7 +33,8 @@ class SmokeConectividadTest {
         val api = retrofit.create(MarketplaceControllerApi::class.java)
 
         val respuesta = api.empresas(buscar = null)
-        println("Marketplace HTTP ${respuesta.code()} — empresas=${respuesta.body()?.size}")
+        // (el body es un objeto paginado {contenido,...}; para el smoke basta con que responda 2xx)
+        println("Marketplace HTTP ${respuesta.code()}")
 
         assertTrue("Esperaba 2xx del marketplace, fue ${respuesta.code()}", respuesta.isSuccessful)
     }

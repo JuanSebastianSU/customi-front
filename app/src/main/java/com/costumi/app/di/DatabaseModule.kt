@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.costumi.app.data.local.CostumiDatabase
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.FavoritoDao
+import com.costumi.app.data.local.dao.SucursalDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,4 +32,7 @@ object DatabaseModule {
 
     @Provides
     fun provideFavoritoDao(db: CostumiDatabase): FavoritoDao = db.favoritoDao()
+
+    @Provides
+    fun provideSucursalDao(db: CostumiDatabase): SucursalDao = db.sucursalDao()
 }

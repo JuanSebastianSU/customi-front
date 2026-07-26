@@ -35,18 +35,33 @@ class SucursalesViewModel @Inject constructor(
     private val _eventos = MutableSharedFlow<EventoSucursal>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()
 
+    /** true tras el primer refresco: recién ahí una caché vacía significa "no hay sucursales" (Empty). */
+    private var yaRefresco = false
+
     init {
+        // Cache-first: la pantalla se pinta desde Room y se actualiza sola cuando el refresco escribe.
+        viewModelScope.launch {
+            repo.observarSucursales().collect { lista ->
+                if (lista.isNotEmpty()) {
+                    _estado.value = UiState.Success(lista.sortedByDescending { it.archivada != true })
+                } else if (yaRefresco) {
+                    _estado.value = UiState.Empty
+                }
+            }
+        }
         cargar()
     }
 
+    /** Refresca desde la red hacia Room. No tapa la caché con un spinner: solo muestra Loading/Error si aún no hay datos. */
     fun cargar() {
         viewModelScope.launch {
-            _estado.value = UiState.Loading
-            _estado.value = when (val r = repo.sucursales()) {
-                is RespuestaRed.Exito ->
-                    if (r.data.isEmpty()) UiState.Empty
-                    else UiState.Success(r.data.sortedByDescending { it.archivada != true })
-                is RespuestaRed.Fallo -> UiState.Error(r.error.mensaje) { cargar() }
+            if (_estado.value !is UiState.Success) _estado.value = UiState.Loading
+            when (val r = repo.refrescarSucursales()) {
+                is RespuestaRed.Exito -> yaRefresco = true // el Flow de Room actualiza la lista
+                is RespuestaRed.Fallo -> {
+                    yaRefresco = true
+                    if (_estado.value !is UiState.Success) _estado.value = UiState.Error(r.error.mensaje) { cargar() }
+                }
             }
         }
     }

@@ -137,8 +137,15 @@ dependencies {
     // Listas grandes (paginación)
     implementation(libs.paging.runtime)
 
-    // Test
+    // Test (unitarios: JUnit + mockk + corrutinas de test)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+
+    // Test instrumentado (DAOs de Room con base en memoria, corre en el emulador)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.room.testing)
 }

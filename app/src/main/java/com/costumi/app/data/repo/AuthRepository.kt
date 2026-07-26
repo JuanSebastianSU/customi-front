@@ -6,6 +6,7 @@ import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.Rol
 import com.costumi.app.core.TipoError
 import com.costumi.app.data.local.dao.FavoritoDao
+import com.costumi.app.data.local.dao.SucursalDao
 import com.costumi.app.data.remote.ejecutarLlamada
 import com.costumi.app.data.remote.session.SesionLocal
 import com.costumi.apiclient.apis.AuthControllerApi
@@ -34,6 +35,7 @@ class AuthRepository @Inject constructor(
     private val push: PushRepository,
     private val miEmpresa: MiEmpresaRepository,
     private val favoritos: FavoritoDao,
+    private val sucursales: SucursalDao,
 ) {
     fun haySesion(): Boolean = sesion.haySesion()
 
@@ -105,6 +107,8 @@ class AuthRepository @Inject constructor(
         miEmpresa.limpiar()
         // Los favoritos guardados son de la cuenta que se cierra: no deben verse en la proxima sesion.
         favoritos.limpiar()
+        // Las sucursales cacheadas son de la empresa de esta sesion (norma N1 del plan de Room).
+        sucursales.limpiar()
         RespuestaRed.Exito(Unit)
     }
 }
