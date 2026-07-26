@@ -165,6 +165,11 @@ class InventarioFragment : Fragment(R.layout.fragment_inventario) {
         }
     }
 
+    /**
+     * Filtro por etiqueta en DOS niveles: primero solo los TIPOS (Talla, Color, Ocasión...), cada uno con
+     * cuántos valores llevas elegidos; al tocar un tipo se abren SUS valores. Antes se pintaban todos los
+     * tipos con todos sus valores de golpe y con muchas etiquetas se volvía inusable.
+     */
     private fun mostrarDialogoFiltros() {
         val tipos = vm.tipos.value
         if (tipos.isEmpty()) {
@@ -172,45 +177,99 @@ class InventarioFragment : Fragment(R.layout.fragment_inventario) {
             return
         }
         val ctx = requireContext()
-        val margen = (16 * resources.displayMetrics.density).toInt()
+        val dp = resources.displayMetrics.density
+        val margen = (24 * dp).toInt()
+
+        // Copia editable de la selección; se confirma con "Aplicar".
+        val seleccion: MutableMap<UUID, MutableSet<UUID>> =
+            vm.etiquetasSel.value.mapValues { it.value.toMutableSet() }.toMutableMap()
+
         val contenedor = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(margen + margen / 2, margen / 2, margen + margen / 2, 0)
+            setPadding(margen, (8 * dp).toInt(), margen, 0)
         }
-        val grupos = LinkedHashMap<UUID, ChipGroup>()
-        val seleccionActual = vm.etiquetasSel.value
+        // Por cada tipo, una fila tocable con su nombre y cuántos valores llevas elegidos.
+        val subtitulos = LinkedHashMap<UUID, TextView>()
         tipos.forEach { tv ->
             val tipoId = tv.tipo.id ?: return@forEach
-            contenedor.addView(TextView(ctx).apply {
-                text = tv.tipo.nombre.orEmpty()
-                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleSmall)
-                setPadding(0, margen / 2, 0, 0)
-            })
-            val cg = ChipGroup(ctx).apply { isSingleSelection = false }
-            tv.valores.forEach { valor ->
-                val vid = valor.id ?: return@forEach
-                val chip = layoutInflater.inflate(R.layout.chip_filtro, cg, false) as Chip
-                chip.text = valor.valor.orEmpty()
-                chip.tag = vid
-                chip.isChecked = seleccionActual[tipoId]?.contains(vid) == true
-                cg.addView(chip)
+            val fila = LinearLayout(ctx).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(0, (12 * dp).toInt(), 0, (12 * dp).toInt())
+                isClickable = true
+                val fondo = android.util.TypedValue()
+                ctx.theme.resolveAttribute(android.R.attr.selectableItemBackground, fondo, true)
+                setBackgroundResource(fondo.resourceId)
             }
-            grupos[tipoId] = cg
-            contenedor.addView(cg)
+            val textos = LinearLayout(ctx).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            textos.addView(TextView(ctx).apply {
+                text = tv.tipo.nombre.orEmpty()
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium)
+            })
+            val sub = TextView(ctx).apply {
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall)
+                setTextColor(com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant))
+            }
+            subtitulos[tipoId] = sub
+            textos.addView(sub)
+            fila.addView(textos)
+            fila.addView(android.widget.ImageView(ctx).apply {
+                setImageResource(R.drawable.ic_chevron_right)
+                imageTintList = android.content.res.ColorStateList.valueOf(
+                    com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant),
+                )
+            })
+            fila.setOnClickListener {
+                elegirValoresDeTipo(tv, seleccion[tipoId] ?: mutableSetOf()) { nueva ->
+                    if (nueva.isEmpty()) seleccion.remove(tipoId) else seleccion[tipoId] = nueva
+                    actualizarSubtitulo(sub, tv, nueva.size)
+                }
+            }
+            actualizarSubtitulo(sub, tv, seleccion[tipoId]?.size ?: 0)
+            contenedor.addView(fila)
         }
+
         val scroll = ScrollView(ctx).apply { addView(contenedor) }
         MaterialAlertDialogBuilder(ctx)
             .setTitle("Filtrar por etiqueta")
             .setView(scroll)
             .setPositiveButton("Aplicar") { _, _ ->
-                val seleccion = grupos.mapValues { (_, cg) ->
-                    (0 until cg.childCount).mapNotNull { i ->
-                        (cg.getChildAt(i) as Chip).takeIf { it.isChecked }?.tag as? UUID
-                    }.toSet()
-                }
-                vm.aplicarEtiquetas(seleccion)
+                vm.aplicarEtiquetas(seleccion.filterValues { it.isNotEmpty() }.mapValues { it.value.toSet() })
             }
             .setNeutralButton("Limpiar") { _, _ -> vm.aplicarEtiquetas(emptyMap()) }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    /** Subtítulo de la fila de un tipo: "Todos" si no eligió nada, o "N elegidos". */
+    private fun actualizarSubtitulo(sub: TextView, tv: com.costumi.app.data.repo.TipoConValores, cuenta: Int) {
+        sub.text = when {
+            cuenta == 0 -> "Todos"
+            cuenta == 1 -> "1 elegido"
+            else -> "$cuenta elegidos"
+        }
+    }
+
+    /** Segundo nivel: los valores de UN tipo, como lista de casillas. Devuelve la nueva selección. */
+    private fun elegirValoresDeTipo(
+        tv: com.costumi.app.data.repo.TipoConValores,
+        seleccionActual: Set<UUID>,
+        alConfirmar: (MutableSet<UUID>) -> Unit,
+    ) {
+        val valores = tv.valores.filter { it.id != null }
+        if (valores.isEmpty()) { mostrarMensaje("Este tipo no tiene valores."); return }
+        val nombres = valores.map { it.valor.orEmpty() }.toTypedArray()
+        val marcadas = valores.map { it.id in seleccionActual }.toBooleanArray()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(tv.tipo.nombre.orEmpty())
+            .setMultiChoiceItems(nombres, marcadas) { _, which, isChecked -> marcadas[which] = isChecked }
+            .setPositiveButton("Listo") { _, _ ->
+                val nueva = valores.filterIndexed { i, _ -> marcadas[i] }.mapNotNull { it.id }.toMutableSet()
+                alConfirmar(nueva)
+            }
             .setNegativeButton("Cancelar", null)
             .show()
     }

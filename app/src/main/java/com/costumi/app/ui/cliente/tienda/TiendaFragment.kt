@@ -58,10 +58,17 @@ class TiendaFragment : Fragment(R.layout.fragment_tienda) {
         observar(vm.descripcion) { binding.toolbar.subtitle = it }
 
         binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) = render()
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                vm.pestanaActiva = binding.tabs.selectedTabPosition
+                render()
+            }
             override fun onTabUnselected(tab: TabLayout.Tab) = Unit
             override fun onTabReselected(tab: TabLayout.Tab) = Unit
         })
+
+        // Al volver del detalle la vista se recrea y el TabLayout arrancaba en Disfraces aunque
+        // estuvieras en Prendas: se restaura la pestaña que quedó activa.
+        binding.tabs.getTabAt(vm.pestanaActiva)?.takeIf { !it.isSelected }?.select()
 
         observar(vm.disfraces) { ultimoDisfraces = it; if (enDisfraces()) render() }
         observar(vm.prendas) { ultimoPrendas = it; if (!enDisfraces()) render() }

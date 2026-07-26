@@ -28,6 +28,9 @@ class TiendaViewModel @Inject constructor(
     private val empresaId: String = savedStateHandle[ExplorarFragment.ARG_EMPRESA_ID] ?: ""
     val nombreTienda: String = savedStateHandle[ExplorarFragment.ARG_NOMBRE] ?: "Tienda"
 
+    /** Pestaña activa (0 = Disfraces, 1 = Prendas). Se recuerda para volver a ella al regresar del detalle. */
+    var pestanaActiva: Int = 0
+
     private val _disfraces = MutableStateFlow<UiState<List<DisfrazResponse>>>(UiState.Loading)
     val disfraces = _disfraces.asStateFlow()
 
