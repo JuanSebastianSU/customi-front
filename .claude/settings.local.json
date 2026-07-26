@@ -253,7 +253,8 @@
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb -s emulator-5554 install -r \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\app\\\\build\\\\outputs\\\\apk\\\\debug\\\\app-debug.apk\" | Select-Object -Last 1; Start-Sleep -Seconds 2; & $adb -s emulator-5554 shell input tap 636 2628; Start-Sleep -Seconds 2; & $adb -s emulator-5554 exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; Start-Sleep -Seconds 4; & $adb -s emulator-5554 shell input tap 636 2628; Start-Sleep -Seconds 2; & $adb -s emulator-5554 exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb -s emulator-5554 shell input tap 934 443; Start-Sleep -Seconds 2; & $adb -s emulator-5554 exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
-      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb -s emulator-5554 shell input tap 343 443; Start-Sleep -Seconds 2; & $adb -s emulator-5554 exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")"
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb -s emulator-5554 shell input tap 343 443; Start-Sleep -Seconds 2; & $adb -s emulator-5554 exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "Bash(git commit -q -m 'Push: pedir permiso de notificaciones tambien en modo gestion *)"
     ]
   }
 }

@@ -32,8 +32,26 @@ class GestionShellFragment : Fragment(R.layout.fragment_gestion_shell) {
     /** Pestañas del rol actual (destinos que muestran la barra inferior). Se arma al conocer el rol. */
     private var pestanas: List<Int> = emptyList()
 
+    /**
+     * Permiso de notificaciones (Android 13+). Antes solo se pedía en el shell de CLIENTE, así que un
+     * dueño/empleado en modo gestión nunca lo concedía y las push no se mostraban en un teléfono real
+     * (el sistema deja la app en importancia NONE). Se pide también aquí.
+     */
+    private val pedirPermisoDeNotificaciones =
+        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
+
+    private fun asegurarPermisoDeNotificaciones() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) return
+        val concedido = androidx.core.content.ContextCompat.checkSelfPermission(
+            requireContext(),
+            android.Manifest.permission.POST_NOTIFICATIONS,
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (!concedido) pedirPermisoDeNotificaciones.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentGestionShellBinding.bind(view)
+        asegurarPermisoDeNotificaciones()
 
         val navHost = childFragmentManager.findFragmentById(R.id.gestion_nav_host) as NavHostFragment
         navController = navHost.navController
