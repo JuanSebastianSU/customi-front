@@ -53,8 +53,21 @@ class PerfilViewModel @Inject constructor(
     val eventos = _eventos.asSharedFlow()
 
     init {
+        // Cache-first: el perfil se pinta desde Room (sin parpadeo) y se refresca por detrás.
+        observarPerfil()
         cargarPerfil()
         cargarMembresia()
+    }
+
+    private fun observarPerfil() {
+        viewModelScope.launch {
+            perfilRepo.observarPerfil().collect { p ->
+                if (p != null) {
+                    _perfil.value = p
+                    _email.value = p.email
+                }
+            }
+        }
     }
 
     /** Lee la membresía activa de /auth/me para decidir si mostrar «Entrar a trabajar» y «Desvincularme». */
@@ -93,16 +106,16 @@ class PerfilViewModel @Inject constructor(
         }
     }
 
+    /** Refresca el perfil desde la red hacia Room (la UI se actualiza por el Flow de [observarPerfil]). */
     private fun cargarPerfil() {
         viewModelScope.launch {
-            when (val r = perfilRepo.perfil()) {
-                is RespuestaRed.Exito -> {
-                    _perfil.value = r.data
-                    _email.value = r.data.email
-                }
-                // Si el perfil no carga, al menos se muestra el correo de la sesion.
+            when (perfilRepo.refrescarPerfil()) {
+                is RespuestaRed.Exito -> Unit // los datos llegan por el Flow de Room
+                // Si el perfil no carga y aún no hay caché, al menos se muestra el correo de la sesion.
                 is RespuestaRed.Fallo ->
-                    (authRepo.me() as? RespuestaRed.Exito)?.let { _email.value = it.data.email }
+                    if (_email.value == null) {
+                        (authRepo.me() as? RespuestaRed.Exito)?.let { _email.value = it.data.email }
+                    }
             }
         }
     }

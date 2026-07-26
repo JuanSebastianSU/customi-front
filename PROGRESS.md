@@ -616,28 +616,32 @@ Orden acordado. El detalle de cada ítem está en `PLAN_PRODUCTO.md`.
 Procedimiento completo en `PLAN_ROOM_OFFLINE.md`. Orden interno acordado:
 
 > **Avance 2026-07-26** (rama `feat/room-sucursales-y-tests`, aún sin mergear a `main`): se aplicaron **A3
-> Sucursales**, **A1 Catálogo de prendas** y **A2 Disfraces** cache-first + se cumplieron **B1** (logout
-> limpia la caché) y **B2** (base v3→v6). Se estrenaron los **tests** (SucursalRepositoryTest 2/2 +
-> MarketplaceRepositoryTest 6/6 unit; SucursalDaoTest 3/3 + PrendaVitrinaDaoTest 3/3 + DisfrazVitrinaDaoTest
-> 3/3 instrumentado; deps mockk + coroutines-test + room-testing). El molde por-tienda ya está probado.
+> Sucursales**, **A1 Catálogo**, **A2 Disfraces** y **A6 Perfil/Mi-tienda** cache-first + se cumplieron **B1**
+> (logout limpia la caché) y **B2** (base v3→v7). Tests: SucursalRepositoryTest 2/2 + MarketplaceRepositoryTest
+> 6/6 + MiEmpresaRepositoryTest 3/3 + PerfilRepositoryTest 3/3 unit; Sucursal/Prenda/DisfrazVitrinaDaoTest
+> 3/3 c/u + CacheUnicaFilaDaoTest 3/3 instrumentado (deps mockk + coroutines-test + room-testing).
 >
-> **A1/A2 detalle:** catálogo y disfraces cacheados **por tienda** (índice `empresaId`), con reemplazo
-> por-empresa (`reemplazarDeEmpresa`) para no borrar el caché de otras tiendas al abrir una nueva (§9.1).
-> Precios `BigDecimal` como texto, etiquetas como JSON, `tipo` de disfraz como texto; **los slots NO se
-> cachean** (solo el conteo de piezas, el detalle se re-pide a la red). `catalogo()`/`disfraces()` viejos
-> quedan intactos (usos filtrados de RentaForm/VentaPos siguen server-side). `TiendaViewModel` observa Room
-> (prendas y disfraces) y refresca sin tapar la caché.
+> **A1/A2 detalle:** catálogo y disfraces cacheados **por tienda** (índice `empresaId`), reemplazo
+> por-empresa (`reemplazarDeEmpresa`) para no borrar el caché de otras tiendas (§9.1). Precios `BigDecimal`
+> como texto, etiquetas como JSON, `tipo` como texto; **los slots NO se cachean** (solo el conteo de piezas).
+> `catalogo()`/`disfraces()` viejos intactos (RentaForm/VentaPos siguen server-side).
+>
+> **A6 detalle:** `MiEmpresaRepository` pasó su caché **de memoria a Room** (una sola fuente de verdad, y
+> ahora sobrevive al reinicio); misma API pública (`mia/refrescar/editar/subir/limpiar`), cero cambios en
+> Dashboard/Identidad. `PerfilRepository` estrena caché (antes no tenía): `observarPerfil()`/`refrescarPerfil()`,
+> `PerfilViewModel` cache-first (sin parpadeo). Ambos son **una sola fila** (`id=0`) serializada a JSON. Logout
+> limpia ambos (N1).
 
-- [x] **B1** Borrado de la caché al cerrar sesión (norma de **seguridad**) — hecho (empresa/favoritos/sucursal/prendas/disfraces)
-- [x] **B2** Subir `version` de `CostumiDatabase` — hecho (v6 con Prenda/DisfrazVitrinaEntity)
+- [x] **B1** Borrado de la caché al cerrar sesión (norma de **seguridad**) — hecho (empresa/favoritos/sucursal/prendas/disfraces/mi-tienda/perfil)
+- [x] **B2** Subir `version` de `CostumiDatabase` — hecho (v7 con Mi Empresa/Perfil)
 - [x] **A3** Sucursales por tienda — **HECHO** (entidad/DAO/repo observar-refrescar/VM observa/logout/tests)
 - [x] **A1** Catálogo de prendas por tienda — **HECHO** (índice+reemplazo por empresa, precios/etiquetas, VM cache-first, tests)
 - [x] **A2** Disfraces por tienda — **HECHO** (mismo molde; se cachea el conteo de piezas, no los slots)
+- [x] **A6** Mi perfil y mi tienda — **HECHO** (caché en memoria de MiEmpresa → Room; Perfil estrena caché; una fila JSON)
 - [ ] **A4** Mis pedidos (el mejor candidato: es historial, ya no cambia)
 - [ ] **A5** Mis multas
-- [ ] **A6** Mi perfil y mi tienda (elimina la caché en memoria de `MiEmpresaRepository`)
 - [ ] **B3** Indicador de "sin conexión / datos guardados"
-- [~] **B4** Tests de DAOs y repositorios con caché — SucursalDao/Repository + Prenda/DisfrazVitrinaDao + MarketplaceRepository (6 unit); se suma por tabla
+- [~] **B4** Tests de DAOs y repositorios con caché — Sucursal/Prenda/Disfraz/UnicaFila DAOs + Marketplace/MiEmpresa/Perfil repos (14 unit); se suma por tabla
 - [ ] **C** Inventario con Paging 3 + RemoteMediator _(rama aparte, al final)_
 
 ### Después — Bloqueantes para publicar (ítems 1-4)

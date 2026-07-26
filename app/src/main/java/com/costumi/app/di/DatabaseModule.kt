@@ -6,6 +6,8 @@ import com.costumi.app.data.local.CostumiDatabase
 import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.FavoritoDao
+import com.costumi.app.data.local.dao.MiEmpresaDao
+import com.costumi.app.data.local.dao.PerfilDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
 import com.costumi.app.data.local.dao.SucursalDao
 import dagger.Module
@@ -43,4 +45,10 @@ object DatabaseModule {
 
     @Provides
     fun provideDisfrazVitrinaDao(db: CostumiDatabase): DisfrazVitrinaDao = db.disfrazVitrinaDao()
+
+    @Provides
+    fun provideMiEmpresaDao(db: CostumiDatabase): MiEmpresaDao = db.miEmpresaDao()
+
+    @Provides
+    fun providePerfilDao(db: CostumiDatabase): PerfilDao = db.perfilDao()
 }

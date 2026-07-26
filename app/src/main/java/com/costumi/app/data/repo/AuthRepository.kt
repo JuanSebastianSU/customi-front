@@ -36,6 +36,7 @@ class AuthRepository @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val push: PushRepository,
     private val miEmpresa: MiEmpresaRepository,
+    private val perfil: PerfilRepository,
     private val favoritos: FavoritoDao,
     private val sucursales: SucursalDao,
     private val prendasVitrina: PrendaVitrinaDao,
@@ -109,6 +110,8 @@ class AuthRepository @Inject constructor(
         sesion.limpiar()
         // La tienda cacheada es de la sesion que se cierra: si no, el proximo dueno veria el nombre anterior.
         miEmpresa.limpiar()
+        // El perfil cacheado es de la cuenta que se cierra (norma N1).
+        perfil.limpiar()
         // Los favoritos guardados son de la cuenta que se cierra: no deben verse en la proxima sesion.
         favoritos.limpiar()
         // Las sucursales cacheadas son de la empresa de esta sesion (norma N1 del plan de Room).
