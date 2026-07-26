@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.costumi.app.databinding.ItemSucursalBinding
+import com.costumi.app.ui.cargarFoto
 import com.costumi.apiclient.models.SucursalResponse
 
 /** Acción sobre una sucursal. */
@@ -28,6 +29,7 @@ class SucursalAdapter(
 
     inner class VH(private val binding: ItemSucursalBinding) : RecyclerView.ViewHolder(binding.root) {
         fun enlazar(s: SucursalResponse) {
+            binding.foto.cargarFoto(s.fotoUrl)
             binding.nombre.text = s.nombre.orEmpty()
             val dir = s.direccion?.takeIf { it.isNotBlank() }
             binding.direccion.isVisible = dir != null

@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.costumi.app.R
+import com.costumi.app.core.UiState
 import com.costumi.app.core.comoPrecio
 import com.costumi.app.databinding.DialogMotivoBinding
 import com.costumi.app.databinding.FragmentMisPedidosBinding
@@ -30,6 +31,10 @@ class MisPedidosFragment : Fragment(R.layout.fragment_mis_pedidos) {
         pintarChipsFiltro()
 
         observar(vm.estado) { estado ->
+            // Si el filtro deja la lista vacia (o hay error/carga), hay que LIMPIAR las filas previas:
+            // el StateView es transparente y, sin esto, se veian las de antes debajo del "Todavia no
+            // tienes pedidos" (el filtro "Activos" mostrando "Por retirar" por detras).
+            if (estado !is UiState.Success) adapter.submitList(emptyList())
             binding.stateView.mostrar(estado, vacio = "Todavia no tienes pedidos.") { pedidos ->
                 adapter.submitList(pedidos)
             }

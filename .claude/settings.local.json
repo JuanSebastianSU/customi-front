@@ -158,7 +158,14 @@
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 1154 2593; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 300 456; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 439 592; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
-      "Bash(git commit -q -m 'Ventas y Rentas \\(gestion\\): filtros por estado + fecha de creacion *)"
+      "Bash(git commit -q -m 'Ventas y Rentas \\(gestion\\): filtros por estado + fecha de creacion *)",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 300 1633; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input keyevent KEYCODE_BACK; Start-Sleep -Milliseconds 500; & $adb shell input tap 1154 2593; Start-Sleep -Seconds 1; & $adb shell input swipe 640 2000 640 600 300; Start-Sleep -Milliseconds 500; & $adb shell input swipe 640 2000 640 600 300; Start-Sleep -Milliseconds 700; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 640 2198; Start-Sleep -Seconds 3; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 799 2593; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 1017 396; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 728 396; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "Bash(git commit -q -m 'Fotos de sucursal, filtros de Mis pedidos y orden de devoluciones *)"
     ]
   }
 }

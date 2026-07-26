@@ -50,7 +50,8 @@ class DevolucionesViewModel @Inject constructor(
                         UiState.Empty
                     } else {
                         val info = repo.infoRentas() // rentaId → (código, cliente)
-                        val items = r.data.sortedByDescending { it.id?.toString() }.map { d ->
+                        // Recencia: más reciente primero por cuándo se REGISTRÓ la devolución, no por id.
+                        val items = r.data.sortedByDescending { it.registradaEn }.map { d ->
                             val ri = d.rentaId?.toString()?.let { info[it] }
                             DevolucionUi(d, codigoRetiro = ri?.first, clienteNombre = ri?.second)
                         }
