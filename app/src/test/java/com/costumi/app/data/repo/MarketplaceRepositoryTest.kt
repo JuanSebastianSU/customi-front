@@ -2,13 +2,16 @@ package com.costumi.app.data.repo
 
 import com.costumi.app.core.DispatcherProvider
 import com.costumi.app.core.RespuestaRed
+import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
+import com.costumi.app.data.local.entity.DisfrazVitrinaEntity
 import com.costumi.app.data.local.entity.PrendaVitrinaEntity
 import com.costumi.apiclient.apis.DisfrazControllerApi
 import com.costumi.apiclient.apis.DisfrazMarketplaceControllerApi
 import com.costumi.apiclient.apis.MarketplaceControllerApi
 import com.costumi.apiclient.infrastructure.Serializer
+import com.costumi.apiclient.models.DisfrazResponse
 import com.costumi.apiclient.models.EtiquetaVitrinaDto
 import com.costumi.apiclient.models.PrendaVitrinaResponse
 import io.mockk.coEvery
@@ -51,12 +54,18 @@ class MarketplaceRepositoryTest {
         override val default = d
     }
 
-    private fun repo(api: MarketplaceControllerApi, dao: PrendaVitrinaDao) = MarketplaceRepository(
+    private fun repo(
+        api: MarketplaceControllerApi = mockk(),
+        prendaDao: PrendaVitrinaDao = mockk(relaxed = true),
+        disfrazApi: DisfrazMarketplaceControllerApi = mockk(),
+        disfrazDao: DisfrazVitrinaDao = mockk(relaxed = true),
+    ) = MarketplaceRepository(
         api,
-        mockk<DisfrazMarketplaceControllerApi>(relaxed = true),
+        disfrazApi,
         mockk<DisfrazControllerApi>(relaxed = true),
         mockk<EmpresaDao>(relaxed = true),
-        dao,
+        prendaDao,
+        disfrazDao,
         gson,
         dispatchers,
     )
@@ -131,5 +140,85 @@ class MarketplaceRepositoryTest {
         assertNull(prendas[0].precioVenta)
         assertEquals("Color", prendas[0].etiquetas?.first()?.tipo)
         assertEquals("Rojo", prendas[0].etiquetas?.first()?.valor)
+    }
+
+    // --- Disfraces (A2): mismo patrón cache-first; se cachea el conteo de piezas, no los slots ---
+
+    private fun disfrazResponse() = DisfrazResponse(
+        id = prendaId,
+        empresaId = UUID.fromString(empresaId),
+        nombre = "Pirata",
+        categoria = "Aventura",
+        tipo = DisfrazResponse.Tipo.AMBOS,
+        precioRentaGeneral = BigDecimal("20.00"),
+        precioVentaSugerido = BigDecimal("80.00"),
+        fotoUrl = null,
+        slots = listOf(
+            com.costumi.apiclient.models.SlotDto(ejePrenda = com.costumi.apiclient.models.SlotDto.EjePrenda.FIJA),
+            com.costumi.apiclient.models.SlotDto(ejePrenda = com.costumi.apiclient.models.SlotDto.EjePrenda.PERSONALIZABLE),
+        ),
+    )
+
+    @Test
+    fun refrescar_disfraces_con_red_ok_escribe_tipo_precio_y_conteo_de_piezas() = runTest {
+        val disfrazApi = mockk<DisfrazMarketplaceControllerApi>()
+        val disfrazDao = mockk<DisfrazVitrinaDao>(relaxed = true)
+        coEvery { disfrazApi.listar18(any()) } returns Response.success(listOf(disfrazResponse()))
+
+        val r = repo(disfrazApi = disfrazApi, disfrazDao = disfrazDao).refrescarDisfraces(empresaId)
+
+        assertTrue(r is RespuestaRed.Exito)
+        coVerify(exactly = 1) {
+            disfrazDao.reemplazarDeEmpresa(
+                empresaId,
+                match {
+                    it.size == 1 &&
+                        it[0].id == prendaId.toString() &&
+                        it[0].empresaId == empresaId &&
+                        it[0].tipo == "AMBOS" &&
+                        it[0].precioRentaGeneral == "20.00" &&
+                        it[0].piezas == 2 // se guarda el conteo, no los slots
+                },
+            )
+        }
+    }
+
+    @Test
+    fun refrescar_disfraces_con_red_caida_no_toca_room() = runTest {
+        val disfrazApi = mockk<DisfrazMarketplaceControllerApi>()
+        val disfrazDao = mockk<DisfrazVitrinaDao>(relaxed = true)
+        coEvery { disfrazApi.listar18(any()) } throws IOException("sin red")
+
+        val r = repo(disfrazApi = disfrazApi, disfrazDao = disfrazDao).refrescarDisfraces(empresaId)
+
+        assertTrue(r is RespuestaRed.Fallo)
+        coVerify(exactly = 0) { disfrazDao.reemplazarDeEmpresa(any(), any()) }
+    }
+
+    @Test
+    fun observar_disfraces_reconstruye_tipo_precio_y_las_piezas_desde_el_conteo() = runTest {
+        val disfrazDao = mockk<DisfrazVitrinaDao>(relaxed = true)
+        val entidad = DisfrazVitrinaEntity(
+            id = prendaId.toString(),
+            empresaId = empresaId,
+            nombre = "Pirata",
+            categoria = "Aventura",
+            tipo = "AMBOS",
+            precioRentaGeneral = "20.00",
+            precioRentaSugerido = null,
+            precioVentaGeneral = null,
+            precioVentaSugerido = "80.00",
+            fotoUrl = null,
+            piezas = 2,
+        )
+        every { disfrazDao.observarDeEmpresa(empresaId) } returns flowOf(listOf(entidad))
+
+        val disfraces = repo(disfrazDao = disfrazDao).observarDisfraces(empresaId).first()
+
+        assertEquals(1, disfraces.size)
+        assertEquals(DisfrazResponse.Tipo.AMBOS, disfraces[0].tipo)
+        assertEquals(BigDecimal("20.00"), disfraces[0].precioRentaGeneral)
+        // La vitrina lee `slots.size`: debe reflejar el conteo cacheado aunque no haya slots reales.
+        assertEquals(2, disfraces[0].slots?.size)
     }
 }

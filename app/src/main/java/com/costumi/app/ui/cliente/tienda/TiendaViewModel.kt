@@ -41,12 +41,14 @@ class TiendaViewModel @Inject constructor(
     private val _descripcion = MutableStateFlow<String?>(null)
     val descripcion = _descripcion.asStateFlow()
 
-    /** true tras el primer refresco de prendas: recién ahí una caché vacía significa "no hay prendas" (Empty). */
+    /** true tras el primer refresco: recién ahí una caché vacía significa "no hay" (Empty), no "cargando". */
     private var yaRefrescoPrendas = false
+    private var yaRefrescoDisfraces = false
 
     init {
+        // Cache-first: prendas y disfraces se pintan desde Room y se actualizan solos al refrescar.
+        observarDisfraces()
         cargarDisfraces()
-        // Cache-first: las prendas se pintan desde Room y se actualizan solas cuando el refresco escribe.
         observarPrendas()
         cargarPrendas()
         cargarDetalle()
@@ -61,6 +63,15 @@ class TiendaViewModel @Inject constructor(
         }
     }
 
+    private fun observarDisfraces() {
+        viewModelScope.launch {
+            repo.observarDisfraces(empresaId).collect { lista ->
+                if (lista.isNotEmpty()) _disfraces.value = UiState.Success(lista)
+                else if (yaRefrescoDisfraces) _disfraces.value = UiState.Empty
+            }
+        }
+    }
+
     private fun cargarDetalle() {
         viewModelScope.launch {
             (repo.detalleEmpresa(empresaId) as? RespuestaRed.Exito)?.data?.descripcion
@@ -68,12 +79,16 @@ class TiendaViewModel @Inject constructor(
         }
     }
 
+    /** Refresca los disfraces desde la red hacia Room. No tapa la caché: solo Loading/Error si aún no hay datos. */
     fun cargarDisfraces() {
         viewModelScope.launch {
-            _disfraces.value = UiState.Loading
-            _disfraces.value = when (val r = repo.disfraces(empresaId)) {
-                is RespuestaRed.Exito -> if (r.data.isEmpty()) UiState.Empty else UiState.Success(r.data)
-                is RespuestaRed.Fallo -> UiState.Error(r.error.mensaje) { cargarDisfraces() }
+            if (_disfraces.value !is UiState.Success) _disfraces.value = UiState.Loading
+            when (val r = repo.refrescarDisfraces(empresaId)) {
+                is RespuestaRed.Exito -> yaRefrescoDisfraces = true // el Flow de Room actualiza la lista
+                is RespuestaRed.Fallo -> {
+                    yaRefrescoDisfraces = true
+                    if (_disfraces.value !is UiState.Success) _disfraces.value = UiState.Error(r.error.mensaje) { cargarDisfraces() }
+                }
             }
         }
     }

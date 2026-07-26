@@ -5,8 +5,10 @@ import com.costumi.app.core.ErrorApi
 import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.mapear
 import com.costumi.app.core.TipoError
+import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
+import com.costumi.app.data.local.entity.DisfrazVitrinaEntity
 import com.costumi.app.data.local.entity.EmpresaEntity
 import com.costumi.app.data.local.entity.PrendaVitrinaEntity
 import com.costumi.app.data.remote.ejecutarLlamada
@@ -17,6 +19,7 @@ import com.costumi.apiclient.models.DisfrazDetalleResponse
 import com.costumi.apiclient.models.DisfrazResponse
 import com.costumi.apiclient.models.EtiquetaVitrinaDto
 import com.costumi.apiclient.models.PrendaVitrinaResponse
+import com.costumi.apiclient.models.SlotDto
 import java.math.BigDecimal
 import com.costumi.apiclient.models.RentarDisfrazRequest
 import com.costumi.apiclient.models.RentarDisfrazResponse
@@ -45,6 +48,7 @@ class MarketplaceRepository @Inject constructor(
     private val disfrazAccionApi: DisfrazControllerApi,
     private val empresaDao: EmpresaDao,
     private val prendaVitrinaDao: PrendaVitrinaDao,
+    private val disfrazVitrinaDao: DisfrazVitrinaDao,
     private val gson: Gson,
     private val dispatchers: DispatcherProvider,
 ) {
@@ -137,6 +141,30 @@ class MarketplaceRepository @Inject constructor(
             ejecutarLlamada(gson) { disfrazApi.listar18(uuid) }
         }
 
+    /**
+     * Disfraces cacheados de una tienda (`PLAN_ROOM_OFFLINE.md` A2). La UI observa esto (Room como fuente de
+     * verdad) y el repo lo sincroniza con [refrescarDisfraces]. Se filtra por `empresaId` para no mezclar
+     * tiendas. Solo se cachea lo que la vitrina pinta; el detalle (slots/disponibilidad) se pide a la red.
+     */
+    fun observarDisfraces(empresaId: String): Flow<List<DisfrazResponse>> =
+        disfrazVitrinaDao.observarDeEmpresa(empresaId).map { lista -> lista.map { it.aResponse() } }
+
+    /** Trae los disfraces de la tienda desde la red y **escribe en Room** (reemplaza solo esa tienda). */
+    suspend fun refrescarDisfraces(empresaId: String): RespuestaRed<Unit> = withContext(dispatchers.io) {
+        val uuid = runCatching { UUID.fromString(empresaId) }.getOrNull()
+            ?: return@withContext RespuestaRed.Fallo(ErrorApi(TipoError.DESCONOCIDO, "Tienda no valida."))
+        when (val r = ejecutarLlamada(gson) { disfrazApi.listar18(uuid) }) {
+            is RespuestaRed.Fallo -> r
+            is RespuestaRed.Exito -> {
+                disfrazVitrinaDao.reemplazarDeEmpresa(empresaId, r.data.mapNotNull { it.aEntity(empresaId) })
+                RespuestaRed.Exito(Unit)
+            }
+        }
+    }
+
+    /** Borra la caché de disfraces (se llama al cerrar sesión, norma N1). */
+    suspend fun limpiarCacheDisfraces() = withContext(dispatchers.io) { disfrazVitrinaDao.limpiar() }
+
     /** Detalle de un disfraz (estructura de slots + disponibilidad) para armarlo. */
     suspend fun disfrazDetalle(empresaId: UUID, disfrazId: UUID): RespuestaRed<DisfrazDetalleResponse> =
         withContext(dispatchers.io) {
@@ -219,5 +247,40 @@ class MarketplaceRepository @Inject constructor(
         etiquetas = etiquetasJson?.let {
             runCatching { gson.fromJson(it, Array<EtiquetaVitrinaDto>::class.java).toList() }.getOrNull()
         },
+    )
+
+    // --- Mapeadores DTO <-> Entity de disfraces (mismos criterios; los slots NO se cachean, solo el conteo) ---
+
+    private fun DisfrazResponse.aEntity(empresaId: String): DisfrazVitrinaEntity? {
+        val idTexto = id?.toString() ?: return null
+        return DisfrazVitrinaEntity(
+            id = idTexto,
+            empresaId = empresaId,
+            nombre = nombre,
+            categoria = categoria,
+            tipo = tipo?.value,
+            precioRentaGeneral = precioRentaGeneral?.toPlainString(),
+            precioRentaSugerido = precioRentaSugerido?.toPlainString(),
+            precioVentaGeneral = precioVentaGeneral?.toPlainString(),
+            precioVentaSugerido = precioVentaSugerido?.toPlainString(),
+            fotoUrl = fotoUrl,
+            piezas = slots?.size,
+        )
+    }
+
+    private fun DisfrazVitrinaEntity.aResponse(): DisfrazResponse = DisfrazResponse(
+        id = runCatching { UUID.fromString(id) }.getOrNull(),
+        empresaId = runCatching { UUID.fromString(empresaId) }.getOrNull(),
+        nombre = nombre,
+        categoria = categoria,
+        tipo = tipo?.let { runCatching { DisfrazResponse.Tipo.valueOf(it) }.getOrNull() },
+        precioRentaGeneral = precioRentaGeneral?.let { runCatching { BigDecimal(it) }.getOrNull() },
+        precioRentaSugerido = precioRentaSugerido?.let { runCatching { BigDecimal(it) }.getOrNull() },
+        precioVentaGeneral = precioVentaGeneral?.let { runCatching { BigDecimal(it) }.getOrNull() },
+        precioVentaSugerido = precioVentaSugerido?.let { runCatching { BigDecimal(it) }.getOrNull() },
+        fotoUrl = fotoUrl,
+        // La vitrina solo usa `slots.size` (el "N piezas"); reconstruimos una lista del conteo cacheado.
+        // El contenido real de los slots se pide a la red al abrir el detalle, así que basta con el tamaño.
+        slots = piezas?.let { n -> List(n) { SlotDto(ejePrenda = SlotDto.EjePrenda.FIJA) } },
     )
 }

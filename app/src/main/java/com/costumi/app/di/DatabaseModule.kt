@@ -3,6 +3,7 @@ package com.costumi.app.di
 import android.content.Context
 import androidx.room.Room
 import com.costumi.app.data.local.CostumiDatabase
+import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.FavoritoDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
@@ -39,4 +40,7 @@ object DatabaseModule {
 
     @Provides
     fun providePrendaVitrinaDao(db: CostumiDatabase): PrendaVitrinaDao = db.prendaVitrinaDao()
+
+    @Provides
+    fun provideDisfrazVitrinaDao(db: CostumiDatabase): DisfrazVitrinaDao = db.disfrazVitrinaDao()
 }
