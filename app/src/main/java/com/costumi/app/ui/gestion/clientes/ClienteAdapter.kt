@@ -19,6 +19,8 @@ class ClienteAdapter(
     private val alEditar: (ClienteResponse) -> Unit,
     private val alVerHistorial: (ClienteResponse) -> Unit,
     private val alVerEstadoCuenta: (ClienteResponse) -> Unit,
+    /** Toca la pastilla de cartera (Debe / Renta en curso): abre las rentas del cliente para actuar. */
+    private val alAbrirCartera: (ClienteResponse) -> Unit,
     private val alAlternarListaNegra: (ClienteResponse) -> Unit,
     private val alAlternarArchivado: (ClienteResponse) -> Unit,
 ) : PagingDataAdapter<ClienteResponse, ClienteAdapter.VH>(DIFF) {
@@ -51,8 +53,9 @@ class ClienteAdapter(
             val enCurso = if (c.tieneRentaEnCurso == true) "Renta en curso" else null
             val cartera = listOfNotNull(debe, multa, enCurso).joinToString("  ·  ")
             binding.botonDeuda.isVisible = cartera.isNotBlank()
-            binding.botonDeuda.text = cartera
-            binding.botonDeuda.setOnClickListener { alVerEstadoCuenta(c) }
+            // Se agrega un chevron para que se lea como acceso a otra pantalla, no como una etiqueta muerta.
+            binding.botonDeuda.text = "$cartera  ›"
+            binding.botonDeuda.setOnClickListener { alAbrirCartera(c) }
 
             // Un solo estado a la vez, y el que más pesa: la lista negra manda sobre el archivado.
             val estado = when {

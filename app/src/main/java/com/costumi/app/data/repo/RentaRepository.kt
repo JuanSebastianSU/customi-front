@@ -40,10 +40,10 @@ class RentaRepository @Inject constructor(
     private val gson: Gson,
     private val dispatchers: DispatcherProvider,
 ) {
-    /** [buscar] filtra por codigo de retiro; [filtro] es la bandeja/estado (chip), null = todas. */
-    fun rentas(buscar: String? = null, filtro: String? = null): Flow<PagingData<RentaResponse>> = Pager(
+    /** [buscar] filtra por codigo de retiro; [filtro] es la bandeja/estado (chip); [clienteId] acota a un cliente. */
+    fun rentas(buscar: String? = null, filtro: String? = null, clienteId: UUID? = null): Flow<PagingData<RentaResponse>> = Pager(
         config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-        pagingSourceFactory = { RentasPagingSource(rentaApi, gson, buscar, filtro) },
+        pagingSourceFactory = { RentasPagingSource(rentaApi, gson, buscar, filtro, clienteId) },
     ).flow
 
     suspend fun sucursales(): RespuestaRed<List<SucursalResponse>> = withContext(dispatchers.io) {

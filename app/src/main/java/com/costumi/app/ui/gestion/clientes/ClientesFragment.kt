@@ -28,6 +28,7 @@ class ClientesFragment : Fragment(R.layout.fragment_clientes) {
         alEditar = { abrirFicha(it) },
         alVerHistorial = { abrirHistorial(it) },
         alVerEstadoCuenta = { vm.verEstadoCuenta(it) },
+        alAbrirCartera = { abrirRentasDeCliente(it) },
         alAlternarListaNegra = { vm.alternarListaNegra(it) },
         alAlternarArchivado = { vm.alternarArchivado(it) },
     )
@@ -91,6 +92,18 @@ class ClientesFragment : Fragment(R.layout.fragment_clientes) {
         findNavController().navigate(
             R.id.clienteHistorialFragment,
             ClienteHistorialFragment.args(id, cliente.nombre),
+        )
+    }
+
+    /**
+     * Atajo desde la pastilla de cartera (Debe / Renta en curso): abre las Rentas acotadas a ese cliente,
+     * que es donde se puede actuar (cobrar, entregar, devolver) en vez de solo ver un saldo.
+     */
+    private fun abrirRentasDeCliente(cliente: ClienteResponse) {
+        val id = cliente.id ?: return
+        findNavController().navigate(
+            R.id.rentasFragment,
+            com.costumi.app.ui.gestion.rentas.RentasFragment.argsDeCliente(id, cliente.nombre),
         )
     }
 

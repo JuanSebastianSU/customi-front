@@ -52,6 +52,13 @@ class RentasFragment : Fragment(R.layout.fragment_rentas) {
         binding.barraBusqueda.editBuscar.alBuscar { vm.buscar(it) }
         binding.lista.adapter = adapter.withLoadStateFooter(PrendasLoadStateAdapter { adapter.retry() })
 
+        // Si se llegó desde la ficha de un cliente (atajo), se acota a sus rentas y se muestra de quién es.
+        vm.clienteNombre?.takeIf { it.isNotBlank() }?.let { nombre ->
+            binding.toolbar.subtitle = "Cliente: $nombre"
+            binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
+            binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        }
+
         setFragmentResultListener(RentaFormFragment.RESULT_REGISTRADA) { _, _ -> adapter.refresh() }
         setFragmentResultListener(DevolucionFormFragment.RESULT_REGISTRADA) { _, _ -> adapter.refresh() }
         setFragmentResultListener(PagoConceptoFragment.RESULT_COBRADO) { _, _ -> adapter.refresh() }
@@ -289,5 +296,16 @@ class RentasFragment : Fragment(R.layout.fragment_rentas) {
         binding.lista.adapter = null
         _binding = null
         super.onDestroyView()
+    }
+
+    companion object {
+        const val ARG_CLIENTE_ID = "clienteId"
+        const val ARG_CLIENTE_NOMBRE = "clienteNombre"
+
+        /** Args para abrir Rentas acotado a un cliente (atajo desde su ficha). */
+        fun argsDeCliente(clienteId: java.util.UUID, nombre: String?) = androidx.core.os.bundleOf(
+            ARG_CLIENTE_ID to clienteId.toString(),
+            ARG_CLIENTE_NOMBRE to nombre,
+        )
     }
 }

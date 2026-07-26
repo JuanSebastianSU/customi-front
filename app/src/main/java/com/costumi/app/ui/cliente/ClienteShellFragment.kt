@@ -7,7 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.navOptions
 import com.costumi.app.R
 import com.costumi.app.databinding.FragmentClienteShellBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,11 +53,26 @@ class ClienteShellFragment : Fragment(R.layout.fragment_cliente_shell) {
 
         val navHost = childFragmentManager.findFragmentById(R.id.cliente_nav_host) as NavHostFragment
         navController = navHost.navController
-        binding.bottomNav.setupWithNavController(navController)
 
-        // La barra solo se muestra en las pestañas; en el flujo de compra se oculta.
+        // Selección de pestaña con navegación SIMPLE (sin save/restore state). El
+        // setupWithNavController usa multi-back-stack (saveState/restoreState) que se corrompía cuando el
+        // flujo de compra navega manualmente a una pestaña (PagoFragment -> Mis pedidos), dejando la
+        // pestaña "Explorar" inalcanzable (al tocarla caía en Mis pedidos). Con esto cada pestaña se
+        // apoya sobre Explorar y el cambio es siempre fiable.
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            if (item.itemId == navController.currentDestination?.id) return@setOnItemSelectedListener true
+            val opciones = navOptions {
+                launchSingleTop = true
+                popUpTo(navController.graph.startDestinationId) { inclusive = false }
+            }
+            runCatching { navController.navigate(item.itemId, null, opciones) }.isSuccess
+        }
+
+        // La barra solo se muestra en las pestañas; en el flujo de compra se oculta. Además sincroniza
+        // el item marcado con el destino actual (antes lo hacía setupWithNavController).
         navController.addOnDestinationChangedListener { _, destino, _ ->
             binding.bottomNav.isVisible = destino.id in pestanas
+            binding.bottomNav.menu.findItem(destino.id)?.isChecked = true
         }
 
         // Atrás: primero navega dentro del grafo del cliente; si no hay a dónde, sale del shell.
