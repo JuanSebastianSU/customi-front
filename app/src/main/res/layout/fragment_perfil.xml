@@ -152,6 +152,24 @@
                 android:textAppearance="?attr/textAppearanceTitleSmall"
                 android:textColor="?attr/colorPrimary" />
 
+            <!-- Notificaciones push: se activan/desactivan en ESTE dispositivo. El switch refleja el estado
+                 real (preferencia + permiso del sistema); si el sistema las bloquea, la nota lleva a ajustes. -->
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchNotificaciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:minHeight="48dp"
+                android:text="Recibir notificaciones" />
+
+            <TextView
+                android:id="@+id/notificacionesAyuda"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Recordatorios de tus rentas y avisos de las tiendas, en este telefono."
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/botonGuardados"
                 style="?attr/materialButtonOutlinedStyle"

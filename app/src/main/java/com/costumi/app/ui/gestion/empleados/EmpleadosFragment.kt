@@ -109,18 +109,32 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
         }
     }
 
-    /** Muestra el enlace de invitación para compartir (copiar al portapapeles). */
+    /**
+     * Confirma que la invitación se envió por correo. El correo es el canal principal; el enlace queda
+     * como plan B por si no llega (spam, dominio que lo bloquea), para pasarlo a mano.
+     */
     private fun mostrarInvitacion(inv: EventoEmpleado.Invitacion) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Invitación a ${inv.email}")
-            .setMessage("Compartí este enlace para que acepte y se una:\n\n${inv.enlace}")
-            .setPositiveButton("Copiar enlace") { _, _ ->
+        val enlace = inv.enlace
+        val esUrl = enlace.startsWith("http", ignoreCase = true)
+        val ayudaEnlace = if (esUrl) {
+            "\n\nSi no le llega (revisá también spam), podés pasarle este enlace a mano:\n$enlace"
+        } else {
+            // Sin URL base configurada el backend devuelve un token pelado: no sirve para compartir a mano.
+            "\n\nSi no le llega, revisá que el correo esté bien escrito y volvé a intentarlo desde «Invitaciones pendientes»."
+        }
+        val dialogo = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Invitación enviada")
+            .setMessage("Le enviamos un correo a ${inv.email} con el enlace para aceptar y unirse.$ayudaEnlace")
+            .setPositiveButton("Entendido", null)
+        // Solo ofrecemos copiar cuando el enlace es una URL de verdad (compartible).
+        if (esUrl) {
+            dialogo.setNeutralButton("Copiar enlace") { _, _ ->
                 val cb = requireContext().getSystemService(android.content.ClipboardManager::class.java)
-                cb?.setPrimaryClip(android.content.ClipData.newPlainText("Invitación Costumi", inv.enlace))
+                cb?.setPrimaryClip(android.content.ClipData.newPlainText("Invitación Costumi", enlace))
                 mostrarMensaje("Enlace copiado")
             }
-            .setNegativeButton("Cerrar", null)
-            .show()
+        }
+        dialogo.show()
     }
 
     private fun mostrarActividad(a: EventoEmpleado.Actividad) {
@@ -148,9 +162,9 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
                 val id = inv.id ?: return@setItems
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(inv.email.orEmpty())
-                    .setMessage("¿Reenviar el enlace de invitación (por si el correo no llegó) o cancelarla?")
+                    .setMessage("¿Volver a enviarle el correo de invitación, o cancelar la invitación?")
                     // El positivo es la acción constructiva (reenviar); cancelar va como neutral/destructivo.
-                    .setPositiveButton("Reenviar") { _, _ -> vm.reenviarInvitacion(id, inv.email.orEmpty()) }
+                    .setPositiveButton("Reenviar correo") { _, _ -> vm.reenviarInvitacion(id, inv.email.orEmpty()) }
                     .setNeutralButton("Cancelar invitación") { _, _ -> vm.cancelarInvitacion(id) }
                     .setNegativeButton("Cerrar", null)
                     .show()

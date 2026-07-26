@@ -25,9 +25,12 @@ import com.costumi.app.ui.alBuscar
 import com.costumi.app.ui.cargarFoto
 import com.costumi.app.ui.common.ListaBuscable
 import com.costumi.app.ui.common.OpcionBuscable
+import com.costumi.app.ui.extensionDeImagen
+import com.costumi.app.ui.leerBytesDeImagen
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.observar
+import com.costumi.app.ui.soloImagenes
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -91,7 +94,7 @@ class DisfrazFormFragment : Fragment(R.layout.fragment_disfraz_form) {
     private var fotoMime: String? = null
     private var fotoNombre: String? = null
 
-    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { elegirFoto(it) }
     }
 
@@ -119,7 +122,7 @@ class DisfrazFormFragment : Fragment(R.layout.fragment_disfraz_form) {
         // La foto se puede agregar tanto al crear como al editar (se sube al guardar).
         binding.botonFoto.isVisible = true
         binding.botonFoto.text = "Agregar foto"
-        binding.botonFoto.setOnClickListener { seleccionarFoto.launch("image/*") }
+        binding.botonFoto.setOnClickListener { seleccionarFoto.launch(soloImagenes) }
 
         observar(vm.datos) { estado ->
             binding.stateView.mostrar(estado, vacio = "Crea prendas antes de armar un disfraz.") { datos ->
@@ -452,27 +455,17 @@ class DisfrazFormFragment : Fragment(R.layout.fragment_disfraz_form) {
         )
     }
 
-    /** Lee la imagen elegida (en IO), la retiene para subirla al guardar y muestra la vista previa. */
+    /** Lee la imagen elegida (en IO, sin crashear), la retiene para subirla al guardar y muestra la vista previa. */
     private fun elegirFoto(uri: Uri) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val datos = withContext(Dispatchers.IO) {
-                val cr = requireContext().contentResolver
-                val bytes = cr.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
-                val mime = cr.getType(uri) ?: "image/*"
-                bytes to mime
-            }
+            val datos = requireContext().leerBytesDeImagen(uri)
             if (datos == null) {
-                mostrarMensaje("No se pudo leer la imagen")
+                mostrarMensaje("No se pudo leer la imagen, intentá de nuevo")
                 return@launch
-            }
-            val extension = when (datos.second) {
-                "image/png" -> "png"
-                "image/webp" -> "webp"
-                else -> "jpg"
             }
             fotoBytes = datos.first
             fotoMime = datos.second
-            fotoNombre = "disfraz.$extension"
+            fotoNombre = "disfraz.${extensionDeImagen(datos.second)}"
             binding.foto.isVisible = true
             binding.foto.setImageURI(uri)
             binding.botonFoto.text = "Cambiar foto"

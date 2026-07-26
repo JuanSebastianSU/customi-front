@@ -260,7 +260,18 @@
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; Start-Sleep -Seconds 4; & $adb -s emulator-5554 shell input tap 1154 2593; Start-Sleep -Seconds 2; & $adb -s emulator-5554 exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb -s emulator-5554 shell input tap 300 456; Start-Sleep -Seconds 2; & $adb -s emulator-5554 shell input tap 934 443; Start-Sleep -Seconds 2; & $adb -s emulator-5554 exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "Bash(git commit -q -m 'Mas mas limpio + toggle Devoluciones/Reembolsos + push a ajustes + reenviar invitacion *)",
-      "Bash(git commit -q -m 'Mas: renombrar la seccion a '\\\\''Devoluciones y reembolsos'\\\\'' *)"
+      "Bash(git commit -q -m 'Mas: renombrar la seccion a '\\\\''Devoluciones y reembolsos'\\\\'' *)",
+      "Bash(git fetch *)",
+      "Bash(git commit -q -m 'Fix: reenviar/re-invitar violaba el indice unico de invitacion pendiente *)",
+      "Read(//c/Users/User/AndroidStudioProjects/costumi-backend/seed/**)",
+      "Bash(cd \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\costumi-backend\" *)",
+      "Bash(curl -sS --connect-timeout 20 -K 'C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-User-AndroidStudioProjects-AppCustomi2\\\\0ed5f30e-3535-4aa9-bbcb-82646f789e51\\\\scratchpad/smtp.cfg' -T 'C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-User-AndroidStudioProjects-AppCustomi2\\\\0ed5f30e-3535-4aa9-bbcb-82646f789e51\\\\scratchpad/mail.txt' -w 'RESULT_HTTP=%{http_code}\\\\n')",
+      "Bash(sed -E 's/wvkbgimshfrgokyd/***/g')",
+      "Bash(gh pr create --title 'Email por API HTTP \\(Brevo\\): Railway bloquea el SMTP saliente' --body ' *)",
+      "PowerShell($g = Get-Command gh -ErrorAction SilentlyContinue; if \\($g\\) { $g.Source } else { \"gh NOT on PATH\" })",
+      "Bash(curl -s -m 30 -w '\\\\n[HTTP %{http_code} · %{time_total}s]\\\\n' -X POST __TRACKED_VAR__/api/v1/auth/olvide -H 'Content-Type: application/json' -d '{\"email\":\"jsebastiansantacruzurgilez2005@gmail.com\"}')",
+      "Bash(cd \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\" *)",
+      "Bash(grep -iE \"keystore|\\\\.jks|\\\\.properties$\")"
     ]
   }
 }

@@ -158,7 +158,15 @@ class EmpleadosViewModel @Inject constructor(
             _procesando.value = true
             when (val r = repo.reenviarInvitacion(id)) {
                 is RespuestaRed.Exito -> _eventos.tryEmit(EventoEmpleado.Invitacion(email, r.data.enlace.orEmpty()))
-                is RespuestaRed.Fallo -> _eventos.tryEmit(EventoEmpleado.Error(r.error.mensaje))
+                // 409 = dos reenvíos casi simultáneos: uno ganó (ya salió el correo), el otro choca con el
+                // índice único de "una sola invitación pendiente". No es un error para el usuario: el correo
+                // ya se mandó. Se muestra un aviso amable en vez del mensaje crudo de base de datos.
+                is RespuestaRed.Fallo ->
+                    if (r.error.httpCode == 409) {
+                        _eventos.tryEmit(EventoEmpleado.Info("Ya se reenvió la invitación a $email. Revisá el correo (puede tardar un momento)."))
+                    } else {
+                        _eventos.tryEmit(EventoEmpleado.Error(r.error.mensaje))
+                    }
             }
             _procesando.value = false
         }

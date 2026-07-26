@@ -15,8 +15,11 @@ import com.costumi.app.databinding.DialogSucursalBinding
 import com.costumi.app.databinding.FragmentSucursalesBinding
 import com.costumi.app.ui.cargarFoto
 import com.costumi.app.ui.mostrar
+import com.costumi.app.ui.extensionDeImagen
+import com.costumi.app.ui.leerBytesDeImagen
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.observar
+import com.costumi.app.ui.soloImagenes
 import com.costumi.apiclient.models.SucursalResponse
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,8 +41,8 @@ class SucursalesFragment : Fragment(R.layout.fragment_sucursales) {
     private var fotoTarget: UUID? = null
     private var fotoPreview: ImageView? = null
 
-    /** Selector de imagen del sistema; sube la foto a la sucursal en edición. */
-    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    /** Selector de imagen moderno; sube la foto a la sucursal en edición. */
+    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { leerYSubirFoto(it) }
     }
 
@@ -85,7 +88,7 @@ class SucursalesFragment : Fragment(R.layout.fragment_sucursales) {
             } else {
                 fotoTarget = sucursalId
                 fotoPreview = d.foto
-                seleccionarFoto.launch("image/*")
+                seleccionarFoto.launch(soloImagenes)
             }
         }
         sucursal?.let {
@@ -107,19 +110,14 @@ class SucursalesFragment : Fragment(R.layout.fragment_sucursales) {
             .show()
     }
 
-    /** Lee los bytes de la imagen elegida (en IO), muestra la vista previa y la sube a la sucursal. */
+    /** Lee los bytes de la imagen elegida (en IO, sin crashear), muestra la vista previa y la sube a la sucursal. */
     private fun leerYSubirFoto(uri: Uri) {
         val target = fotoTarget ?: return
         fotoPreview?.let { it.isVisible = true; it.setImageURI(uri) }
         viewLifecycleOwner.lifecycleScope.launch {
-            val datos = withContext(Dispatchers.IO) {
-                val cr = requireContext().contentResolver
-                val bytes = cr.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
-                bytes to (cr.getType(uri) ?: "image/*")
-            }
-            if (datos == null) { mostrarMensaje("No se pudo leer la imagen"); return@launch }
-            val ext = when (datos.second) { "image/png" -> "png"; "image/webp" -> "webp"; else -> "jpg" }
-            vm.subirFoto(target, datos.first, datos.second, "foto.$ext")
+            val datos = requireContext().leerBytesDeImagen(uri)
+            if (datos == null) { mostrarMensaje("No se pudo leer la imagen, intentá de nuevo"); return@launch }
+            vm.subirFoto(target, datos.first, datos.second, "foto.${extensionDeImagen(datos.second)}")
         }
     }
 

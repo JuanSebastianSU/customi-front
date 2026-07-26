@@ -10,8 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.appcompat.app.AlertDialog
 import com.costumi.app.R
 import com.costumi.app.core.comoPrecio
+import com.costumi.app.databinding.DialogTarjetaBinding
 import com.costumi.app.databinding.FragmentPagoBinding
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.mostrarMensaje
@@ -31,7 +33,7 @@ class PagoFragment : Fragment(R.layout.fragment_pago) {
         _binding = FragmentPagoBinding.bind(view)
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
-        binding.botonTarjeta.setOnClickListener { vm.pagarConTarjeta() }
+        binding.botonTarjeta.setOnClickListener { mostrarDialogoTarjeta() }
         binding.botonEfectivo.setOnClickListener { vm.pagarEnTienda() }
 
         observar(vm.estado) { estado ->
@@ -54,9 +56,57 @@ class PagoFragment : Fragment(R.layout.fragment_pago) {
             when (evento) {
                 is EventoPago.AbrirCheckout -> abrirCheckout(evento.url)
                 is EventoPago.Reservado -> confirmarEfectivo(evento.codigo)
+                is EventoPago.TarjetaAprobada -> confirmarTarjeta(evento.codigo)
                 is EventoPago.Error -> mostrarMensaje(evento.mensaje)
             }
         }
+    }
+
+    /**
+     * Panel de pago con tarjeta (simulado). Recoge y valida los datos —que NO se envían a ningún lado— y,
+     * si están completos, dispara el pago simulado. La pasarela real no está configurada; esto da el flujo
+     * de tarjeta completo para la demo.
+     */
+    private fun mostrarDialogoTarjeta() {
+        val d = DialogTarjetaBinding.inflate(layoutInflater)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Pago con tarjeta")
+            .setView(d.root)
+            .setPositiveButton("Pagar", null)
+            .setNegativeButton("Cancelar", null)
+            .create()
+        // Se valida sin cerrar el diálogo cuando hay un error (por eso se sobreescribe el botón tras show).
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val numero = d.editNumero.text?.toString()?.filter { it.isDigit() }.orEmpty()
+                val venc = d.editVencimiento.text?.toString()?.trim().orEmpty()
+                val cvv = d.editCvv.text?.toString()?.trim().orEmpty()
+                val nombre = d.editNombre.text?.toString()?.trim().orEmpty()
+                when {
+                    numero.length < 13 -> mostrarMensaje("Número de tarjeta inválido")
+                    !venc.matches(Regex("^(0[1-9]|1[0-2])/\\d{2}$")) -> mostrarMensaje("Vencimiento inválido (MM/AA)")
+                    cvv.length < 3 -> mostrarMensaje("CVV inválido")
+                    nombre.isBlank() -> mostrarMensaje("Ingresá el nombre de la tarjeta")
+                    else -> { dialog.dismiss(); vm.pagarConTarjetaSimulado() }
+                }
+            }
+        }
+        dialog.show()
+    }
+
+    /** El pago con tarjeta (simulado) se aprobó: la orden se creó y este es su código de retiro. */
+    private fun confirmarTarjeta(codigo: String?) {
+        val mensaje = buildString {
+            append("¡Pago aprobado! ")
+            if (codigo != null) append("Tu código de retiro es:\n\n$codigo\n\n") else append("Revisá tu código en Mis Pedidos. ")
+            append("Presentá tu código en la tienda para retirar.")
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("✅ Pago con tarjeta")
+            .setMessage(mensaje)
+            .setPositiveButton("Entendido") { _, _ -> irAMisPedidos() }
+            .setCancelable(false)
+            .show()
     }
 
     private fun abrirCheckout(url: String) {

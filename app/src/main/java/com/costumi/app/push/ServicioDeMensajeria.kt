@@ -13,10 +13,11 @@ import javax.inject.Inject
 /**
  * Recibe las notificaciones push de Firebase (RF-18.11).
  *
- * Los avisos que manda el backend viajan con bloque `notification`, asi que **Android los muestra solo**
- * cuando la app esta en segundo plano; este servicio no tiene que dibujarlas. Lo que si atiende es el
- * cambio de token: Firebase lo rota (reinstalar, limpiar datos, restaurar el equipo) y si no se reenvia,
- * el backend queda con uno viejo y las notificaciones dejan de llegar en silencio.
+ * Los avisos del backend viajan con bloque `notification`. Android los muestra solo cuando la app esta en
+ * **segundo plano**; con la app en **primer plano** ese bloque NO se dibuja solo (antes no aparecia nada),
+ * asi que aca lo dibujamos nosotros. Tambien atiende el cambio de token: Firebase lo rota (reinstalar,
+ * limpiar datos, restaurar el equipo) y si no se reenvia, el backend queda con uno viejo y las
+ * notificaciones dejan de llegar en silencio.
  */
 @AndroidEntryPoint
 class ServicioDeMensajeria : FirebaseMessagingService() {
@@ -29,13 +30,17 @@ class ServicioDeMensajeria : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        // Si el usuario apago las push en este dispositivo, no reenganchamos el token al backend.
+        if (!Notificaciones.activadasPorUsuario(this)) return
         alcance.launch { push.registrar(token) }
     }
 
     override fun onMessageReceived(mensaje: RemoteMessage) {
         super.onMessageReceived(mensaje)
-        // Con la app abierta no se interrumpe al usuario con una notificacion del sistema: los avisos ya
-        // se ven en la pantalla de Notificaciones. Aqui solo quedaria mostrar un aviso propio si hiciera
-        // falta en el futuro.
+        // App en primer plano: Firebase no dibuja el bloque `notification`, lo hacemos nosotros para que
+        // el aviso se vea igual (antes, con la app abierta, no aparecia nada).
+        val titulo = mensaje.notification?.title ?: mensaje.data["title"] ?: "Costumi"
+        val cuerpo = mensaje.notification?.body ?: mensaje.data["body"] ?: return
+        Notificaciones.mostrarAviso(this, titulo, cuerpo)
     }
 }

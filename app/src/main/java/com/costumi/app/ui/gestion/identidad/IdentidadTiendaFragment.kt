@@ -13,14 +13,15 @@ import com.costumi.app.R
 import com.costumi.app.databinding.DialogEditarTiendaBinding
 import com.costumi.app.databinding.FragmentIdentidadTiendaBinding
 import com.costumi.app.ui.cargarFoto
+import com.costumi.app.ui.extensionDeImagen
+import com.costumi.app.ui.leerBytesDeImagen
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.observar
+import com.costumi.app.ui.soloImagenes
 import com.costumi.apiclient.models.EmpresaResponse
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /** Identidad de la tienda: cambiar el logo y la portada que ve el cliente en el marketplace. */
 @AndroidEntryPoint
@@ -31,18 +32,18 @@ class IdentidadTiendaFragment : Fragment(R.layout.fragment_identidad_tienda) {
     private val binding get() = _binding!!
     private var empresaActual: EmpresaResponse? = null
 
-    private val elegirLogo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val elegirLogo = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { leer(it) { b, m, n -> vm.subirLogo(b, m, n) } }
     }
-    private val elegirPortada = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val elegirPortada = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { leer(it) { b, m, n -> vm.subirPortada(b, m, n) } }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentIdentidadTiendaBinding.bind(view)
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        binding.botonLogo.setOnClickListener { elegirLogo.launch("image/*") }
-        binding.botonPortada.setOnClickListener { elegirPortada.launch("image/*") }
+        binding.botonLogo.setOnClickListener { elegirLogo.launch(soloImagenes) }
+        binding.botonPortada.setOnClickListener { elegirPortada.launch(soloImagenes) }
         binding.botonEditar.setOnClickListener { dialogoEditar() }
 
         observar(vm.empresa) { empresa ->
@@ -89,17 +90,12 @@ class IdentidadTiendaFragment : Fragment(R.layout.fragment_identidad_tienda) {
             .show()
     }
 
-    /** Lee los bytes de la imagen elegida (en IO) y ejecuta la subida correspondiente. */
+    /** Lee los bytes de la imagen elegida (en IO, sin crashear) y ejecuta la subida correspondiente. */
     private fun leer(uri: Uri, subir: (ByteArray, String, String) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val datos = withContext(Dispatchers.IO) {
-                val cr = requireContext().contentResolver
-                val bytes = cr.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
-                bytes to (cr.getType(uri) ?: "image/*")
-            }
-            if (datos == null) { mostrarMensaje("No se pudo leer la imagen"); return@launch }
-            val ext = when (datos.second) { "image/png" -> "png"; "image/webp" -> "webp"; else -> "jpg" }
-            subir(datos.first, datos.second, "foto.$ext")
+            val datos = requireContext().leerBytesDeImagen(uri)
+            if (datos == null) { mostrarMensaje("No se pudo leer la imagen, intentá de nuevo"); return@launch }
+            subir(datos.first, datos.second, "foto.${extensionDeImagen(datos.second)}")
         }
     }
 

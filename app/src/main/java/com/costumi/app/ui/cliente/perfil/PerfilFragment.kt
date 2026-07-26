@@ -16,10 +16,17 @@ import com.costumi.app.databinding.DialogRegistrarTiendaBinding
 import com.costumi.app.databinding.FragmentPerfilBinding
 import com.costumi.app.core.ModoApp
 import com.costumi.app.ui.cargarFoto
+import com.costumi.app.ui.extensionDeImagen
 import com.costumi.app.ui.irAHome
+import com.costumi.app.ui.leerBytesDeImagen
+import com.costumi.app.ui.soloImagenes
 import com.costumi.app.ui.irALogin
 import com.costumi.app.ui.mostrarMensaje
+import com.costumi.app.ui.notificacionesActivas
 import com.costumi.app.ui.observar
+import com.costumi.app.ui.ofrecerActivarNotificaciones
+import com.costumi.app.ui.registrarPermisoNotificaciones
+import com.costumi.app.ui.tienePermisoNotificaciones
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -36,9 +43,15 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
     private var nombreActual: String? = null
     private var correoActual: String? = null
 
-    /** Selector de imagen del sistema para la foto de perfil; al elegir, la sube. */
-    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    /** Selector de imagen moderno para la foto de perfil; al elegir, la sube. */
+    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { leerYSubirFoto(it) }
+    }
+
+    /** Respuesta al permiso de notificaciones cuando el usuario prende el switch. */
+    private val pedirPermisoNotif = registrarPermisoNotificaciones { concedido ->
+        if (concedido) vm.activarNotificaciones() else ofrecerActivarNotificaciones()
+        sincronizarSwitchNotificaciones()
     }
 
     /** Cabecera de identidad: nombre (o el usuario del correo) y la inicial en el avatar. */
@@ -53,7 +66,7 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
         _binding = FragmentPerfilBinding.bind(view)
 
         // Foto de perfil: al tocar el avatar se elige una imagen y se sube a S3.
-        binding.avatarContenedor.setOnClickListener { seleccionarFoto.launch("image/*") }
+        binding.avatarContenedor.setOnClickListener { seleccionarFoto.launch(soloImagenes) }
         binding.botonLogout.setOnClickListener { vm.cerrarSesion() }
         binding.botonRegistrarTienda.setOnClickListener { mostrarDialogoTienda() }
         // Las multas viven aca y no en una pestania propia: son informacion de la cuenta, no navegacion
@@ -67,6 +80,19 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
             )
         }
         binding.botonContrasena.setOnClickListener { mostrarDialogoContrasena() }
+
+        // Toggle de notificaciones: al prender, pide permiso si falta y registra el dispositivo; al apagar,
+        // deja de recibir push en este telefono. Se usa click (no checkedChange) para no reaccionar cuando
+        // lo ponemos nosotros al sincronizar.
+        binding.switchNotificaciones.setOnClickListener {
+            if (binding.switchNotificaciones.isChecked) {
+                if (tienePermisoNotificaciones()) vm.activarNotificaciones()
+                else { pedirPermisoNotif.launch(android.Manifest.permission.POST_NOTIFICATIONS); return@setOnClickListener }
+            } else {
+                vm.desactivarNotificaciones()
+            }
+            sincronizarSwitchNotificaciones()
+        }
 
         observar(vm.email) { correo ->
             correoActual = correo
@@ -111,17 +137,23 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
         }
     }
 
-    /** Lee los bytes de la imagen elegida (en IO) y la sube como foto de perfil. */
+    override fun onResume() {
+        super.onResume()
+        // El usuario pudo cambiar el permiso desde Ajustes del sistema; re-sincronizar al volver.
+        _binding?.let { sincronizarSwitchNotificaciones() }
+    }
+
+    /** Pone el switch en el estado real (preferencia del usuario + permiso del sistema). */
+    private fun sincronizarSwitchNotificaciones() {
+        binding.switchNotificaciones.isChecked = notificacionesActivas()
+    }
+
+    /** Lee los bytes de la imagen elegida (en IO, sin crashear) y la sube como foto de perfil. */
     private fun leerYSubirFoto(uri: Uri) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val datos = withContext(Dispatchers.IO) {
-                val cr = requireContext().contentResolver
-                val bytes = cr.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
-                bytes to (cr.getType(uri) ?: "image/*")
-            }
-            if (datos == null) { mostrarMensaje("No se pudo leer la imagen"); return@launch }
-            val ext = when (datos.second) { "image/png" -> "png"; "image/webp" -> "webp"; else -> "jpg" }
-            vm.subirFoto(datos.first, datos.second, "foto.$ext")
+            val datos = requireContext().leerBytesDeImagen(uri)
+            if (datos == null) { mostrarMensaje("No se pudo leer la imagen, intentá de nuevo"); return@launch }
+            vm.subirFoto(datos.first, datos.second, "foto.${extensionDeImagen(datos.second)}")
         }
     }
 

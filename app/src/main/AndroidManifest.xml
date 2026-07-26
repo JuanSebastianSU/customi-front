@@ -44,6 +44,15 @@
             </intent-filter>
         </service>
 
+        <!-- Canal e icono por defecto para las push que Android muestra solo (app en segundo plano). Sin
+             esto, en Android 8+ el aviso cae en un canal fabricante que algunos equipos esconden. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="avisos" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notificacion" />
+
 </application>
 
 </manifest>

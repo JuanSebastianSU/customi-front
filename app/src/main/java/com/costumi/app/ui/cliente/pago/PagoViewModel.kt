@@ -115,45 +115,22 @@ class PagoViewModel @Inject constructor(
     }
 
     /**
-     * Pago con tarjeta: materializa la orden (checkout) y abre la pasarela por el concepto creado. Si el
-     * checkout creó varias rentas (varios periodos), no hay un único concepto que cobrar con tarjeta: quedan
-     * reservadas para pagar en la tienda.
+     * Pago con tarjeta **SIMULADO** (la pasarela real MercadoPago no está configurada). La pantalla ya
+     * recogió y validó los datos de la tarjeta (que **no salen del dispositivo**); acá solo se materializa
+     * la orden —igual que "pagar en la tienda"— y se informa como pago con tarjeta aprobado. Así la demo
+     * muestra un flujo de tarjeta completo sin cobrar de verdad ni depender de la pasarela.
      */
-    fun pagarConTarjeta() {
+    fun pagarConTarjetaSimulado() {
         if (_cargando.value) return
-        val monto = total
-        if (monto == null) {
-            emitir(EventoPago.Error("No se puede iniciar el pago de este pedido."))
-            return
-        }
         viewModelScope.launch {
             _cargando.value = true
             val creada = crearOrden()
-            val conceptoId = (creada as? Orden.Ok)?.conceptoUnico
-            when {
-                creada is Orden.Fallo -> { _cargando.value = false; emitir(EventoPago.Error(creada.mensaje)) }
-                conceptoId == null -> { _cargando.value = false; emitir(EventoPago.Reservado(null)) }
-                else -> {
-                    val concepto = if (esRenta) {
-                        IntentoDePagoDeClienteRequest.TipoConcepto.RENTA
-                    } else {
-                        IntentoDePagoDeClienteRequest.TipoConcepto.VENTA
-                    }
-                    val e = UUID.fromString(empresaId)
-                    val s = UUID.fromString(sucursalId)
-                    val r = pagoRepo.intento(e, s, concepto, conceptoId, monto)
-                    _cargando.value = false
-                    when (r) {
-                        is RespuestaRed.Fallo -> emitir(EventoPago.Error(r.error.mensaje))
-                        is RespuestaRed.Exito -> {
-                            val url = r.data.urlCheckout
-                            if (url.isNullOrBlank()) {
-                                emitir(EventoPago.Error("La pasarela no devolvio un enlace de pago."))
-                            } else {
-                                emitir(EventoPago.AbrirCheckout(url))
-                            }
-                        }
-                    }
+            _cargando.value = false
+            when (creada) {
+                is Orden.Fallo -> emitir(EventoPago.Error(creada.mensaje))
+                is Orden.Ok -> {
+                    val codigo = creada.conceptoUnico?.let { buscarCodigo(it) }
+                    emitir(EventoPago.TarjetaAprobada(codigo))
                 }
             }
         }

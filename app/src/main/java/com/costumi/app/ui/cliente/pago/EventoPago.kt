@@ -11,5 +11,13 @@ sealed interface EventoPago {
      */
     data class Reservado(val codigo: String?) : EventoPago
 
+    /**
+     * Pago con tarjeta **aprobado (simulado)**: se creó la orden y este es su código de retiro. La
+     * pasarela real (MercadoPago) no está configurada; el pago con tarjeta se simula del lado de la app
+     * para la demo (los datos de la tarjeta no salen del dispositivo). [codigo] null si se crearon varias
+     * rentas.
+     */
+    data class TarjetaAprobada(val codigo: String?) : EventoPago
+
     data class Error(val mensaje: String) : EventoPago
 }

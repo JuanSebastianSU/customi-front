@@ -19,9 +19,12 @@ import com.costumi.app.R
 import com.costumi.app.databinding.FragmentPrendaFormBinding
 import com.costumi.app.databinding.ItemEtiquetaSelectorBinding
 import com.costumi.app.ui.cargarFoto
+import com.costumi.app.ui.extensionDeImagen
+import com.costumi.app.ui.leerBytesDeImagen
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.observar
+import com.costumi.app.ui.soloImagenes
 import com.costumi.apiclient.models.CategoriaResponse
 import com.costumi.apiclient.models.CrearPrendaRequest
 import com.costumi.apiclient.models.EtiquetaSeleccionadaDto
@@ -50,8 +53,8 @@ class PrendaFormFragment : Fragment(R.layout.fragment_prenda_form) {
     private var fotoMime: String? = null
     private var fotoNombre: String? = null
 
-    /** Selector de imagen del sistema; al elegir, la guarda localmente y muestra la vista previa. */
-    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    /** Selector de imagen moderno; al elegir, la guarda localmente y muestra la vista previa. */
+    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { elegirFoto(it) }
     }
 
@@ -75,7 +78,7 @@ class PrendaFormFragment : Fragment(R.layout.fragment_prenda_form) {
         binding.botonGuardar.setOnClickListener { guardar() }
 
         // La foto se puede agregar tanto al crear como al editar (se sube al guardar).
-        binding.botonFoto.setOnClickListener { seleccionarFoto.launch("image/*") }
+        binding.botonFoto.setOnClickListener { seleccionarFoto.launch(soloImagenes) }
 
         observar(vm.categorias) { estado ->
             binding.stateView.mostrar(estado, vacio = "No hay categorias. Crea una primero.") { lista ->
@@ -104,27 +107,17 @@ class PrendaFormFragment : Fragment(R.layout.fragment_prenda_form) {
         }
     }
 
-    /** Lee los bytes de la imagen elegida (en IO), la retiene para subirla al guardar y muestra la vista previa. */
+    /** Lee los bytes de la imagen elegida (en IO, sin crashear), la retiene para subirla al guardar y muestra la vista previa. */
     private fun elegirFoto(uri: Uri) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val datos = withContext(Dispatchers.IO) {
-                val cr = requireContext().contentResolver
-                val bytes = cr.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
-                val mime = cr.getType(uri) ?: "image/*"
-                bytes to mime
-            }
+            val datos = requireContext().leerBytesDeImagen(uri)
             if (datos == null) {
-                mostrarMensaje("No se pudo leer la imagen")
+                mostrarMensaje("No se pudo leer la imagen, intentá de nuevo")
                 return@launch
-            }
-            val extension = when (datos.second) {
-                "image/png" -> "png"
-                "image/webp" -> "webp"
-                else -> "jpg"
             }
             fotoBytes = datos.first
             fotoMime = datos.second
-            fotoNombre = "foto.$extension"
+            fotoNombre = "foto.${extensionDeImagen(datos.second)}"
             binding.foto.isVisible = true
             binding.foto.setImageURI(uri)
             binding.botonFoto.text = "Cambiar foto"

@@ -1,4 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
+// Firma de release: se lee de keystore.properties (fuera del repo, gitignored). Si el archivo no está
+// (CI, otro equipo sin la keystore), el build de release simplemente queda sin firmar y no rompe el debug.
+val keystorePropsFile = rootProject.file("keystore.properties")
+val keystoreProps = Properties().apply {
+    if (keystorePropsFile.exists()) keystorePropsFile.inputStream().use { load(it) }
+}
 
 plugins {
     alias(libs.plugins.android.application)
@@ -26,13 +34,30 @@ android {
         buildConfigField("String", "BASE_URL", "\"https://just-upliftment-production-cb1f.up.railway.app/\"")
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystorePropsFile.exists()) {
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            // R8/ofuscación off por ahora: para un primer test es más seguro (R8 mal configurado rompe la
+            // serialización de Gson/Room solo en release). Se activa después con reglas + prueba del AAB.
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Firma el AAB/APK de release solo si hay keystore configurada.
+            if (keystorePropsFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {

@@ -7,6 +7,7 @@ import com.costumi.app.data.repo.AuthRepository
 import com.costumi.app.data.repo.CuentaRepository
 import com.costumi.app.data.repo.MembresiaRepository
 import com.costumi.app.data.repo.PerfilRepository
+import com.costumi.app.data.repo.PushRepository
 import com.costumi.apiclient.models.CambiarContextoRequest
 import com.costumi.apiclient.models.MembresiaActiva
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +32,7 @@ class PerfilViewModel @Inject constructor(
     private val cuentaRepo: CuentaRepository,
     private val perfilRepo: PerfilRepository,
     private val membresiaRepo: MembresiaRepository,
+    private val pushRepo: PushRepository,
 ) : ViewModel() {
 
     private val _email = MutableStateFlow<String?>(null)
@@ -158,6 +160,16 @@ class PerfilViewModel @Inject constructor(
             }
             _procesando.value = false
         }
+    }
+
+    /** El usuario activa las push en este dispositivo (registra el token). El permiso lo pide la pantalla. */
+    fun activarNotificaciones() {
+        viewModelScope.launch { pushRepo.activar() }
+    }
+
+    /** El usuario apaga las push en este dispositivo (borra el token de Firebase). */
+    fun desactivarNotificaciones() {
+        viewModelScope.launch { pushRepo.desactivar() }
     }
 
     fun cerrarSesion() {
