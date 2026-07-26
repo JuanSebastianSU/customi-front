@@ -22,3 +22,6 @@ local.properties
 
 # Salida de generación del cliente OpenAPI (se regenera; el módulo usado es :api-client)
 api-client-gen/
+
+# Capturas temporales de verificacion en emulador
+_shot.png
