@@ -34,9 +34,21 @@ class TiendaViewModel @Inject constructor(
     private val _prendas = MutableStateFlow<UiState<List<PrendaVitrinaResponse>>>(UiState.Loading)
     val prendas = _prendas.asStateFlow()
 
+    /** Descripción de la tienda (para la cabecera); null si no la cargó o no tiene. */
+    private val _descripcion = MutableStateFlow<String?>(null)
+    val descripcion = _descripcion.asStateFlow()
+
     init {
         cargarDisfraces()
         cargarPrendas()
+        cargarDetalle()
+    }
+
+    private fun cargarDetalle() {
+        viewModelScope.launch {
+            (repo.detalleEmpresa(empresaId) as? RespuestaRed.Exito)?.data?.descripcion
+                ?.takeIf { it.isNotBlank() }?.let { _descripcion.value = it }
+        }
     }
 
     fun cargarDisfraces() {

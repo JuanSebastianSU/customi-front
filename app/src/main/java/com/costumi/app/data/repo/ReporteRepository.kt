@@ -62,6 +62,8 @@ data class ReporteCompleto(
     val tablero: List<GrupoInventario>,
     /** Serie de ingresos por día (A9), para ver la evolución en el rango elegido. */
     val serie: List<com.costumi.apiclient.models.IngresoDelDia> = emptyList(),
+    /** Cantidad de devoluciones registradas que faltan CERRAR (decidir el depósito). */
+    val devolucionesPorCerrar: Long? = null,
 )
 
 /**
@@ -129,6 +131,7 @@ class ReporteRepository @Inject constructor(
             val empleadoD = async { ejecutarLlamada(gson) { reporteApi.ventasPorEmpleado(sucursalId) } }
             val tableroD = async { ejecutarLlamada(gson) { reporteApi.tableroDeInventario(sucursalId) } }
             val serieD = async { ejecutarLlamada(gson) { reporteApi.ingresosPorDia(sucursalId, desde, hasta) } }
+            val devPorCerrarD = async { ejecutarLlamada(gson) { reporteApi.devolucionesPorCerrar(sucursalId) } }
 
             val ingresos = ingresosD.await()
             if (ingresos is RespuestaRed.Fallo) return@coroutineScope ingresos
@@ -146,6 +149,7 @@ class ReporteRepository @Inject constructor(
                     ventasPorEmpleado = empleadoD.await().datoONull().orEmpty(),
                     tablero = tableroD.await().datoONull().orEmpty(),
                     serie = serieD.await().datoONull().orEmpty(),
+                    devolucionesPorCerrar = devPorCerrarD.await().datoONull()?.total,
                 ),
             )
         }

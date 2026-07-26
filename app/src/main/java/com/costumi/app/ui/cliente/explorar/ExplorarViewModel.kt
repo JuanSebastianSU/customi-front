@@ -7,9 +7,11 @@ import com.costumi.app.core.UiState
 import com.costumi.app.data.local.entity.EmpresaEntity
 import com.costumi.app.data.repo.MarketplaceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.costumi.apiclient.models.DisfrazDestacadoResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -71,8 +73,19 @@ class ExplorarViewModel @Inject constructor(
         }
     }
 
+    /** Disfraces destacados para el carrusel del home. */
+    private val _destacados = MutableStateFlow<List<DisfrazDestacadoResponse>>(emptyList())
+    val destacados = _destacados.asStateFlow()
+
     init {
         refrescar()
+        cargarDestacados()
+    }
+
+    private fun cargarDestacados() {
+        viewModelScope.launch {
+            (repo.destacados() as? RespuestaRed.Exito)?.let { _destacados.value = it.data }
+        }
     }
 
     fun refrescar() {

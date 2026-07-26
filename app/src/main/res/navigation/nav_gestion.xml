@@ -151,6 +151,11 @@
         android:label="Configuracion" />
 
     <fragment
+        android:id="@+id/identidadTiendaFragment"
+        android:name="com.costumi.app.ui.gestion.identidad.IdentidadTiendaFragment"
+        android:label="Identidad de la tienda" />
+
+    <fragment
         android:id="@+id/notificacionesFragment"
         android:name="com.costumi.app.ui.gestion.notificaciones.NotificacionesFragment"
         android:label="Notificaciones" />

@@ -231,6 +231,17 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Elegir sucursal" />
+
+                    <TextView
+                        android:id="@+id/sucursalInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        tools:text="Av. 6N #23-100 · 📍 Ver en mapa" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

@@ -201,6 +201,21 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideFotoPerfilApi(retrofit: Retrofit): com.costumi.app.data.remote.FotoPerfilApi =
+        retrofit.create(com.costumi.app.data.remote.FotoPerfilApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFotoSucursalApi(retrofit: Retrofit): com.costumi.app.data.remote.FotoSucursalApi =
+        retrofit.create(com.costumi.app.data.remote.FotoSucursalApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFotoEmpresaApi(retrofit: Retrofit): com.costumi.app.data.remote.FotoEmpresaApi =
+        retrofit.create(com.costumi.app.data.remote.FotoEmpresaApi::class.java)
+
+    @Provides
+    @Singleton
     fun provideMiEmpresaApi(retrofit: Retrofit): com.costumi.app.data.remote.MiEmpresaApi =
         retrofit.create(com.costumi.app.data.remote.MiEmpresaApi::class.java)
 
@@ -258,6 +273,12 @@ object NetworkModule {
     @Singleton
     fun provideEmpleadoApi(retrofit: Retrofit): EmpleadoControllerApi =
         retrofit.create(EmpleadoControllerApi::class.java)
+
+    // Aceptar invitación de trabajo (pública): preview por token + aceptar con T&C.
+    @Provides
+    @Singleton
+    fun provideInvitacionApi(retrofit: Retrofit): com.costumi.apiclient.apis.InvitacionControllerApi =
+        retrofit.create(com.costumi.apiclient.apis.InvitacionControllerApi::class.java)
 
     @Provides
     @Singleton

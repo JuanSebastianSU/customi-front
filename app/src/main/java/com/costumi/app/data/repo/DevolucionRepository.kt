@@ -5,6 +5,7 @@ import com.costumi.app.core.mapear
 import com.costumi.app.data.remote.ejecutarLlamada
 import com.costumi.apiclient.apis.DevolucionControllerApi
 import com.costumi.apiclient.apis.PrendaControllerApi
+import com.costumi.apiclient.apis.RentaControllerApi
 import com.costumi.apiclient.models.DevolucionResponse
 import com.costumi.apiclient.models.PrendaResponse
 import com.costumi.apiclient.models.RegistrarDevolucionRequest
@@ -19,9 +20,20 @@ import javax.inject.Singleton
 class DevolucionRepository @Inject constructor(
     private val devolucionApi: DevolucionControllerApi,
     private val prendaApi: PrendaControllerApi,
+    private val rentaApi: RentaControllerApi,
     private val gson: Gson,
     private val dispatchers: DispatcherProvider,
 ) {
+    /** Mapa rentaId → (código de retiro, nombre del cliente): la devolución solo trae el rentaId. */
+    suspend fun infoRentas(): Map<String, Pair<String?, String?>> = withContext(dispatchers.io) {
+        when (val r = ejecutarLlamada(gson) { rentaApi.listar2(pagina = 0, tamano = 500) }) {
+            is RespuestaRed.Exito -> r.data.contenido.orEmpty().mapNotNull { renta ->
+                renta.id?.toString()?.let { it to (renta.codigoRetiro to renta.clienteNombre) }
+            }.toMap()
+            is RespuestaRed.Fallo -> emptyMap()
+        }
+    }
+
     /** Historial de devoluciones ya liquidadas de la empresa. */
     suspend fun historial(buscar: String? = null): RespuestaRed<List<DevolucionResponse>> =
         withContext(dispatchers.io) {

@@ -50,6 +50,16 @@
                         tools:text="A" />
 
                     <ImageView
+                        android:id="@+id/avatarFoto"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_circulo"
+                        android:clipToOutline="true"
+                        android:contentDescription="Foto de perfil"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
+
+                    <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="bottom|end"

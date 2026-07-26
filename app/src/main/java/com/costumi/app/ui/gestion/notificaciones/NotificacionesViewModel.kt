@@ -46,8 +46,23 @@ class NotificacionesViewModel @Inject constructor(
     private val _eventos = MutableSharedFlow<EventoNotif>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()
 
+    /** Estado legible de los canales (push/WhatsApp): "Push ✓ · WhatsApp ✗". */
+    private val _canales = MutableStateFlow<String?>(null)
+    val canales = _canales.asStateFlow()
+
     init {
         cargarClientes()
+        cargarCanales()
+    }
+
+    private fun cargarCanales() {
+        viewModelScope.launch {
+            (repo.estadoCanales() as? RespuestaRed.Exito)?.data?.let { c ->
+                val push = "Push " + if (c.fcmConfigurado == true) "✓" else "✗"
+                val wa = "WhatsApp " + if (c.whatsAppConfigurado == true) "✓" else "✗"
+                _canales.value = "$push · $wa"
+            }
+        }
     }
 
     /** El usuario escribio en la caja de busqueda: se reemite el Pager con el nuevo filtro. */

@@ -84,6 +84,18 @@ class MarketplaceRepository @Inject constructor(
             ejecutarLlamada(gson) { api.sucursales(empresaId) }
         }
 
+    /** Disfraces destacados del marketplace (carrusel del home). */
+    suspend fun destacados(): RespuestaRed<List<com.costumi.apiclient.models.DisfrazDestacadoResponse>> =
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { api.destacados() } }
+
+    /** Detalle de la tienda (nombre/descripción/ciudad/portada) para la cabecera del catálogo. */
+    suspend fun detalleEmpresa(empresaId: String): RespuestaRed<com.costumi.apiclient.models.EmpresaVitrinaResponse> =
+        withContext(dispatchers.io) {
+            val uuid = runCatching { UUID.fromString(empresaId) }.getOrNull()
+                ?: return@withContext RespuestaRed.Fallo(ErrorApi(TipoError.DESCONOCIDO, "Tienda no valida."))
+            ejecutarLlamada(gson) { api.empresa(uuid) }
+        }
+
     /** Disfraces en vitrina de una tienda (apartado Disfraces). */
     suspend fun disfraces(empresaId: String): RespuestaRed<List<DisfrazResponse>> =
         withContext(dispatchers.io) {

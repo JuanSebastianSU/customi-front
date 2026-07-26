@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.costumi.app.R
 import com.costumi.app.core.comoPrecio
+import com.costumi.app.ui.common.comoDiaMes
 import com.costumi.app.databinding.DialogAltaEmpleadoBinding
 import com.costumi.app.databinding.DialogRolBinding
 import com.costumi.app.databinding.FragmentEmpleadosBinding
@@ -98,7 +99,10 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
             mostrarMensaje("No hay invitaciones pendientes.")
             return
         }
-        val etiquetas = invs.map { "${it.email.orEmpty()} — ${it.rol.orEmpty()}" }.toTypedArray()
+        val etiquetas = invs.map {
+            val vence = it.expiraEn?.toLocalDate()?.let { d -> " · vence ${d.comoDiaMes()}" }.orEmpty()
+            "${it.email.orEmpty()} — ${it.rol.orEmpty()}$vence"
+        }.toTypedArray()
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Invitaciones pendientes")
             .setItems(etiquetas) { _, i ->

@@ -7,7 +7,6 @@ import com.costumi.app.data.remote.session.SesionLocal
 import com.costumi.apiclient.apis.MembresiaControllerApi
 import com.costumi.apiclient.models.CambiarContextoRequest
 import com.costumi.apiclient.models.MembresiaEstadoResponse
-import com.costumi.apiclient.models.MembresiaResponse
 import com.google.gson.Gson
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -37,9 +36,10 @@ class MembresiaRepository @Inject constructor(
             }
         }
 
-    /** Las tiendas del usuario con su rol y estado (a lo sumo una ACTIVA). */
-    suspend fun misMembresias(): RespuestaRed<List<MembresiaResponse>> =
-        withContext(dispatchers.io) { ejecutarLlamada(gson) { api.mias1() } }
+    // Nota: NO hay "selector multi-tienda" a propósito. El modelo Fase B es exclusivo: una persona trabaja
+    // en UNA sola tienda a la vez (regla de seguridad #2; aceptar una 2ª invitación se rechaza en el backend
+    // hasta desvincularse). `/auth/me` ya expone la única membresía activa. Por eso `GET /auth/me/membresias`
+    // (listar todas) no se usa: no existe un caso de "cambiar de tienda".
 
     /** El propio empleado se desvincula de su tienda: queda solo-cliente. */
     suspend fun desvincularme(): RespuestaRed<MembresiaEstadoResponse> =

@@ -55,6 +55,7 @@ class TiendaFragment : Fragment(R.layout.fragment_tienda) {
         _binding = FragmentTiendaBinding.bind(view)
         binding.toolbar.title = vm.nombreTienda
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        observar(vm.descripcion) { binding.toolbar.subtitle = it }
 
         binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) = render()

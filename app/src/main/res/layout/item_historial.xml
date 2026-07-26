@@ -36,6 +36,18 @@
                 android:textAppearance="?attr/textAppearanceBodySmall"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 tools:text="2026-09-01" />
+
+            <TextView
+                android:id="@+id/articulos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="Vestido de princesa, Corona" />
         </LinearLayout>
 
         <LinearLayout

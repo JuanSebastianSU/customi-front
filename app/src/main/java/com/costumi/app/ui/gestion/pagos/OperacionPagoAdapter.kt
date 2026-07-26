@@ -33,7 +33,9 @@ class OperacionPagoAdapter(
             val tipo = if (op.tipo == TipoConcepto.VENTA) "Venta" else "Renta"
             binding.detalle.text = "$tipo  ·  ${op.total.comoPrecio() ?: "-"}"
             binding.chipEstado.pintarPastilla(op.estado?.lowercase()?.replaceFirstChar { it.uppercase() } ?: "-", Tono.INFO)
+            // Tocar la tarjeta o el botón «Cobrar» abren la pantalla de cobro de esa operación.
             binding.root.setOnClickListener { alElegir(op) }
+            binding.botonCobrar.setOnClickListener { alElegir(op) }
         }
     }
 

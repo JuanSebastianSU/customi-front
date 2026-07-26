@@ -105,6 +105,22 @@ class PerfilViewModel @Inject constructor(
         }
     }
 
+    /** Sube la foto de perfil elegida y refresca el avatar con la URL nueva. */
+    fun subirFoto(bytes: ByteArray, mime: String, nombre: String) {
+        if (_procesando.value) return
+        viewModelScope.launch {
+            _procesando.value = true
+            when (val r = perfilRepo.subirFoto(bytes, mime, nombre)) {
+                is RespuestaRed.Exito -> {
+                    _perfil.value = r.data
+                    _eventos.tryEmit(EventoPerfil.Info("Foto de perfil actualizada."))
+                }
+                is RespuestaRed.Fallo -> _eventos.tryEmit(EventoPerfil.Error(r.error.mensaje))
+            }
+            _procesando.value = false
+        }
+    }
+
     /** Guarda nombre y telefono. Vacio borra el dato: son opcionales. */
     fun guardarDatos(nombre: String, telefono: String) {
         if (_procesando.value) return

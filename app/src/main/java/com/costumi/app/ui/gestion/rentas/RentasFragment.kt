@@ -70,7 +70,20 @@ class RentasFragment : Fragment(R.layout.fragment_rentas) {
 
     /** Desglose de la renta: sus prendas (foto+nombre+cantidad), depósito, importe y código de retiro. */
     private fun mostrarDesgloseRenta(r: RentaResponse) {
-        val lineas = r.lineas.orEmpty().map { l ->
+        // Piezas del mismo disfraz → un solo artículo con el nombre del disfraz.
+        val (deDisfraz, sueltas) = r.lineas.orEmpty().partition { it.disfrazGrupo != null }
+        val disfraces = deDisfraz.groupBy { it.disfrazGrupo!! }.map { (_, piezas) ->
+            val primera = piezas.first()
+            val porDia = piezas.mapNotNull { it.precioPorDia }
+                .fold(java.math.BigDecimal.ZERO) { a, b -> a + b }
+            LineaDesglose(
+                fotoUrl = piezas.firstOrNull { !it.fotoUrl.isNullOrBlank() }?.fotoUrl,
+                nombre = primera.disfrazNombre ?: "Disfraz",
+                detalle = "Cantidad: ${primera.disfrazCantidad ?: 1} · ${piezas.size} piezas",
+                monto = porDia.comoPrecio()?.let { "$it / dia" },
+            )
+        }
+        val sueltasLd = sueltas.map { l ->
             LineaDesglose(
                 fotoUrl = l.fotoUrl,
                 nombre = l.nombre ?: "Prenda",
@@ -78,6 +91,7 @@ class RentasFragment : Fragment(R.layout.fragment_rentas) {
                 monto = l.precioPorDia.comoPrecio()?.let { "$it / dia" },
             )
         }
+        val lineas = disfraces + sueltasLd
         val pie = buildList {
             r.deposito?.takeIf { it.signum() > 0 }?.let { add("Deposito" to (it.comoPrecio() ?: "-")) }
             r.importe?.let { add("Importe" to (it.comoPrecio() ?: "-")) }

@@ -57,6 +57,8 @@ class SucursalesViewModel @Inject constructor(
         ejecutar("Sucursal actualizada.") { repo.editar(id, nombre, direccion, ubicacionMaps) }
     fun archivar(id: UUID) = ejecutar("Sucursal archivada.") { repo.archivar(id) }
     fun activar(id: UUID) = ejecutar("Sucursal activada.") { repo.activar(id) }
+    fun subirFoto(id: UUID, bytes: ByteArray, mime: String, nombre: String) =
+        ejecutar("Foto de la tienda actualizada.") { repo.subirFoto(id, bytes, mime, nombre) }
 
     private fun ejecutar(exito: String, accion: suspend () -> RespuestaRed<SucursalResponse>) {
         if (_procesando.value) return

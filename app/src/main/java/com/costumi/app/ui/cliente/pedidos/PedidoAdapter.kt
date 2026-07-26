@@ -43,6 +43,7 @@ class PedidoAdapter(
         holder.binding.tipoEstado.text = listOfNotNull(
             tipoLegible(item.tipo),
             item.fecha?.comoDiaMes(),
+            EstadoDePedido.pagoEtiqueta(item),
         ).joinToString("  ·  ")
         holder.binding.monto.text = item.monto.comoPrecio() ?: ""
 

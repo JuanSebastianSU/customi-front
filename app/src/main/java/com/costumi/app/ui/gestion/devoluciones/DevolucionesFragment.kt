@@ -41,7 +41,8 @@ class DevolucionesFragment : Fragment(R.layout.fragment_devoluciones) {
     }
 
     /** Desglose de la devolución: estado de cada pieza (bien/dañada/perdida/pendiente) y liquidación. */
-    private fun mostrarDesgloseDevolucion(d: DevolucionResponse) {
+    private fun mostrarDesgloseDevolucion(u: DevolucionUi) {
+        val d = u.dev
         val lineas = d.piezas.orEmpty().map { p ->
             val flags = buildList {
                 add(if (p.llego == false) "no llego" else "llego")
@@ -61,8 +62,10 @@ class DevolucionesFragment : Fragment(R.layout.fragment_devoluciones) {
             d.multa?.takeIf { it.signum() > 0 }?.let { add("Multa" to (it.comoPrecio() ?: "-")) }
         }
         val pendientes = d.piezas?.count { it.resuelta == false } ?: 0
+        val quien = listOfNotNull(u.clienteNombre?.takeIf { it.isNotBlank() }, u.codigoRetiro).joinToString(" · ")
         mostrarDesglose(
             titulo = "Devolucion" + if (pendientes > 0) " · $pendientes pendiente(s)" else " · liquidada",
+            subtitulo = quien.ifBlank { null },
             lineas = lineas,
             pie = pie,
         )

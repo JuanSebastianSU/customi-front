@@ -10,6 +10,7 @@ import com.costumi.apiclient.apis.ClienteControllerApi
 import com.costumi.apiclient.apis.NotificacionControllerApi
 import com.costumi.apiclient.models.ClienteResponse
 import com.costumi.apiclient.models.EnviarNotificacionRequest
+import com.costumi.apiclient.models.EstadoDeCanales
 import com.costumi.apiclient.models.NotificacionResponse
 import com.costumi.apiclient.models.RecordatorioResponse
 import com.google.gson.Gson
@@ -54,6 +55,10 @@ class NotificacionRepository @Inject constructor(
     ): RespuestaRed<NotificacionResponse> = withContext(dispatchers.io) {
         ejecutarLlamada(gson) { notificacionApi.enviar(EnviarNotificacionRequest(canal, clienteId, mensaje)) }
     }
+
+    /** Estado de configuración de los canales (push FCM / WhatsApp): para avisar si están apagados. */
+    suspend fun estadoCanales(): RespuestaRed<EstadoDeCanales> =
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { notificacionApi.estadoDeCanales() } }
 
     suspend fun recordarVencidas(): RespuestaRed<RecordatorioResponse> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { notificacionApi.recordarVencidas() } }

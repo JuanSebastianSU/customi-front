@@ -50,6 +50,7 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
         "Reportes",
         "Empleados",
         "Sucursales",
+        "Identidad de la tienda",
         "Configuracion",
         "Notificaciones",
         "Mensajes automaticos",
@@ -66,6 +67,7 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
         "Reportes" to "REPORTES",
         "Empleados" to "EMPLEADOS",
         "Sucursales" to "SUCURSALES",
+        "Identidad de la tienda" to "IDENTIDAD_TIENDA",
         "Configuracion" to "CONFIGURACION",
         "Notificaciones" to "NOTIFICACIONES",
         "Mensajes automaticos" to "NOTIFICACIONES",
@@ -171,6 +173,7 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
             "Reportes" -> R.id.reportesFragment
             "Empleados" -> R.id.empleadosFragment
             "Sucursales" -> R.id.sucursalesFragment
+            "Identidad de la tienda" -> R.id.identidadTiendaFragment
             "Configuracion" -> R.id.configuracionFragment
             "Notificaciones" -> R.id.notificacionesFragment
             "Mensajes automaticos" -> R.id.plantillasFragment

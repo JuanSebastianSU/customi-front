@@ -41,6 +41,7 @@ class RecuperarFragment : Fragment(R.layout.fragment_recuperar) {
                 }
                 is EventoAuth.Error -> mostrarMensaje(evento.mensaje)
                 is EventoAuth.Navegar -> Unit
+                is EventoAuth.InvitacionLista -> Unit
             }
         }
     }

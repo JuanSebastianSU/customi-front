@@ -136,6 +136,32 @@ class DetalleDisfrazFragment : Fragment(R.layout.fragment_detalle_disfraz) {
         }
         observar(vm.sucursalSeleccionada) { sucursal ->
             binding.botonSucursal.text = sucursal?.nombre ?: "Elegir sucursal"
+            val info = listOfNotNull(
+                sucursal?.direccion?.takeIf { it.isNotBlank() },
+                sucursal?.descripcion?.takeIf { it.isNotBlank() },
+            ).joinToString(" · ")
+            val mapa = sucursal?.let { mapUrlDe(it) }
+            binding.sucursalInfo.isVisible = info.isNotBlank() || mapa != null
+            binding.sucursalInfo.text = listOfNotNull(info.ifBlank { null }, mapa?.let { "📍 Ver en mapa" })
+                .joinToString("  ·  ")
+            binding.sucursalInfo.setOnClickListener(
+                if (mapa != null) View.OnClickListener { abrirMapa(mapa) } else null,
+            )
+        }
+    }
+
+    /** URL de mapa de una sucursal: el enlace que cargó el dueño o, si no, coordenadas geo. */
+    private fun mapUrlDe(s: SucursalVitrinaResponse): String? = when {
+        !s.ubicacionMaps.isNullOrBlank() -> s.ubicacionMaps
+        s.latitud != null && s.longitud != null -> "geo:${s.latitud},${s.longitud}?q=${s.latitud},${s.longitud}(${android.net.Uri.encode(s.nombre ?: "Sucursal")})"
+        else -> null
+    }
+
+    private fun abrirMapa(url: String) {
+        try {
+            startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
+        } catch (e: Exception) {
+            mostrarMensaje("No se pudo abrir el mapa")
         }
     }
 

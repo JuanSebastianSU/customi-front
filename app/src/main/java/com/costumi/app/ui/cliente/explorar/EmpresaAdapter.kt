@@ -28,10 +28,12 @@ class EmpresaAdapter(
         holder.binding.nombre.text = empresa.nombre
         holder.binding.avatar.text = empresa.nombre.firstOrNull()?.uppercase() ?: "?"
 
-        // Portada: si el backend trae portadaUrl, la imagen; si no, un color decorativo por tienda
+        // Portada: si el backend trae portadaUrl, la imagen real; si no, un color decorativo por tienda
         // (estable por id, adapta a claro/oscuro) para que la tarjeta tenga identidad sin inventar datos.
         val attr = FONDOS[Math.floorMod(empresa.id.hashCode(), FONDOS.size)]
         holder.binding.portada.setBackgroundColor(MaterialColors.getColor(holder.binding.portada, attr))
+        val tienePortada = !empresa.portadaUrl.isNullOrBlank()
+        if (tienePortada) holder.binding.portada.cargarFoto(empresa.portadaUrl) else holder.binding.portada.setImageDrawable(null)
 
         // Logo real de la tienda cuando el backend lo dé; si no, la inicial (degrada bien).
         val tieneLogo = !empresa.logoUrl.isNullOrBlank()

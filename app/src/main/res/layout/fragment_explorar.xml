@@ -25,6 +25,31 @@
         android:id="@+id/barraBusqueda"
         layout="@layout/barra_busqueda" />
 
+    <TextView
+        android:id="@+id/tituloDestacados"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:text="Destacados"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:visibility="gone"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:visibility="visible" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaDestacados"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_destacado"
+        xmlns:tools="http://schemas.android.com/tools" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"

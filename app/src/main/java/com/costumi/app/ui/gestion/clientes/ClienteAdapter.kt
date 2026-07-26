@@ -48,7 +48,8 @@ class ClienteAdapter(
             // Cartera: cuánto debe todavía y su multa acumulada (solo si hay algo, RF-7/11.5).
             val debe = c.saldoPendiente?.takeIf { it.signum() > 0 }?.let { "Debe ${it.comoPrecio()}" }
             val multa = c.multaTotal?.takeIf { it.signum() > 0 }?.let { "multa ${it.comoPrecio()}" }
-            val cartera = listOfNotNull(debe, multa).joinToString("  ·  ")
+            val enCurso = if (c.tieneRentaEnCurso == true) "Renta en curso" else null
+            val cartera = listOfNotNull(debe, multa, enCurso).joinToString("  ·  ")
             binding.botonDeuda.isVisible = cartera.isNotBlank()
             binding.botonDeuda.text = cartera
             binding.botonDeuda.setOnClickListener { alVerEstadoCuenta(c) }

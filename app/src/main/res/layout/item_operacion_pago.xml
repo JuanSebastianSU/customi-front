@@ -63,11 +63,17 @@
             app:ensureMinTouchTargetSize="false"
             tools:text="Confirmada" />
 
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:contentDescription="@null"
-            android:src="@drawable/ic_chevron_right"
-            app:tint="?attr/colorOnSurfaceVariant" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/botonCobrar"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="16dp"
+            android:text="Cobrar" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

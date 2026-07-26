@@ -43,7 +43,22 @@ class VentasFragment : Fragment(R.layout.fragment_ventas) {
 
     /** Desglose de la venta: sus artículos (foto+nombre+cantidad+subtotal), total y código de retiro. */
     private fun mostrarDesgloseVenta(v: VentaResponse) {
-        val lineas = v.lineas.orEmpty().map { l ->
+        // Las piezas que salieron de un mismo disfraz se muestran como UN artículo (el nombre del disfraz).
+        val (deDisfraz, sueltas) = v.lineas.orEmpty().partition { it.disfrazGrupo != null }
+        val disfraces = deDisfraz.groupBy { it.disfrazGrupo!! }.map { (_, piezas) ->
+            val primera = piezas.first()
+            val subtotal = piezas.mapNotNull { it.subtotal }
+                .fold(java.math.BigDecimal.ZERO) { a, b -> a + b }
+            val devueltoN = piezas.sumOf { it.cantidadDevuelta ?: 0 }
+            val devuelto = if (devueltoN > 0) " · devuelto $devueltoN" else ""
+            LineaDesglose(
+                fotoUrl = piezas.firstOrNull { !it.fotoUrl.isNullOrBlank() }?.fotoUrl,
+                nombre = primera.disfrazNombre ?: "Disfraz",
+                detalle = "Cantidad: ${primera.disfrazCantidad ?: 1} · ${piezas.size} piezas$devuelto",
+                monto = subtotal.comoPrecio(),
+            )
+        }
+        val lineasSueltas = sueltas.map { l ->
             val devuelto = (l.cantidadDevuelta ?: 0).takeIf { it > 0 }?.let { " · devuelto $it" } ?: ""
             LineaDesglose(
                 fotoUrl = l.fotoUrl,
@@ -52,6 +67,7 @@ class VentasFragment : Fragment(R.layout.fragment_ventas) {
                 monto = l.subtotal.comoPrecio(),
             )
         }
+        val lineas = disfraces + lineasSueltas
         val pie = buildList {
             v.descuento?.takeIf { it.signum() > 0 }?.let { add("Descuento" to (it.comoPrecio() ?: "-")) }
             v.total?.let { add("Total" to (it.comoPrecio() ?: "-")) }

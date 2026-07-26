@@ -34,7 +34,8 @@ class ReembolsoAdapter(
     inner class VH(private val binding: ItemReembolsoBinding) : RecyclerView.ViewHolder(binding.root) {
         fun enlazar(s: SolicitudDeReembolsoResponse) {
             val tipo = if (s.tipoConcepto?.value == "RENTA") "Renta" else "Venta"
-            binding.titulo.text = "$tipo · ${s.monto.comoPrecio() ?: "-"}"
+            val quien = s.solicitanteNombre?.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty()
+            binding.titulo.text = "$tipo · ${s.monto.comoPrecio() ?: "-"}$quien"
 
             val estado = s.estado?.value
             binding.chipEstado.pintarPastilla(etiqueta(estado), tono(estado))

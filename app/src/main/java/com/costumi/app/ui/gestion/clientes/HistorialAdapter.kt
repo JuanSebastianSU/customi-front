@@ -5,8 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.core.view.isVisible
 import com.costumi.app.core.comoPrecio
 import com.costumi.app.databinding.ItemHistorialBinding
+import com.costumi.app.ui.cliente.pedidos.LineaPedidoAdapter
 import com.costumi.apiclient.models.HistorialItem
 
 /** Historial (ventas/rentas) de un cliente: tipo, fecha, monto y estado. */
@@ -29,6 +31,11 @@ class HistorialAdapter : ListAdapter<HistorialItem, HistorialAdapter.VH>(DIFF) {
             binding.fecha.text = h.fecha?.toString().orEmpty()
             binding.monto.text = h.monto.comoPrecio() ?: "-"
             binding.estado.text = h.estado.orEmpty()
+            // Qué compró/rentó: los artículos (piezas del mismo disfraz agrupadas como uno).
+            val articulos = LineaPedidoAdapter.agrupar(h.lineas.orEmpty())
+                .joinToString(", ") { a -> a.nombre + if (a.cantidad > 1) " x${a.cantidad}" else "" }
+            binding.articulos.isVisible = articulos.isNotBlank()
+            binding.articulos.text = articulos
         }
     }
 

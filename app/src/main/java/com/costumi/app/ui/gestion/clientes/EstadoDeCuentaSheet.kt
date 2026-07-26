@@ -15,10 +15,15 @@ fun Fragment.mostrarEstadoDeCuenta(nombreCliente: String, estado: EstadoDeCuenta
     val lineas = estado.lineas.orEmpty().map { l ->
         val partes = listOfNotNull(
             l.importe?.comoPrecio()?.let { "Renta $it" },
+            l.cargoPorDanos?.takeIf { it.signum() > 0 }?.comoPrecio()?.let { "daño $it" },
+            l.cargoPorRetraso?.takeIf { it.signum() > 0 }?.comoPrecio()?.let { "retraso $it" },
+            l.deposito?.takeIf { it.signum() > 0 }?.comoPrecio()?.let { "depósito $it" },
             l.multa?.takeIf { it.signum() > 0 }?.comoPrecio()?.let { "multa $it" },
             l.pagado?.takeIf { it.signum() > 0 }?.comoPrecio()?.let { "pagado $it" },
         ).joinToString("  ·  ")
-        val titulo = listOfNotNull(l.codigoRetiro, l.fechaRetiro?.toString()).joinToString("  ·  ")
+        val fechas = listOfNotNull(l.fechaRetiro?.toString(), l.fechaDevolucion?.toString())
+            .joinToString(" → ")
+        val titulo = listOfNotNull(l.codigoRetiro, fechas.ifBlank { null }).joinToString("  ·  ")
             .ifBlank { "Renta" }
         LineaDesglose(
             fotoUrl = null,

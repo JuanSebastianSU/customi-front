@@ -41,6 +41,7 @@ class NotificacionesFragment : Fragment(R.layout.fragment_notificaciones) {
         binding.barraBusqueda.tilBuscar.hint = "Buscar en el mensaje"
         binding.barraBusqueda.editBuscar.alBuscar { vm.buscar(it) }
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        observar(vm.canales) { binding.toolbar.subtitle = it }
         // El menú de un toolbar suelto hay que inflarlo por código.
         binding.toolbar.inflateMenu(R.menu.menu_notificaciones)
         binding.toolbar.setOnMenuItemClickListener { item ->

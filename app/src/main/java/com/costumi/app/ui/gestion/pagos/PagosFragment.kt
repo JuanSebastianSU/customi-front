@@ -34,9 +34,12 @@ class PagosFragment : Fragment(R.layout.fragment_pagos) {
         binding.lista.adapter = adapter.withLoadStateFooter(PrendasLoadStateAdapter { adapter.retry() })
 
         binding.toggleTipo.check(R.id.botonVentas)
+        pintarChipsEstado(TipoConcepto.VENTA)
         binding.toggleTipo.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
-                vm.cambiarTipo(if (checkedId == R.id.botonRentas) TipoConcepto.RENTA else TipoConcepto.VENTA)
+                val tipo = if (checkedId == R.id.botonRentas) TipoConcepto.RENTA else TipoConcepto.VENTA
+                vm.cambiarTipo(tipo)
+                pintarChipsEstado(tipo)
             }
         }
 
@@ -44,6 +47,27 @@ class PagosFragment : Fragment(R.layout.fragment_pagos) {
 
         observar(vm.operaciones) { adapter.submitData(viewLifecycleOwner.lifecycle, it) }
         observar(adapter.loadStateFlow) { estados -> pintarEstado(estados.refresh) }
+    }
+
+    /** Chips de filtro por estado según la pestaña (Todos + los estados posibles de ese tipo). */
+    private fun pintarChipsEstado(tipo: TipoConcepto) {
+        val grupo = binding.chipsEstado
+        grupo.removeAllViews()
+        fun agregar(etiqueta: String, estado: String?, marcado: Boolean) {
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = etiqueta
+                isCheckable = true
+                isChecked = marcado
+                setEnsureMinTouchTargetSize(false)
+                setOnClickListener { vm.filtrarEstado(estado) }
+            }
+            grupo.addView(chip)
+        }
+        agregar("Todos", null, true)
+        vm.estadosDe(tipo).forEach { e ->
+            agregar(e.lowercase().replaceFirstChar { it.uppercase() }.replace('_', ' '), e, false)
+        }
+        vm.filtrarEstado(null)
     }
 
     private fun abrirConcepto(op: OperacionPago) {

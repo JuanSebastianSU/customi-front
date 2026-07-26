@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.costumi.app.R
 import com.costumi.app.core.comoPrecio
+import com.costumi.app.ui.common.comoDiaMes
 import com.costumi.app.databinding.DialogCerrarTurnoBinding
 import com.costumi.app.databinding.DialogMovimientoBinding
 import com.costumi.app.databinding.FragmentTurnoDetalleBinding
@@ -67,6 +68,8 @@ class TurnoDetalleFragment : Fragment(R.layout.fragment_turno_detalle) {
         turno.corte?.get("TARJETA")?.takeIf { it.signum() != 0 }?.let { lineas.add("Tarjeta: ${it.comoPrecio()}") }
         turno.corte?.get("TRANSFERENCIA")?.takeIf { it.signum() != 0 }?.let { lineas.add("Transferencia: ${it.comoPrecio()}") }
         lineas.add("Fondo inicial: ${turno.fondoInicial.comoPrecio() ?: "$0"}")
+        turno.abiertoEn?.let { lineas.add("Abrió: ${it.toLocalDate().comoDiaMes()} ${"%02d:%02d".format(it.hour, it.minute)}") }
+        turno.cerradoEn?.let { lineas.add("Cerró: ${it.toLocalDate().comoDiaMes()} ${"%02d:%02d".format(it.hour, it.minute)}") }
         binding.corte.text = lineas.joinToString("\n")
 
         if (!abierto && turno.efectivoContado != null) {

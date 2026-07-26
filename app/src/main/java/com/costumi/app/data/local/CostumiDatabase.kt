@@ -16,7 +16,7 @@ import com.costumi.app.data.local.entity.FavoritoDisfrazEntity
         EmpresaEntity::class,
         FavoritoDisfrazEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class CostumiDatabase : RoomDatabase() {

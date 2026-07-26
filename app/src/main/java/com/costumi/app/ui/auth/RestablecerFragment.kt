@@ -43,6 +43,7 @@ class RestablecerFragment : Fragment(R.layout.fragment_restablecer) {
                 }
                 is EventoAuth.Error -> mostrarMensaje(evento.mensaje)
                 is EventoAuth.Navegar -> Unit
+                is EventoAuth.InvitacionLista -> Unit
             }
         }
     }

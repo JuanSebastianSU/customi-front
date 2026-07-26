@@ -59,7 +59,13 @@ class CarritoFragment : Fragment(R.layout.fragment_carrito) {
                 adapter.submitList(carrito.lineas.orEmpty())
                 // Total real calculado por el backend (misma lógica que el checkout).
                 binding.textoTotal.text = carrito.total.comoPrecio() ?: "-"
-                binding.notaCarrito.text = "Eliges como pagar (tarjeta o en la tienda) en el siguiente paso."
+                val deposito = carrito.totalDeposito?.takeIf { it.signum() > 0 }
+                binding.notaCarrito.text = buildString {
+                    if (deposito != null) {
+                        append("Incluye depósito ${deposito.comoPrecio()} (se te devuelve al entregar la prenda). ")
+                    }
+                    append("Eliges como pagar (tarjeta o en la tienda) en el siguiente paso.")
+                }
                 // Fail-fast: si alguna linea dejo de poder cumplirse, no se puede finalizar hasta quitarla.
                 val noDisponibles = carrito.lineas.orEmpty().count { !it.motivoNoDisponible.isNullOrBlank() }
                 checkoutBloqueado = noDisponibles > 0

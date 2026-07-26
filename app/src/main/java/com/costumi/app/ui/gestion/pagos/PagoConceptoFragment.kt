@@ -84,7 +84,13 @@ class PagoConceptoFragment : Fragment(R.layout.fragment_pago_concepto) {
         binding.pendiente.text = "Pendiente: ${pendienteActual.comoPrecio() ?: "$0"}"
         val partes = mutableListOf("Cobrado ${comp.totalCobrado.comoPrecio() ?: "$0"}")
         comp.multa?.takeIf { it.signum() > 0 }?.let { partes.add("multa ${it.comoPrecio()}") }
-        comp.impuesto?.takeIf { it.signum() > 0 }?.let { partes.add("impuesto ${it.comoPrecio()}") }
+        comp.impuesto?.takeIf { it.signum() > 0 }?.let { imp ->
+            val extra = listOfNotNull(
+                comp.baseImponible?.comoPrecio()?.let { "base $it" },
+                comp.tasaImpuesto?.takeIf { it.signum() > 0 }?.let { "${it.multiply(BigDecimal(100)).toInt()}%" },
+            ).joinToString(", ")
+            partes.add("impuesto ${imp.comoPrecio()}" + if (extra.isNotBlank()) " ($extra)" else "")
+        }
         comp.totalReembolsado?.takeIf { it.signum() > 0 }?.let { partes.add("reembolsado ${it.comoPrecio()}") }
         comp.deposito?.activo?.takeIf { it.signum() > 0 }?.let { partes.add("deposito ${it.comoPrecio()}") }
         binding.desglose.text = partes.joinToString(" · ")

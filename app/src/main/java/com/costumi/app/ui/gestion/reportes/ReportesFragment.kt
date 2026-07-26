@@ -14,6 +14,7 @@ import com.costumi.app.R
 import com.costumi.app.core.comoPrecio
 import com.costumi.app.databinding.FragmentReportesBinding
 import com.costumi.app.databinding.ItemReporteFilaBinding
+import com.costumi.app.ui.cargarFoto
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.observar
@@ -109,7 +110,10 @@ class ReportesFragment : Fragment(R.layout.fragment_reportes) {
         binding.porMetodo.text =
             "Efectivo ${m?.efectivo.comoPrecio() ?: "$0"} · Tarjeta ${m?.tarjeta.comoPrecio() ?: "$0"} · Transf. ${m?.transferencia.comoPrecio() ?: "$0"}"
 
-        binding.depositos.text = "Depositos activos: ${r.depositos?.total.comoPrecio() ?: "$0"}"
+        binding.depositos.text = buildString {
+            append("Depositos activos: ${r.depositos?.total.comoPrecio() ?: "$0"}")
+            r.devolucionesPorCerrar?.takeIf { it > 0 }?.let { append("  ·  Devoluciones por cerrar: $it") }
+        }
 
         pintarSerie(binding.contenedorSerie, binding.tituloSerie, r.serie)
         pintarRanking(binding.contenedorVendidos, binding.tituloVendidos, r.masVendidos)
@@ -187,7 +191,7 @@ class ReportesFragment : Fragment(R.layout.fragment_reportes) {
         items.forEach { a ->
             fila(
                 contenedor, "${a.nombre.orEmpty()} (${a.unidades ?: 0} uds)", a.monto.comoPrecio() ?: "-",
-                fraccion = fraccionDe(a.monto, max),
+                fraccion = fraccionDe(a.monto, max), fotoUrl = a.fotoUrl,
             )
         }
     }
@@ -206,7 +210,7 @@ class ReportesFragment : Fragment(R.layout.fragment_reportes) {
             val sufijo = if (unidades == 1L) "disfraz" else "disfraces"
             fila(
                 contenedor, "${d.nombre.orEmpty()} ($unidades $sufijo)", d.monto.comoPrecio() ?: "-",
-                fraccion = fraccionDe(d.monto, max),
+                fraccion = fraccionDe(d.monto, max), fotoUrl = d.fotoUrl,
             )
         }
     }
@@ -217,9 +221,10 @@ class ReportesFragment : Fragment(R.layout.fragment_reportes) {
         binding.tituloVencidas.isVisible = hay
         binding.contenedorVencidas.isVisible = hay
         items.forEach { v ->
+            val deposito = v.deposito?.takeIf { it.signum() > 0 }?.let { " · depósito ${it.comoPrecio()}" }.orEmpty()
             fila(
                 binding.contenedorVencidas,
-                "${v.diasVencida ?: 0} dias · vence ${v.fechaDevolucion ?: "?"}",
+                "${v.diasVencida ?: 0} dias · vence ${v.fechaDevolucion ?: "?"}$deposito",
                 v.importe.comoPrecio() ?: "-",
             )
         }
@@ -246,10 +251,13 @@ class ReportesFragment : Fragment(R.layout.fragment_reportes) {
     }
 
     /** [fraccion] null = fila sin barra (listas que no son ranking). */
-    private fun fila(contenedor: ViewGroup, etiqueta: String, valor: String, fraccion: Float? = null) {
+    private fun fila(contenedor: ViewGroup, etiqueta: String, valor: String, fraccion: Float? = null,
+            fotoUrl: String? = null) {
         val f = ItemReporteFilaBinding.inflate(layoutInflater, contenedor, false)
         f.etiqueta.text = etiqueta
         f.valor.text = valor
+        f.foto.isVisible = !fotoUrl.isNullOrBlank()
+        if (!fotoUrl.isNullOrBlank()) f.foto.cargarFoto(fotoUrl)
         f.barra.isVisible = fraccion != null
         if (fraccion != null) {
             // La barra son dos Views con peso: llena = fracción, resto = 1 - fracción. Un mínimo visible

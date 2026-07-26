@@ -12,13 +12,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** Una devolución con el cliente y el código de la renta ya resueltos (para mostrar "de quién es"). */
+data class DevolucionUi(
+    val dev: DevolucionResponse,
+    val codigoRetiro: String?,
+    val clienteNombre: String?,
+)
+
 /** Historial de devoluciones liquidadas de la empresa (solo lectura). */
 @HiltViewModel
 class DevolucionesViewModel @Inject constructor(
     private val repo: DevolucionRepository,
 ) : ViewModel() {
 
-    private val _estado = MutableStateFlow<UiState<List<DevolucionResponse>>>(UiState.Loading)
+    private val _estado = MutableStateFlow<UiState<List<DevolucionUi>>>(UiState.Loading)
     val estado = _estado.asStateFlow()
 
     init {
@@ -38,8 +45,18 @@ class DevolucionesViewModel @Inject constructor(
         viewModelScope.launch {
             _estado.value = UiState.Loading
             _estado.value = when (val r = repo.historial(buscar)) {
-                is RespuestaRed.Exito ->
-                    if (r.data.isEmpty()) UiState.Empty else UiState.Success(r.data.sortedByDescending { it.id?.toString() })
+                is RespuestaRed.Exito -> {
+                    if (r.data.isEmpty()) {
+                        UiState.Empty
+                    } else {
+                        val info = repo.infoRentas() // rentaId → (código, cliente)
+                        val items = r.data.sortedByDescending { it.id?.toString() }.map { d ->
+                            val ri = d.rentaId?.toString()?.let { info[it] }
+                            DevolucionUi(d, codigoRetiro = ri?.first, clienteNombre = ri?.second)
+                        }
+                        UiState.Success(items)
+                    }
+                }
                 is RespuestaRed.Fallo -> UiState.Error(r.error.mensaje) { cargar() }
             }
         }

@@ -9,6 +9,15 @@
 
     <!-- Foto de la tienda: el "dónde pongo la foto" del dueño. El endpoint para subirla aún no existe
          (ver «Identidad de tienda» en el lote de backend), así que por ahora avisa que llega pronto. -->
+    <ImageView
+        android:id="@+id/foto"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginBottom="12dp"
+        android:contentDescription="Foto de la tienda"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/botonFoto"
         style="?attr/materialButtonOutlinedStyle"

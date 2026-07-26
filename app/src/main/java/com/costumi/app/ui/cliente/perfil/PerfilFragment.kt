@@ -1,10 +1,13 @@
 package com.costumi.app.ui.cliente.perfil
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.costumi.app.R
@@ -12,12 +15,16 @@ import com.costumi.app.databinding.DialogCambiarContrasenaBinding
 import com.costumi.app.databinding.DialogRegistrarTiendaBinding
 import com.costumi.app.databinding.FragmentPerfilBinding
 import com.costumi.app.core.ModoApp
+import com.costumi.app.ui.cargarFoto
 import com.costumi.app.ui.irAHome
 import com.costumi.app.ui.irALogin
 import com.costumi.app.ui.mostrarMensaje
 import com.costumi.app.ui.observar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** Perfil: datos propios (nombre/telefono), cambio de contrasena, "Registrar mi tienda" y cerrar sesion. */
 @AndroidEntryPoint
@@ -28,6 +35,11 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
     private val binding get() = _binding!!
     private var nombreActual: String? = null
     private var correoActual: String? = null
+
+    /** Selector de imagen del sistema para la foto de perfil; al elegir, la sube. */
+    private val seleccionarFoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { leerYSubirFoto(it) }
+    }
 
     /** Cabecera de identidad: nombre (o el usuario del correo) y la inicial en el avatar. */
     private fun actualizarCabecera() {
@@ -40,10 +52,8 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentPerfilBinding.bind(view)
 
-        // Afford­ance de foto de perfil (maquetado): el endpoint del avatar del cliente aún no existe.
-        binding.avatarContenedor.setOnClickListener {
-            mostrarMensaje("Tu foto de perfil estará disponible pronto.")
-        }
+        // Foto de perfil: al tocar el avatar se elige una imagen y se sube a S3.
+        binding.avatarContenedor.setOnClickListener { seleccionarFoto.launch("image/*") }
         binding.botonLogout.setOnClickListener { vm.cerrarSesion() }
         binding.botonRegistrarTienda.setOnClickListener { mostrarDialogoTienda() }
         // Las multas viven aca y no en una pestania propia: son informacion de la cuenta, no navegacion
@@ -69,6 +79,11 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
             if (binding.editTelefono.text.isNullOrEmpty()) binding.editTelefono.setText(perfil?.telefono.orEmpty())
             nombreActual = perfil?.nombre
             actualizarCabecera()
+            // Avatar: si hay foto la mostramos (encima de la inicial).
+            val foto = perfil?.fotoUrl?.takeIf { it.isNotBlank() }
+            binding.avatarFoto.isVisible = foto != null
+            binding.inicial.isVisible = foto == null
+            if (foto != null) binding.avatarFoto.cargarFoto(foto)
         }
         observar(vm.procesando) { procesando ->
             binding.progreso.isVisible = procesando
@@ -93,6 +108,20 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
                 is EventoPerfil.Info -> mostrarMensaje(evento.mensaje)
                 is EventoPerfil.Error -> mostrarMensaje(evento.mensaje)
             }
+        }
+    }
+
+    /** Lee los bytes de la imagen elegida (en IO) y la sube como foto de perfil. */
+    private fun leerYSubirFoto(uri: Uri) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val datos = withContext(Dispatchers.IO) {
+                val cr = requireContext().contentResolver
+                val bytes = cr.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
+                bytes to (cr.getType(uri) ?: "image/*")
+            }
+            if (datos == null) { mostrarMensaje("No se pudo leer la imagen"); return@launch }
+            val ext = when (datos.second) { "image/png" -> "png"; "image/webp" -> "webp"; else -> "jpg" }
+            vm.subirFoto(datos.first, datos.second, "foto.$ext")
         }
     }
 

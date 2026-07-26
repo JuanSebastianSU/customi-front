@@ -6,8 +6,10 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.core.view.isVisible
 import com.costumi.app.R
 import com.costumi.app.databinding.FragmentExplorarBinding
+import com.costumi.app.ui.cliente.detalle.DetalleDisfrazFragment
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.alBuscar
 import com.costumi.app.ui.observar
@@ -28,11 +30,30 @@ class ExplorarFragment : Fragment(R.layout.fragment_explorar) {
         )
     }
 
+    private val destacadoAdapter = DestacadoAdapter { d ->
+        findNavController().navigate(
+            R.id.detalleDisfrazFragment,
+            bundleOf(
+                DetalleDisfrazFragment.ARG_EMPRESA_ID to d.empresaId?.toString(),
+                DetalleDisfrazFragment.ARG_DISFRAZ_ID to d.disfrazId?.toString(),
+                DetalleDisfrazFragment.ARG_NOMBRE to (d.nombre ?: "Disfraz"),
+            ),
+        )
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentExplorarBinding.bind(view)
         binding.barraBusqueda.tilBuscar.hint = "Buscar tienda por nombre"
         binding.barraBusqueda.editBuscar.alBuscar { vm.buscar(it) }
         binding.lista.adapter = adapter
+        binding.listaDestacados.adapter = destacadoAdapter
+
+        observar(vm.destacados) { lista ->
+            val hay = lista.isNotEmpty()
+            binding.tituloDestacados.isVisible = hay
+            binding.listaDestacados.isVisible = hay
+            destacadoAdapter.submitList(lista)
+        }
 
         binding.swipe.setOnRefreshListener { vm.refrescar() }
 
@@ -46,6 +67,7 @@ class ExplorarFragment : Fragment(R.layout.fragment_explorar) {
 
     override fun onDestroyView() {
         binding.lista.adapter = null
+        binding.listaDestacados.adapter = null
         _binding = null
         super.onDestroyView()
     }

@@ -20,6 +20,11 @@ class FavoritosViewModel @Inject constructor(
     val favoritos: StateFlow<List<FavoritoDisfrazEntity>> =
         repo.observar().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    init {
+        // Al abrir "Mis guardados" se baja la lista de la cuenta (sync entre dispositivos).
+        viewModelScope.launch { repo.sincronizar() }
+    }
+
     fun quitar(f: FavoritoDisfrazEntity) {
         viewModelScope.launch { repo.alternar(f, esFavorito = true) }
     }

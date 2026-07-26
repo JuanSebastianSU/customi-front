@@ -8,12 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.costumi.app.core.comoPrecio
 import com.costumi.app.databinding.ItemDevolucionBinding
-import com.costumi.apiclient.models.DevolucionResponse
 
-/** Historial de devoluciones: cargos, remanente devuelto y multa (si la hubo). */
+/** Historial de devoluciones: de quién es (cliente/código), cargos, remanente devuelto y multa. */
 class DevolucionAdapter(
-    private val alTocar: (DevolucionResponse) -> Unit,
-) : ListAdapter<DevolucionResponse, DevolucionAdapter.VH>(DIFF) {
+    private val alTocar: (DevolucionUi) -> Unit,
+) : ListAdapter<DevolucionUi, DevolucionAdapter.VH>(DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val binding = ItemDevolucionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -27,12 +26,15 @@ class DevolucionAdapter(
     }
 
     class VH(private val binding: ItemDevolucionBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun enlazar(d: DevolucionResponse) {
+        fun enlazar(u: DevolucionUi) {
+            val d = u.dev
             val piezas = d.piezas?.size ?: 0
             val pendientes = d.piezas?.count { it.resuelta == false } ?: 0
-            binding.titulo.text = "$piezas pieza(s) revisadas"
+            // El título dice de QUIÉN es: cliente + código de la renta; si no se resolvió, cae al conteo de piezas.
+            binding.titulo.text = listOfNotNull(u.clienteNombre?.takeIf { it.isNotBlank() }, u.codigoRetiro)
+                .joinToString(" · ").ifBlank { "$piezas pieza(s) revisadas" }
             binding.detalle.text = buildString {
-                append("Deposito ${d.deposito.comoPrecio() ?: "$0"}")
+                append("$piezas pieza(s) · Deposito ${d.deposito.comoPrecio() ?: "$0"}")
                 d.cargoPorDanos?.takeIf { it.signum() > 0 }?.let { append(" · danos ${it.comoPrecio()}") }
                 d.cargoPorRetraso?.takeIf { it.signum() > 0 }?.let { append(" · retraso ${it.comoPrecio()}") }
                 if (pendientes > 0) append(" · $pendientes pendiente(s)")
@@ -45,9 +47,9 @@ class DevolucionAdapter(
     }
 
     companion object {
-        private val DIFF = object : DiffUtil.ItemCallback<DevolucionResponse>() {
-            override fun areItemsTheSame(a: DevolucionResponse, b: DevolucionResponse) = a.id == b.id
-            override fun areContentsTheSame(a: DevolucionResponse, b: DevolucionResponse) = a == b
+        private val DIFF = object : DiffUtil.ItemCallback<DevolucionUi>() {
+            override fun areItemsTheSame(a: DevolucionUi, b: DevolucionUi) = a.dev.id == b.dev.id
+            override fun areContentsTheSame(a: DevolucionUi, b: DevolucionUi) = a == b
         }
     }
 }

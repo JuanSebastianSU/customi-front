@@ -41,6 +41,7 @@ class RegistroFragment : Fragment(R.layout.fragment_registro) {
                 is EventoAuth.Navegar -> findNavController().irAHome(evento.modo)
                 is EventoAuth.Error -> mostrarMensaje(evento.mensaje)
                 is EventoAuth.Info -> mostrarMensaje(evento.mensaje)
+                is EventoAuth.InvitacionLista -> Unit
             }
         }
     }

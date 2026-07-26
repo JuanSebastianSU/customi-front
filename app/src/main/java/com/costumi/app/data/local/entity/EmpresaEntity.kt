@@ -14,4 +14,5 @@ data class EmpresaEntity(
     val nombre: String,
     val ciudad: String?,
     val logoUrl: String?,
+    val portadaUrl: String?,
 )
