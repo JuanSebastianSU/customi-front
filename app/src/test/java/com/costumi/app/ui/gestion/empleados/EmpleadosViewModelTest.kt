@@ -45,11 +45,9 @@ class EmpleadosViewModelTest {
 
     private fun vmCon(lista: List<EmpleadoDetalleResponse>): EmpleadosViewModel {
         coEvery { repo.empleados(any()) } returns RespuestaRed.Exito(lista)
-        // Nota: en el VM las props (`todos`, filtros) se declaran DESPUÉS del `init{}`, así que sus
-        // inicializadores corren tras `cargar()`. En producción no importa porque `cargar()` es asíncrono
-        // (termina después); con el dispatcher de test corre síncrono, así que se llama `cargar()` de nuevo
-        // (post-construcción) para dejar `todos` poblado, tal como queda en el uso real.
-        return EmpleadosViewModel(repo).also { it.cargar() }
+        // El VM declara sus props (`todos`, filtros) ANTES del init{}, así que el cargar() del init las
+        // puebla bien incluso corriendo síncrono (con el dispatcher de test). Sin workaround.
+        return EmpleadosViewModel(repo)
     }
 
     private fun eventos(vm: EmpleadosViewModel): MutableList<EventoEmpleado> {

@@ -47,11 +47,6 @@ class EmpleadosViewModel @Inject constructor(
     private val _eventos = MutableSharedFlow<EventoEmpleado>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()
 
-    init {
-        cargar()
-        cargarSucursales()
-    }
-
     /** Texto de busqueda vigente; null = sin filtrar. */
     private var buscar: String? = null
 
@@ -61,6 +56,13 @@ class EmpleadosViewModel @Inject constructor(
     /** Filtros en la app (la lista de personal es acotada y viene completa). null = sin filtrar. */
     private var rolFiltro: String? = null
     private var sucursalFiltro: UUID? = null
+
+    // El init va DESPUÉS de declarar el estado y los filtros: sus inicializadores deben correr antes de que
+    // cargar()/publicar() los usen (si no, un cargar() síncrono los encontraría sin inicializar).
+    init {
+        cargar()
+        cargarSucursales()
+    }
 
     /** El usuario escribio en la caja de busqueda: se guarda y se recarga la lista. */
     fun buscar(texto: String) {
