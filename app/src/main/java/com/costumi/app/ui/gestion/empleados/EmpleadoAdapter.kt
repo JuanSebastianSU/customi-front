@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.costumi.app.databinding.ItemEmpleadoBinding
+import com.costumi.app.ui.cargarFoto
 import com.costumi.app.ui.common.Tono
 import com.costumi.app.ui.common.pintarPastilla
 import com.costumi.apiclient.models.EmpleadoDetalleResponse
@@ -43,6 +44,11 @@ class EmpleadoAdapter(
             val email = e.email.orEmpty()
             binding.email.text = email
             binding.inicial.text = email.trim().take(1).uppercase().ifBlank { "?" }
+
+            // Foto del empleado si la tiene; si no, queda la inicial detras.
+            val foto = e.fotoUrl?.takeIf { it.isNotBlank() }
+            binding.foto.isVisible = foto != null
+            if (foto != null) binding.foto.cargarFoto(foto)
 
             // Rol legible ("MOSTRADOR" → "Mostrador"), como pastilla informativa.
             val rol = e.rol.orEmpty().lowercase().replaceFirstChar { it.uppercase() }

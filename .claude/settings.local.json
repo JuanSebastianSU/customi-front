@@ -165,7 +165,16 @@
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 799 2593; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 1017 396; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 728 396; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
-      "Bash(git commit -q -m 'Fotos de sucursal, filtros de Mis pedidos y orden de devoluciones *)"
+      "Bash(git commit -q -m 'Fotos de sucursal, filtros de Mis pedidos y orden de devoluciones *)",
+      "Bash(cd C:/Users/User/AndroidStudioProjects/costumi-backend && ls gradlew* 2>/dev/null; echo \"JDK21?\"; ls \"C:/Program Files/Java\" 2>/dev/null | grep -i 21)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Java/jdk-21\" ./mvnw -q -o compile)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Java/jdk-21\" ./mvnw -q compile)",
+      "Bash(git stash *)",
+      "Bash(git commit -q -m 'Empleados: exponer fotoUrl en el listado del tenant \\(G1\\) *)",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb install -r \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\app\\\\build\\\\outputs\\\\apk\\\\debug\\\\app-debug.apk\" | Select-Object -Last 1)",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell monkey -p com.costumi.app -c android.intent.category.LAUNCHER 1 2>&1 | Out-Null; Start-Sleep -Seconds 3; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 1154 2593; Start-Sleep -Seconds 1; & $adb shell input tap 300 1465; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "Bash(git commit -q -m 'Empleados: pintar la foto del empleado \\(front de G\\) *)"
     ]
   }
 }

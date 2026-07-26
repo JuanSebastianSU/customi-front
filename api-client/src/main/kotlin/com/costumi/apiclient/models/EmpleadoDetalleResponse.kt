@@ -51,6 +51,9 @@ data class EmpleadoDetalleResponse (
     @SerializedName("activo")
     val activo: kotlin.Boolean? = null,
 
+    @SerializedName("fotoUrl")
+    val fotoUrl: kotlin.String? = null,
+
     @SerializedName("sucursales")
     val sucursales: kotlin.collections.List<java.util.UUID>? = null
 

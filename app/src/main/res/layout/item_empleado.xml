@@ -30,16 +30,33 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/inicial"
+            <FrameLayout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/bg_circulo"
-                android:gravity="center"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorPrimary"
-                tools:text="M" />
+                android:layout_marginEnd="12dp">
+
+                <TextView
+                    android:id="@+id/inicial"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_circulo"
+                    android:gravity="center"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorPrimary"
+                    tools:text="M" />
+
+                <!-- Foto del empleado (usuario.fotoUrl). Circular por clipToOutline sobre bg_circulo;
+                     oculta si no hay foto y queda la inicial. -->
+                <ImageView
+                    android:id="@+id/foto"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_circulo"
+                    android:clipToOutline="true"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
