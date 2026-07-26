@@ -32,13 +32,18 @@ class MisDeudasRepository @Inject constructor(
     fun observarDeudas(): Flow<List<MiDeudaDto>> =
         dao.observarTodas().map { lista -> lista.mapNotNull { it.aDto() } }
 
-    /** Trae las deudas desde la red y **escribe en Room** (los datos llegan por el Flow). Solo devuelve el error. */
-    suspend fun refrescarDeudas(): RespuestaRed<Unit> = withContext(dispatchers.io) {
+    /**
+     * Trae las deudas desde la red y **escribe en Room** (los datos llegan por el Flow). Devuelve **cuántas**
+     * trajo: el VM lo usa para distinguir "0 = no debes nada" de "cargando" (Room no re-emite si la tabla ya
+     * estaba vacía, así que sin esto la pantalla se quedaría cargando para siempre).
+     */
+    suspend fun refrescarDeudas(): RespuestaRed<Int> = withContext(dispatchers.io) {
         when (val r = ejecutarLlamada(gson) { api.mias() }) {
             is RespuestaRed.Fallo -> r
             is RespuestaRed.Exito -> {
-                dao.reemplazar(r.data.mapIndexedNotNull { i, d -> d.aEntity(i) })
-                RespuestaRed.Exito(Unit)
+                val entidades = r.data.mapIndexedNotNull { i, d -> d.aEntity(i) }
+                dao.reemplazar(entidades)
+                RespuestaRed.Exito(entidades.size)
             }
         }
     }

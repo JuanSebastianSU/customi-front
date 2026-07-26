@@ -62,7 +62,12 @@ class SucursalesViewModel @Inject constructor(
         viewModelScope.launch {
             if (_estado.value !is UiState.Success) _estado.value = UiState.Loading
             when (val r = repo.refrescarSucursales()) {
-                is RespuestaRed.Exito -> { yaRefresco = true; _sinConexion.value = false } // el Flow de Room actualiza la lista
+                is RespuestaRed.Exito -> {
+                    yaRefresco = true
+                    _sinConexion.value = false
+                    // Room no re-emite si la tabla ya estaba vacía: si la red confirma 0, mostrar Empty (no cargar sin fin).
+                    if (r.data == 0 && _estado.value !is UiState.Success) _estado.value = UiState.Empty
+                }
                 is RespuestaRed.Fallo -> {
                     yaRefresco = true
                     val hayCache = _estado.value is UiState.Success

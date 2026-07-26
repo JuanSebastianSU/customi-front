@@ -95,8 +95,9 @@ class MisPedidosViewModel @Inject constructor(
                 is RespuestaRed.Exito -> {
                     yaRefresco = true
                     _sinConexion.value = false
-                    // Si el historial quedó vacío tras refrescar, el Flow puede no re-emitir: publicá igual.
-                    publicar()
+                    // Room no re-emite si la tabla ya estaba vacía: si la red confirma 0, publicá (mostrará Empty).
+                    // Con datos, el Flow re-emite y publicá desde `observar()` (evita parpadeo de "no hay pedidos").
+                    if (r.data == 0) publicar()
                 }
                 is RespuestaRed.Fallo -> {
                     yaRefresco = true

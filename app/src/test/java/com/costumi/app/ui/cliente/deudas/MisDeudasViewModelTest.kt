@@ -41,7 +41,7 @@ class MisDeudasViewModelTest {
 
     private fun repoCon(
         cache: List<MiDeudaDto>,
-        refresco: RespuestaRed<Unit>,
+        refresco: RespuestaRed<Int>,
     ): MisDeudasRepository = mockk {
         every { observarDeudas() } returns flowOf(cache)
         coEvery { refrescarDeudas() } returns refresco
@@ -61,10 +61,19 @@ class MisDeudasViewModelTest {
 
     @Test
     fun con_refresco_ok_no_prende_el_aviso() {
-        val repo = repoCon(cache = listOf(unaDeuda()), refresco = RespuestaRed.Exito(Unit))
+        val repo = repoCon(cache = listOf(unaDeuda()), refresco = RespuestaRed.Exito(1))
         val vm = MisDeudasViewModel(repo)
 
         assertFalse(vm.sinConexion.value)
+    }
+
+    @Test
+    fun sin_cache_y_refresco_vacio_muestra_empty_no_se_queda_cargando() {
+        // Regresión: Room no re-emite si la tabla ya estaba vacía; sin el conteo, quedaba en Loading para siempre.
+        val repo = repoCon(cache = emptyList(), refresco = RespuestaRed.Exito(0))
+        val vm = MisDeudasViewModel(repo)
+
+        assertTrue(vm.estado.value is UiState.Empty)
     }
 
     @Test

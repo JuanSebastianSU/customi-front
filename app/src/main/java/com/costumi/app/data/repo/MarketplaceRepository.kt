@@ -97,15 +97,20 @@ class MarketplaceRepository @Inject constructor(
     fun observarCatalogo(empresaId: String): Flow<List<PrendaVitrinaResponse>> =
         prendaVitrinaDao.observarDeEmpresa(empresaId).map { lista -> lista.map { it.aResponse() } }
 
-    /** Trae el catálogo completo de la tienda desde la red y **escribe en Room** (reemplaza solo esa tienda). */
-    suspend fun refrescarCatalogo(empresaId: String): RespuestaRed<Unit> = withContext(dispatchers.io) {
+    /**
+     * Trae el catálogo completo de la tienda desde la red y **escribe en Room** (reemplaza solo esa tienda).
+     * Devuelve **cuántas** prendas trajo: el VM lo usa para mostrar "vacío" cuando la red confirma 0 (Room no
+     * re-emite si la tabla ya estaba vacía).
+     */
+    suspend fun refrescarCatalogo(empresaId: String): RespuestaRed<Int> = withContext(dispatchers.io) {
         val uuid = runCatching { UUID.fromString(empresaId) }.getOrNull()
             ?: return@withContext RespuestaRed.Fallo(ErrorApi(TipoError.DESCONOCIDO, "Tienda no valida."))
         when (val r = ejecutarLlamada(gson) { api.catalogo1(uuid, null) }) {
             is RespuestaRed.Fallo -> r
             is RespuestaRed.Exito -> {
-                prendaVitrinaDao.reemplazarDeEmpresa(empresaId, r.data.mapNotNull { it.aEntity(empresaId) })
-                RespuestaRed.Exito(Unit)
+                val entidades = r.data.mapNotNull { it.aEntity(empresaId) }
+                prendaVitrinaDao.reemplazarDeEmpresa(empresaId, entidades)
+                RespuestaRed.Exito(entidades.size)
             }
         }
     }
@@ -149,15 +154,16 @@ class MarketplaceRepository @Inject constructor(
     fun observarDisfraces(empresaId: String): Flow<List<DisfrazResponse>> =
         disfrazVitrinaDao.observarDeEmpresa(empresaId).map { lista -> lista.map { it.aResponse() } }
 
-    /** Trae los disfraces de la tienda desde la red y **escribe en Room** (reemplaza solo esa tienda). */
-    suspend fun refrescarDisfraces(empresaId: String): RespuestaRed<Unit> = withContext(dispatchers.io) {
+    /** Trae los disfraces de la tienda desde la red y **escribe en Room** (reemplaza solo esa tienda). Devuelve cuántos trajo. */
+    suspend fun refrescarDisfraces(empresaId: String): RespuestaRed<Int> = withContext(dispatchers.io) {
         val uuid = runCatching { UUID.fromString(empresaId) }.getOrNull()
             ?: return@withContext RespuestaRed.Fallo(ErrorApi(TipoError.DESCONOCIDO, "Tienda no valida."))
         when (val r = ejecutarLlamada(gson) { disfrazApi.listar18(uuid) }) {
             is RespuestaRed.Fallo -> r
             is RespuestaRed.Exito -> {
-                disfrazVitrinaDao.reemplazarDeEmpresa(empresaId, r.data.mapNotNull { it.aEntity(empresaId) })
-                RespuestaRed.Exito(Unit)
+                val entidades = r.data.mapNotNull { it.aEntity(empresaId) }
+                disfrazVitrinaDao.reemplazarDeEmpresa(empresaId, entidades)
+                RespuestaRed.Exito(entidades.size)
             }
         }
     }

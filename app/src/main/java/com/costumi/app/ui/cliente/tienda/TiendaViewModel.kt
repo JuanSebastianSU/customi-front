@@ -95,7 +95,11 @@ class TiendaViewModel @Inject constructor(
         viewModelScope.launch {
             if (_disfraces.value !is UiState.Success) _disfraces.value = UiState.Loading
             when (val r = repo.refrescarDisfraces(empresaId)) {
-                is RespuestaRed.Exito -> { yaRefrescoDisfraces = true; disfracesSinRed = false } // el Flow de Room actualiza
+                is RespuestaRed.Exito -> {
+                    yaRefrescoDisfraces = true
+                    disfracesSinRed = false
+                    if (r.data == 0 && _disfraces.value !is UiState.Success) _disfraces.value = UiState.Empty
+                }
                 is RespuestaRed.Fallo -> {
                     yaRefrescoDisfraces = true
                     val hayCache = _disfraces.value is UiState.Success
@@ -112,7 +116,12 @@ class TiendaViewModel @Inject constructor(
         viewModelScope.launch {
             if (_prendas.value !is UiState.Success) _prendas.value = UiState.Loading
             when (val r = repo.refrescarCatalogo(empresaId)) {
-                is RespuestaRed.Exito -> { yaRefrescoPrendas = true; prendasSinRed = false } // el Flow de Room actualiza
+                is RespuestaRed.Exito -> {
+                    yaRefrescoPrendas = true
+                    prendasSinRed = false
+                    // Room no re-emite si la tabla ya estaba vacía: si la red confirma 0, mostrar Empty.
+                    if (r.data == 0 && _prendas.value !is UiState.Success) _prendas.value = UiState.Empty
+                }
                 is RespuestaRed.Fallo -> {
                     yaRefrescoPrendas = true
                     val hayCache = _prendas.value is UiState.Success

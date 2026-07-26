@@ -44,13 +44,17 @@ class SucursalRepository @Inject constructor(
     fun observarSucursales(): Flow<List<SucursalResponse>> =
         sucursalDao.observarTodas().map { lista -> lista.map { it.aResponse() } }
 
-    /** Trae de la red y **escribe en Room** (los datos llegan por el Flow). Devuelve solo el error si lo hay. */
-    suspend fun refrescarSucursales(): RespuestaRed<Unit> = withContext(dispatchers.io) {
+    /**
+     * Trae de la red y **escribe en Room** (los datos llegan por el Flow). Devuelve **cuántas** sucursales
+     * trajo: el VM lo usa para saber que "0 = vacío de verdad" (Room no re-emite si la tabla ya estaba vacía).
+     */
+    suspend fun refrescarSucursales(): RespuestaRed<Int> = withContext(dispatchers.io) {
         when (val r = sucursales()) {
             is RespuestaRed.Fallo -> r
             is RespuestaRed.Exito -> {
-                sucursalDao.reemplazar(r.data.mapNotNull { it.aEntity() })
-                RespuestaRed.Exito(Unit)
+                val entidades = r.data.mapNotNull { it.aEntity() }
+                sucursalDao.reemplazar(entidades)
+                RespuestaRed.Exito(entidades.size)
             }
         }
     }

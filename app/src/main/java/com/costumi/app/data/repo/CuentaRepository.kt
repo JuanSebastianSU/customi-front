@@ -47,13 +47,18 @@ class CuentaRepository @Inject constructor(
     fun observarHistorial(): Flow<List<HistorialItem>> =
         pedidoDao.observarTodos().map { lista -> lista.mapNotNull { it.aItem() } }
 
-    /** Trae el historial desde la red y **escribe en Room** (los datos llegan por el Flow). Solo devuelve el error. */
-    suspend fun refrescarHistorial(): RespuestaRed<Unit> = withContext(dispatchers.io) {
+    /**
+     * Trae el historial desde la red y **escribe en Room** (los datos llegan por el Flow). Devuelve **cuántos**
+     * pedidos trajo: el VM lo usa para mostrar "no tienes pedidos" cuando la red confirma 0 (Room no re-emite
+     * si la tabla ya estaba vacía, así que sin esto la pantalla se quedaría cargando).
+     */
+    suspend fun refrescarHistorial(): RespuestaRed<Int> = withContext(dispatchers.io) {
         when (val r = ejecutarLlamada(gson) { clienteApi.miHistorial() }.mapear { it.contenido.orEmpty() }) {
             is RespuestaRed.Fallo -> r
             is RespuestaRed.Exito -> {
-                pedidoDao.reemplazar(r.data.mapIndexedNotNull { i, item -> item.aEntity(i) })
-                RespuestaRed.Exito(Unit)
+                val entidades = r.data.mapIndexedNotNull { i, item -> item.aEntity(i) }
+                pedidoDao.reemplazar(entidades)
+                RespuestaRed.Exito(entidades.size)
             }
         }
     }
