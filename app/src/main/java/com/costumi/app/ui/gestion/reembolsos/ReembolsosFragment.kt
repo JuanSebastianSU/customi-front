@@ -40,6 +40,20 @@ class ReembolsosFragment : Fragment(R.layout.fragment_reembolsos) {
         binding.lista.adapter = adapter
         binding.fabNueva.setOnClickListener { findNavController().navigate(R.id.solicitarReembolsoFragment) }
 
+        // Toggle Devoluciones/Reembolsos: Reembolsos es esta pantalla; tocar Devoluciones vuelve a ellas.
+        binding.toggleTipo.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked && checkedId == R.id.botonDevoluciones) {
+                findNavController().navigate(
+                    R.id.devolucionesFragment,
+                    null,
+                    androidx.navigation.navOptions {
+                        launchSingleTop = true
+                        popUpTo(R.id.devolucionesFragment) { inclusive = false }
+                    },
+                )
+            }
+        }
+
         binding.chipsEstado.setOnCheckedStateChangeListener { _, ids ->
             vm.filtrar(
                 when (ids.firstOrNull()) {

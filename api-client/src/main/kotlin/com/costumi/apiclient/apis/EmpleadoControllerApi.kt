@@ -76,6 +76,17 @@ interface EmpleadoControllerApi {
     suspend fun cancelarInvitacion(@Path("invitacionId") invitacionId: java.util.UUID): Response<Unit>
 
     /**
+     * POST api/v1/empleados/invitaciones/{invitacionId}/reenviar
+     *
+     * Reenvía una invitación pendiente: enlace nuevo (mismo email/rol/sucursales) y reenvío del email.
+     *
+     * @param invitacionId
+     * @return [InvitacionResponse]
+     */
+    @POST("api/v1/empleados/invitaciones/{invitacionId}/reenviar")
+    suspend fun reenviarInvitacion(@Path("invitacionId") invitacionId: java.util.UUID): Response<InvitacionResponse>
+
+    /**
      * POST api/v1/empleados/{usuarioId}/desactivar
      * 
      * 

@@ -32,6 +32,20 @@ class DevolucionesFragment : Fragment(R.layout.fragment_devoluciones) {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         binding.lista.adapter = adapter
 
+        // Toggle Devoluciones/Reembolsos: Devoluciones es esta pantalla; tocar Reembolsos abre esa.
+        binding.toggleTipo.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked && checkedId == R.id.botonReembolsos) {
+                findNavController().navigate(
+                    R.id.reembolsosFragment,
+                    null,
+                    androidx.navigation.navOptions {
+                        launchSingleTop = true
+                        popUpTo(R.id.devolucionesFragment) { inclusive = false }
+                    },
+                )
+            }
+        }
+
         observar(vm.estado) { estado ->
             binding.stateView.mostrar(
                 estado,

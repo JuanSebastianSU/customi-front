@@ -41,12 +41,12 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
     private var seccionesPermitidas: Set<String>? = null
     private var sucursalesActuales: List<SucursalResponse> = emptyList()
 
+    // "Rentas" y "Reembolsos" ya NO están: Rentas se abre desde el toggle de Ventas, y Reembolsos desde
+    // el toggle de Devoluciones. Se evita duplicar el acceso.
     private val secciones = listOf(
-        "Rentas",
         "Devoluciones",
         "Pagos y cobros",
         "Caja / turnos",
-        "Reembolsos",
         "Reportes",
         "Empleados",
         "Sucursales",
@@ -83,10 +83,10 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
     private fun seccionesDe(rol: Rol): Set<String> = when (rol) {
         Rol.DUENO, Rol.ENCARGADO -> secciones.toSet()
         Rol.MOSTRADOR -> setOf(
-            "Rentas", "Devoluciones", "Pagos y cobros", "Caja / turnos", "Reembolsos", "Notificaciones",
+            "Devoluciones", "Pagos y cobros", "Caja / turnos", "Notificaciones",
         )
         Rol.ATENCION -> setOf(
-            "Rentas", "Devoluciones", "Reembolsos", "Pagos y cobros", "Notificaciones",
+            "Devoluciones", "Pagos y cobros", "Notificaciones",
         )
         Rol.BODEGA -> setOf("Devoluciones", "Notificaciones")
         else -> emptySet()

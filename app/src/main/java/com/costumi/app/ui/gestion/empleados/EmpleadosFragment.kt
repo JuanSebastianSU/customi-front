@@ -147,10 +147,12 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
                 val inv = invs[i]
                 val id = inv.id ?: return@setItems
                 MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("¿Cancelar invitación?")
-                    .setMessage("Se cancelará la invitación a ${inv.email.orEmpty()}.")
-                    .setPositiveButton("Cancelar invitación") { _, _ -> vm.cancelarInvitacion(id) }
-                    .setNegativeButton("No", null)
+                    .setTitle(inv.email.orEmpty())
+                    .setMessage("¿Reenviar el enlace de invitación (por si el correo no llegó) o cancelarla?")
+                    // El positivo es la acción constructiva (reenviar); cancelar va como neutral/destructivo.
+                    .setPositiveButton("Reenviar") { _, _ -> vm.reenviarInvitacion(id, inv.email.orEmpty()) }
+                    .setNeutralButton("Cancelar invitación") { _, _ -> vm.cancelarInvitacion(id) }
+                    .setNegativeButton("Cerrar", null)
                     .show()
             }
             .setNegativeButton("Cerrar", null)

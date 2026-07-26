@@ -151,6 +151,19 @@ class EmpleadosViewModel @Inject constructor(
         }
     }
 
+    /** Reenvía una invitación pendiente y muestra el enlace nuevo (para compartir a mano si el email no llega). */
+    fun reenviarInvitacion(id: UUID, email: String) {
+        if (_procesando.value) return
+        viewModelScope.launch {
+            _procesando.value = true
+            when (val r = repo.reenviarInvitacion(id)) {
+                is RespuestaRed.Exito -> _eventos.tryEmit(EventoEmpleado.Invitacion(email, r.data.enlace.orEmpty()))
+                is RespuestaRed.Fallo -> _eventos.tryEmit(EventoEmpleado.Error(r.error.mensaje))
+            }
+            _procesando.value = false
+        }
+    }
+
     fun asignarSucursales(id: UUID, sucursalIds: List<UUID>) =
         ejecutar("Sucursales asignadas.") { repo.asignarSucursales(id, sucursalIds) }
 

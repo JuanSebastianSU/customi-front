@@ -10,6 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
 import com.costumi.app.R
 import com.costumi.app.databinding.FragmentClienteShellBinding
+import com.costumi.app.ui.ofrecerActivarNotificaciones
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -36,7 +37,10 @@ class ClienteShellFragment : Fragment(R.layout.fragment_cliente_shell) {
      * sola vez al entrar; si el usuario dice que no, la app sigue funcionando igual.
      */
     private val pedirPermisoDeNotificaciones =
-        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
+        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { concedido ->
+            // Si lo rechazó (o ya estaba rechazado), Android no vuelve a preguntar: se ofrece ir a ajustes.
+            if (!concedido) this@ClienteShellFragment.ofrecerActivarNotificaciones()
+        }
 
     private fun asegurarPermisoDeNotificaciones() {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) return

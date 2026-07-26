@@ -14,6 +14,7 @@ import com.costumi.app.R
 import com.costumi.app.core.Rol
 import com.costumi.app.databinding.FragmentGestionShellBinding
 import com.costumi.app.ui.observar
+import com.costumi.app.ui.ofrecerActivarNotificaciones
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -38,7 +39,10 @@ class GestionShellFragment : Fragment(R.layout.fragment_gestion_shell) {
      * (el sistema deja la app en importancia NONE). Se pide también aquí.
      */
     private val pedirPermisoDeNotificaciones =
-        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
+        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { concedido ->
+            // Si lo rechazó (o ya estaba rechazado), Android no vuelve a preguntar: se ofrece ir a ajustes.
+            if (!concedido) ofrecerActivarNotificaciones()
+        }
 
     private fun asegurarPermisoDeNotificaciones() {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) return

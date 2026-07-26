@@ -87,6 +87,10 @@ class EmpleadoRepository @Inject constructor(
     suspend fun cancelarInvitacion(id: UUID): RespuestaRed<Unit> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.cancelarInvitacion(id) } }
 
+    /** Reenvía una invitación pendiente: enlace nuevo + reenvío del email. Devuelve el nuevo enlace. */
+    suspend fun reenviarInvitacion(id: UUID): RespuestaRed<InvitacionResponse> =
+        withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.reenviarInvitacion(id) } }
+
     suspend fun asignarSucursales(id: UUID, sucursalIds: List<UUID>): RespuestaRed<List<UUID>> =
         withContext(dispatchers.io) { ejecutarLlamada(gson) { empleadoApi.asignarSucursales(id, AsignarSucursalesRequest(sucursalIds)) } }
 

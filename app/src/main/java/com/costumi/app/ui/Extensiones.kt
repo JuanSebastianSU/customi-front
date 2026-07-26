@@ -26,6 +26,32 @@ fun Fragment.mostrarMensaje(mensaje: String) {
 }
 
 /**
+ * Si las notificaciones del sistema están DESACTIVADAS para la app, ofrece abrir los ajustes para
+ * activarlas. Android no vuelve a pedir el permiso una vez rechazado (es por dispositivo, no por cuenta),
+ * así que la única salida es que el usuario lo active a mano: este aviso lo lleva directo a esa pantalla.
+ */
+fun Fragment.ofrecerActivarNotificaciones() {
+    val vista = view ?: return
+    val ctx = requireContext()
+    if (androidx.core.app.NotificationManagerCompat.from(ctx).areNotificationsEnabled()) return
+    Snackbar.make(vista, "Las notificaciones estan desactivadas para Costumi.", Snackbar.LENGTH_LONG)
+        .setAction("Activar") {
+            val intent = android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, ctx.packageName)
+            runCatching { startActivity(intent) }.onFailure {
+                // Fallback: la pantalla de detalles de la app.
+                runCatching {
+                    startActivity(
+                        android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                            .setData(android.net.Uri.fromParts("package", ctx.packageName, null)),
+                    )
+                }
+            }
+        }
+        .show()
+}
+
+/**
  * Renderiza un [UiState] sobre este StateView: muestra cargando/vacio/error y, cuando hay datos,
  * se oculta y entrega los datos a [alTenerDatos] (para poblar la lista/contenido real).
  */
