@@ -75,8 +75,14 @@ class InventarioFragment : Fragment(R.layout.fragment_inventario) {
             when (item.itemId) {
                 R.id.accionCategorias -> { findNavController().navigate(R.id.categoriasFragment); true }
                 R.id.accionTiposEtiqueta -> { findNavController().navigate(R.id.tiposEtiquetaFragment); true }
-                R.id.accionDisfraces -> { findNavController().navigate(R.id.disfracesFragment); true }
                 else -> false
+            }
+        }
+
+        // Toggle Disfraces/Prendas: Prendas es esta pantalla; tocar Disfraces abre su gestión.
+        binding.toggleTipo.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked && checkedId == R.id.botonDisfraces) {
+                findNavController().navigate(R.id.disfracesFragment)
             }
         }
 

@@ -19,6 +19,39 @@
             app:title="Disfraces"
             app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
 
+        <!-- Mismo toggle que en Inventario: Disfraces es esta pantalla; Prendas vuelve al inventario. -->
+        <!-- saveEnabled=false: evita que el toggle restaure su estado y dispare el listener al recrear
+             la vista (ver nota en fragment_inventario.xml). Aquí arranca siempre en Disfraces. -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleTipo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:saveEnabled="false"
+            app:checkedButton="@+id/botonDisfraces"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonDisfraces"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:saveEnabled="false"
+                android:text="Disfraces" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonPrendas"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:saveEnabled="false"
+                android:text="Prendas" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
         <include
             android:id="@+id/barraBusqueda"
             layout="@layout/barra_busqueda" />

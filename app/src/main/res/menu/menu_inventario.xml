@@ -9,8 +9,4 @@
         android:id="@+id/accionTiposEtiqueta"
         android:title="Tipos de etiqueta"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/accionDisfraces"
-        android:title="Disfraces"
-        app:showAsAction="never" />
 </menu>

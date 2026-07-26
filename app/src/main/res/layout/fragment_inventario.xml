@@ -18,6 +18,41 @@
             app:title="Inventario"
             app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
 
+        <!-- Alternar entre Disfraces y Prendas de un toque, en vez de esconder Disfraces en los tres
+             puntitos. Prendas es el modo por defecto de esta pantalla. -->
+        <!-- saveEnabled=false: sin esto, al volver a esta pantalla el toggle restaura su estado guardado
+             (Disfraces) DESPUÉS de onViewCreated y dispara el listener → re-navega en bucle. Con esto
+             siempre arranca en Prendas (su valor por defecto aquí). -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleTipo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:saveEnabled="false"
+            app:checkedButton="@+id/botonPrendas"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonDisfraces"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:saveEnabled="false"
+                android:text="Disfraces" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonPrendas"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:saveEnabled="false"
+                android:text="Prendas" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
         <include
             android:id="@+id/barraBusqueda"
             layout="@layout/barra_busqueda" />

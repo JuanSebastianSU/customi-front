@@ -47,6 +47,14 @@ class DisfracesFragment : Fragment(R.layout.fragment_disfraces) {
                 else -> false
             }
         }
+        // Toggle Disfraces/Prendas: Disfraces es esta pantalla; tocar Prendas vuelve al inventario (de
+        // donde siempre se llega aquí).
+        binding.toggleTipo.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked && checkedId == R.id.botonPrendas) {
+                findNavController().popBackStack()
+            }
+        }
+
         // Los disfraces se rentan/venden (mezclados con prendas) desde "Nueva renta" y "Nueva venta".
         binding.lista.adapter = adapter
         binding.fabNueva.setOnClickListener { findNavController().navigate(R.id.disfrazFormFragment) }
