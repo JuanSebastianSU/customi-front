@@ -51,6 +51,8 @@ class DetallePrendaFragment : Fragment(R.layout.fragment_detalle_prenda) {
         binding.nombre.text = vm.nombre
         binding.categoria.isVisible = !vm.categoria.isNullOrBlank()
         binding.categoria.text = vm.categoria
+        binding.etiquetas.isVisible = !vm.etiquetas.isNullOrBlank()
+        binding.etiquetas.text = vm.etiquetas.orEmpty()
 
         binding.botonRenta.isVisible = vm.permiteRenta
         binding.botonVenta.isVisible = vm.permiteVenta
@@ -144,6 +146,7 @@ class DetallePrendaFragment : Fragment(R.layout.fragment_detalle_prenda) {
         const val ARG_PRENDA_ID = "prendaId"
         const val ARG_NOMBRE = "nombre"
         const val ARG_CATEGORIA = "categoria"
+        const val ARG_ETIQUETAS = "etiquetas"
         const val ARG_PRECIO_RENTA = "precioRenta"
         const val ARG_PRECIO_VENTA = "precioVenta"
         const val ARG_FOTO_URL = "fotoUrl"

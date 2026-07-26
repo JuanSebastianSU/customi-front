@@ -30,6 +30,11 @@ class PrendaAdapter(
         holder.binding.categoria.text = listOfNotNull(prenda.categoria, prenda.tipoArticulo)
             .joinToString(" - ").ifBlank { "Sin categoria" }
 
+        // Etiquetas (color/talla/estilo…): los valores, para que el cliente vea qué es de un vistazo.
+        val etiquetas = prenda.etiquetas.orEmpty().mapNotNull { it.valor?.takeIf { v -> v.isNotBlank() } }
+        holder.binding.etiquetas.isVisible = etiquetas.isNotEmpty()
+        holder.binding.etiquetas.text = etiquetas.joinToString("  ·  ")
+
         // Renta como precio primario y venta debajo (no en la misma linea): en una tarjeta de grilla,
         // juntarlas truncaba ambas.
         val renta = prenda.precioRenta.comoPrecio()?.let { "Renta $it" }

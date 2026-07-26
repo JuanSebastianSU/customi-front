@@ -60,7 +60,10 @@ data class PrendaVitrinaResponse (
     val categoria: kotlin.String? = null,
 
     @SerializedName("fotoUrl")
-    val fotoUrl: kotlin.String? = null
+    val fotoUrl: kotlin.String? = null,
+
+    @SerializedName("etiquetas")
+    val etiquetas: kotlin.collections.List<EtiquetaVitrinaDto>? = null
 
 ) {
 

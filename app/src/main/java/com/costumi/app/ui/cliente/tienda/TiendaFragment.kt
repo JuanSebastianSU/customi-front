@@ -164,6 +164,10 @@ class TiendaFragment : Fragment(R.layout.fragment_tienda) {
                 DetallePrendaFragment.ARG_PRENDA_ID to prenda.id?.toString(),
                 DetallePrendaFragment.ARG_NOMBRE to (prenda.nombre ?: "Articulo"),
                 DetallePrendaFragment.ARG_CATEGORIA to prenda.categoria,
+                DetallePrendaFragment.ARG_ETIQUETAS to prenda.etiquetas.orEmpty()
+                    .filter { !it.tipo.isNullOrBlank() && !it.valor.isNullOrBlank() }
+                    .joinToString("  ·  ") { "${it.tipo}: ${it.valor}" }
+                    .ifBlank { null },
                 DetallePrendaFragment.ARG_PRECIO_RENTA to prenda.precioRenta?.toPlainString(),
                 DetallePrendaFragment.ARG_PRECIO_VENTA to prenda.precioVenta?.toPlainString(),
                 DetallePrendaFragment.ARG_FOTO_URL to prenda.fotoUrl,

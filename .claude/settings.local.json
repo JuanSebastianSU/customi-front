@@ -231,7 +231,9 @@
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 143 781; Start-Sleep -Seconds 1; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 400 1164; Start-Sleep -Seconds 1; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 300 811; Start-Sleep -Milliseconds 300; & $adb shell input tap 300 954; Start-Sleep -Milliseconds 300; & $adb shell input tap 1008 2292; Start-Sleep -Seconds 1; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
-      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 1001 2118; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")"
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 1001 2118; Start-Sleep -Seconds 2; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "Bash(git commit -q -m 'Vitrina: la prenda del marketplace devuelve sus etiquetas con nombres *)",
+      "Bash(git commit -q -m 'Vitrina: pintar las etiquetas de la prenda \\(front de #4\\) *)"
     ]
   }
 }

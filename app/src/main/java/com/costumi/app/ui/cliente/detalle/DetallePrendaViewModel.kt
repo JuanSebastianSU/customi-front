@@ -29,6 +29,9 @@ class DetallePrendaViewModel @Inject constructor(
     val categoria: String? = savedStateHandle[DetallePrendaFragment.ARG_CATEGORIA]
     val fotoUrl: String? = savedStateHandle[DetallePrendaFragment.ARG_FOTO_URL]
 
+    /** Etiquetas ya formateadas ("Color: Negro · Talla: M") para que el cliente sepa qué es. */
+    val etiquetas: String? = savedStateHandle[DetallePrendaFragment.ARG_ETIQUETAS]
+
     private val precioRenta = savedStateHandle.get<String>(DetallePrendaFragment.ARG_PRECIO_RENTA)
         ?.toBigDecimalOrNull()
     private val precioVenta = savedStateHandle.get<String>(DetallePrendaFragment.ARG_PRECIO_VENTA)
