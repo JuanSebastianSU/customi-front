@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.costumi.app.R
 import com.costumi.app.databinding.DialogSucursalBinding
 import com.costumi.app.databinding.FragmentSucursalesBinding
+import com.costumi.app.ui.avisoDatosGuardados
 import com.costumi.app.ui.cargarFoto
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.extensionDeImagen
@@ -22,6 +23,7 @@ import com.costumi.app.ui.observar
 import com.costumi.app.ui.soloImagenes
 import com.costumi.apiclient.models.SucursalResponse
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +38,7 @@ class SucursalesFragment : Fragment(R.layout.fragment_sucursales) {
     private var _binding: FragmentSucursalesBinding? = null
     private val binding get() = _binding!!
     private val adapter = SucursalAdapter { sucursal, accion -> accionar(sucursal, accion) }
+    private var avisoRed: Snackbar? = null
 
     // Foto de la tienda: la sucursal en edición y su vista previa en el diálogo abierto.
     private var fotoTarget: UUID? = null
@@ -52,6 +55,7 @@ class SucursalesFragment : Fragment(R.layout.fragment_sucursales) {
         binding.lista.adapter = adapter
         binding.fabNueva.setOnClickListener { dialogoSucursal(null) }
 
+        observar(vm.sinConexion) { off -> avisoRed = avisoDatosGuardados(avisoRed, off) { vm.cargar() } }
         observar(vm.estado) { estado ->
             binding.stateView.mostrar(estado, vacio = "No hay sucursales. Crea la primera.") { adapter.submitList(it) }
         }
@@ -131,6 +135,8 @@ class SucursalesFragment : Fragment(R.layout.fragment_sucursales) {
     }
 
     override fun onDestroyView() {
+        avisoRed?.dismiss()
+        avisoRed = null
         binding.lista.adapter = null
         _binding = null
         super.onDestroyView()

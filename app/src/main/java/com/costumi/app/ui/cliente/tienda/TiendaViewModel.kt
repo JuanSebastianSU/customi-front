@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.costumi.app.core.RespuestaRed
+import com.costumi.app.core.TipoError
 import com.costumi.app.core.UiState
 import com.costumi.app.data.repo.MarketplaceRepository
 import com.costumi.app.ui.cliente.explorar.ExplorarFragment
@@ -45,6 +46,12 @@ class TiendaViewModel @Inject constructor(
     private var yaRefrescoPrendas = false
     private var yaRefrescoDisfraces = false
 
+    /** Aviso N4 "datos guardados": true si prendas o disfraces muestran caché por falta de red. */
+    private var prendasSinRed = false
+    private var disfracesSinRed = false
+    private val _sinConexion = MutableStateFlow(false)
+    val sinConexion = _sinConexion.asStateFlow()
+
     init {
         // Cache-first: prendas y disfraces se pintan desde Room y se actualizan solos al refrescar.
         observarDisfraces()
@@ -72,6 +79,10 @@ class TiendaViewModel @Inject constructor(
         }
     }
 
+    private fun actualizarSinConexion() {
+        _sinConexion.value = prendasSinRed || disfracesSinRed
+    }
+
     private fun cargarDetalle() {
         viewModelScope.launch {
             (repo.detalleEmpresa(empresaId) as? RespuestaRed.Exito)?.data?.descripcion
@@ -84,12 +95,15 @@ class TiendaViewModel @Inject constructor(
         viewModelScope.launch {
             if (_disfraces.value !is UiState.Success) _disfraces.value = UiState.Loading
             when (val r = repo.refrescarDisfraces(empresaId)) {
-                is RespuestaRed.Exito -> yaRefrescoDisfraces = true // el Flow de Room actualiza la lista
+                is RespuestaRed.Exito -> { yaRefrescoDisfraces = true; disfracesSinRed = false } // el Flow de Room actualiza
                 is RespuestaRed.Fallo -> {
                     yaRefrescoDisfraces = true
-                    if (_disfraces.value !is UiState.Success) _disfraces.value = UiState.Error(r.error.mensaje) { cargarDisfraces() }
+                    val hayCache = _disfraces.value is UiState.Success
+                    disfracesSinRed = hayCache && r.error.tipo == TipoError.SIN_CONEXION
+                    if (!hayCache) _disfraces.value = UiState.Error(r.error.mensaje) { cargarDisfraces() }
                 }
             }
+            actualizarSinConexion()
         }
     }
 
@@ -98,12 +112,15 @@ class TiendaViewModel @Inject constructor(
         viewModelScope.launch {
             if (_prendas.value !is UiState.Success) _prendas.value = UiState.Loading
             when (val r = repo.refrescarCatalogo(empresaId)) {
-                is RespuestaRed.Exito -> yaRefrescoPrendas = true // el Flow de Room actualiza la lista
+                is RespuestaRed.Exito -> { yaRefrescoPrendas = true; prendasSinRed = false } // el Flow de Room actualiza
                 is RespuestaRed.Fallo -> {
                     yaRefrescoPrendas = true
-                    if (_prendas.value !is UiState.Success) _prendas.value = UiState.Error(r.error.mensaje) { cargarPrendas() }
+                    val hayCache = _prendas.value is UiState.Success
+                    prendasSinRed = hayCache && r.error.tipo == TipoError.SIN_CONEXION
+                    if (!hayCache) _prendas.value = UiState.Error(r.error.mensaje) { cargarPrendas() }
                 }
             }
+            actualizarSinConexion()
         }
     }
 }

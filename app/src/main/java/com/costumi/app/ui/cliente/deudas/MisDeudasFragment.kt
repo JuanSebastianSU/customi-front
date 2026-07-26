@@ -9,8 +9,10 @@ import com.costumi.app.R
 import com.costumi.app.core.UiState
 import com.costumi.app.core.comoPrecio
 import com.costumi.app.databinding.FragmentMisDeudasBinding
+import com.costumi.app.ui.avisoDatosGuardados
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.observar
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.math.BigDecimal
 
@@ -27,10 +29,13 @@ class MisDeudasFragment : Fragment(R.layout.fragment_mis_deudas) {
     private var _binding: FragmentMisDeudasBinding? = null
     private val binding get() = _binding!!
     private val adapter = DeudaAdapter()
+    private var avisoRed: Snackbar? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentMisDeudasBinding.bind(view)
         binding.lista.adapter = adapter
+
+        observar(vm.sinConexion) { off -> avisoRed = avisoDatosGuardados(avisoRed, off) { vm.cargar() } }
 
         observar(vm.estado) { estado ->
             if (estado !is UiState.Success<*>) adapter.submitList(emptyList())
@@ -57,6 +62,8 @@ class MisDeudasFragment : Fragment(R.layout.fragment_mis_deudas) {
     }
 
     override fun onDestroyView() {
+        avisoRed?.dismiss()
+        avisoRed = null
         binding.lista.adapter = null
         _binding = null
         super.onDestroyView()

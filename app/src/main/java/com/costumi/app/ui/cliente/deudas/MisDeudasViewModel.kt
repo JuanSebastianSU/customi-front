@@ -3,6 +3,7 @@ package com.costumi.app.ui.cliente.deudas
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.costumi.app.core.RespuestaRed
+import com.costumi.app.core.TipoError
 import com.costumi.app.core.UiState
 import com.costumi.app.data.remote.MiDeudaDto
 import com.costumi.app.data.repo.MisDeudasRepository
@@ -34,6 +35,10 @@ class MisDeudasViewModel @Inject constructor(
     /** true tras el primer refresco: recién ahí una caché vacía significa "no debes nada" (Empty). */
     private var yaRefresco = false
 
+    /** true cuando se muestra caché porque el refresco falló por falta de red (aviso N4). */
+    private val _sinConexion = MutableStateFlow(false)
+    val sinConexion = _sinConexion.asStateFlow()
+
     init {
         // Cache-first: la pantalla se pinta desde Room y se actualiza sola cuando el refresco escribe.
         // El saldo es informativo (N3): el importe se reconfirma con el servidor al momento de pagar.
@@ -56,10 +61,13 @@ class MisDeudasViewModel @Inject constructor(
         viewModelScope.launch {
             if (_estado.value !is UiState.Success) _estado.value = UiState.Loading
             when (val r = repo.refrescarDeudas()) {
-                is RespuestaRed.Exito -> yaRefresco = true // el Flow de Room actualiza la lista
+                is RespuestaRed.Exito -> { yaRefresco = true; _sinConexion.value = false } // el Flow de Room actualiza la lista
                 is RespuestaRed.Fallo -> {
                     yaRefresco = true
-                    if (_estado.value !is UiState.Success) _estado.value = UiState.Error(r.error.mensaje) { cargar() }
+                    val hayCache = _estado.value is UiState.Success
+                    // Con caché a la vista y sin red: se avisa (N4). Sin caché: error a pantalla completa.
+                    _sinConexion.value = hayCache && r.error.tipo == TipoError.SIN_CONEXION
+                    if (!hayCache) _estado.value = UiState.Error(r.error.mensaje) { cargar() }
                 }
             }
         }

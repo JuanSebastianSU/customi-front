@@ -13,6 +13,7 @@ import com.costumi.app.databinding.FragmentTiendaBinding
 import com.costumi.app.ui.cliente.detalle.DetalleDisfrazFragment
 import com.costumi.app.ui.cliente.detalle.DetallePrendaFragment
 import com.costumi.app.ui.cliente.explorar.ExplorarFragment
+import com.costumi.app.ui.avisoDatosGuardados
 import com.costumi.app.ui.mostrar
 import com.costumi.app.ui.common.ListaBuscable
 import com.costumi.app.ui.common.OpcionBuscable
@@ -20,6 +21,7 @@ import com.costumi.app.ui.observar
 import com.costumi.apiclient.models.DisfrazResponse
 import com.costumi.apiclient.models.PrendaVitrinaResponse
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,6 +46,7 @@ class TiendaFragment : Fragment(R.layout.fragment_tienda) {
     }
 
     private val prendaAdapter = PrendaAdapter { prenda -> navegarADetallePrenda(prenda) }
+    private var avisoRed: Snackbar? = null
 
     private var ultimoDisfraces: UiState<List<DisfrazResponse>> = UiState.Loading
     private var ultimoPrendas: UiState<List<PrendaVitrinaResponse>> = UiState.Loading
@@ -76,6 +79,9 @@ class TiendaFragment : Fragment(R.layout.fragment_tienda) {
 
         observar(vm.disfraces) { ultimoDisfraces = it; if (enDisfraces()) render() }
         observar(vm.prendas) { ultimoPrendas = it; if (!enDisfraces()) render() }
+        observar(vm.sinConexion) { off ->
+            avisoRed = avisoDatosGuardados(avisoRed, off) { vm.cargarPrendas(); vm.cargarDisfraces() }
+        }
     }
 
     private fun enDisfraces(): Boolean = binding.tabs.selectedTabPosition != 1
@@ -298,6 +304,8 @@ class TiendaFragment : Fragment(R.layout.fragment_tienda) {
     }
 
     override fun onDestroyView() {
+        avisoRed?.dismiss()
+        avisoRed = null
         binding.lista.adapter = null
         _binding = null
         super.onDestroyView()

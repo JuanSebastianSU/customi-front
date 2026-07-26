@@ -38,6 +38,30 @@ fun Fragment.mostrarMensaje(mensaje: String) {
 }
 
 /**
+ * Aviso persistente de "sin conexión · mostrando datos guardados" (norma **N4** de `PLAN_ROOM_OFFLINE.md`):
+ * se muestra cuando la pantalla enseña la caché porque el último refresco falló por falta de red. Mostrar
+ * datos viejos **sin avisar** es peor que un error: el usuario decide creyendo que está al día.
+ *
+ * Devuelve el Snackbar vivo (o null) para que la pantalla lo recuerde entre emisiones y lo cierre en
+ * `onDestroyView`. Idempotente: si ya está visible no crea otro; si [mostrar] es false lo cierra.
+ */
+fun Fragment.avisoDatosGuardados(
+    actual: Snackbar?,
+    mostrar: Boolean,
+    reintentar: () -> Unit,
+): Snackbar? {
+    if (!mostrar) {
+        actual?.dismiss()
+        return null
+    }
+    if (actual != null) return actual
+    val vista = view ?: return null
+    return Snackbar.make(vista, "Sin conexion · mostrando datos guardados", Snackbar.LENGTH_INDEFINITE)
+        .setAction("Reintentar") { reintentar() }
+        .also { it.show() }
+}
+
+/**
  * Lee los bytes de un `content://` (imagen elegida en un selector) de forma **segura**: devuelve
  * `(bytes, mime)` o `null` si no se pudo, **sin crashear nunca**. Corre en IO.
  *

@@ -625,7 +625,12 @@ Procedimiento completo en `PLAN_ROOM_OFFLINE.md`. Orden interno acordado:
 > Sucursal). Cada deuda es JSON por fila (el adapter usa el DTO completo con desglose), clave `rentaId`,
 > con `orden` para conservar el orden del servidor. `MisDeudasViewModel` cache-first; el saldo total se
 > recalcula desde la lista observada. **Es informativo (N3):** el importe se reconfirma al pagar (esta
-> pantalla no cobra). El banner N4 "datos guardados" queda para B3.
+> pantalla no cobra).
+>
+> **B3 detalle:** aviso N4 "datos guardados" en las pantallas cache-first con lista (Tienda/Sucursales/Mis
+> multas). Cada VM expone `sinConexion: StateFlow<Boolean>` (true solo si hay caché a la vista y el refresco
+> falló por `SIN_CONEXION`); el fragment muestra un Snackbar indefinido con "Reintentar" vía el helper
+> reutilizable `Fragment.avisoDatosGuardados`. Test de la lógica: `MisDeudasViewModelTest` 3/3.
 >
 > **A1/A2 detalle:** catálogo y disfraces cacheados **por tienda** (índice `empresaId`), reemplazo
 > por-empresa (`reemplazarDeEmpresa`) para no borrar el caché de otras tiendas (§9.1). Precios `BigDecimal`
@@ -647,7 +652,10 @@ Procedimiento completo en `PLAN_ROOM_OFFLINE.md`. Orden interno acordado:
 - [x] **A5** Mis multas — **HECHO** (lista por-usuario, JSON por fila con orden; VM cache-first; N3 informativo)
 - [ ] **A4** Mis pedidos (el único que queda del Bloque A: historial 1-N pedido+líneas, el más complejo)
 - [ ] **A5** Mis multas
-- [ ] **B3** Indicador de "sin conexión / datos guardados"
+- [x] **B3** Indicador de "sin conexión / datos guardados" (N4) — **HECHO** en las pantallas cache-first con lista
+      (Tienda, Sucursales, Mis multas): Snackbar indefinido "Sin conexión · datos guardados / Reintentar" vía
+      `Fragment.avisoDatosGuardados`, disparado por `sinConexion: StateFlow<Boolean>` (se prende solo si hay
+      caché a la vista y el refresco falló por red). Perfil/Mi-tienda (formularios) quedan sin banner.
 - [~] **B4** Tests de DAOs y repositorios con caché — Sucursal/Prenda/Disfraz/Deuda/UnicaFila DAOs + Marketplace/MiEmpresa/Perfil/MisDeudas repos (17 unit); se suma por tabla
 - [ ] **C** Inventario con Paging 3 + RemoteMediator _(rama aparte, al final)_
 
