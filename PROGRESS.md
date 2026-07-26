@@ -615,16 +615,21 @@ Orden acordado. El detalle de cada ítem está en `PLAN_PRODUCTO.md`.
 ### Ahora — Room / offline (ítem 7)
 Procedimiento completo en `PLAN_ROOM_OFFLINE.md`. Orden interno acordado:
 
-- [ ] **B1** Borrado de la caché al cerrar sesión (norma de **seguridad**) + test
-- [ ] **B2** Subir `version` de `CostumiDatabase` y verificar instalación sobre versión previa
+> **Avance 2026-07-26** (rama `feat/room-sucursales-y-tests`, aún sin mergear a `main`): se aplicó **A3
+> Sucursales** cache-first + se cumplieron **B1** (logout limpia la caché, incl. sucursales) y **B2** (base
+> v3→v4). Se estrenaron los **tests** (SucursalRepositoryTest unit 2/2 + SucursalDaoTest instrumentado 3/3;
+> deps mockk + coroutines-test + room-testing). El molde ya está: los A restantes van más rápido.
+
+- [x] **B1** Borrado de la caché al cerrar sesión (norma de **seguridad**) — hecho (empresa/favoritos/sucursal)
+- [x] **B2** Subir `version` de `CostumiDatabase` — hecho (v4 con SucursalEntity)
+- [x] **A3** Sucursales por tienda — **HECHO** (entidad/DAO/repo observar-refrescar/VM observa/logout/tests)
 - [ ] **A4** Mis pedidos (el mejor candidato: es historial, ya no cambia)
 - [ ] **A1** Catálogo de prendas por tienda
 - [ ] **A2** Disfraces por tienda
-- [ ] **A3** Sucursales por tienda
 - [ ] **A5** Mis multas
 - [ ] **A6** Mi perfil y mi tienda (elimina la caché en memoria de `MiEmpresaRepository`)
 - [ ] **B3** Indicador de "sin conexión / datos guardados"
-- [ ] **B4** Tests de DAOs y repositorios con caché
+- [~] **B4** Tests de DAOs y repositorios con caché — empezado (SucursalDao + SucursalRepository); se suma por tabla
 - [ ] **C** Inventario con Paging 3 + RemoteMediator _(rama aparte, al final)_
 
 ### Después — Bloqueantes para publicar (ítems 1-4)
@@ -699,6 +704,15 @@ Ver `PENDIENTE_FRONTEND.md` — auditoría de 6 hallazgos (FRONT-1..6) y problem
 
 ## Registro de sesiones
 
+- **2026-07-26** — Tanda de cierre para presentación. **En `main`** (commit `21f6d47`): notificaciones
+  (toggle activar/desactivar en Perfil + canal + foreground), **pago con tarjeta SIMULADO** (panel local, no
+  toca backend), **blindaje de los 6 pickers de foto** (PickVisualMedia + lectura segura → no crashea al
+  volver del selector), invitar/reenviar "email-first" + manejo del 409, **firma de release** (keystore
+  fuera del repo) + **AAB firmado** para Play, y `AUDITORIA_MVVM.md`. **En rama `feat/room-sucursales-y-tests`**:
+  Room A3 Sucursales cache-first + primeros tests (verdes). **Backend** (PRs sin mergear): email por HTTP
+  (Brevo, ya desplegado), texto del correo de invitación, y fallback del router a FCM. **Play Store**: cuenta
+  creada, **esperando verificación de identidad de Google** (bloqueo para publicar). Ver memoria
+  `estado-actual-play-room-tests`.
 - **2026-07-22** — Auditoría completa de arquitectura (MVVM, lifecycles, dispatchers, Room). Se detectó
   que Room quedó en una sola tabla pese a que el diseño pedía cache-first (`ORDEN_CONSTRUCCION.md` Fase 8).
   Se decidió: no agregar capa `domain`, ejecutar el plan de Room completo + RemoteMediator solo en
