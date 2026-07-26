@@ -51,6 +51,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="Categoria: Todas" />
+
+        <!-- Filtro por etiqueta (color/talla/estilo…): solo en Prendas, solo si hay etiquetas. -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipEtiquetas"
+            style="@style/Widget.Material3.Chip.Assist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:visibility="gone"
+            tools:text="Filtros"
+            tools:visibility="visible" />
     </LinearLayout>
 
     <FrameLayout
