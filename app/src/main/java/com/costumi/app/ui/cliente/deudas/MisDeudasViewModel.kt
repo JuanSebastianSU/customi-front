@@ -31,20 +31,36 @@ class MisDeudasViewModel @Inject constructor(
     private val _saldoTotal = MutableStateFlow(BigDecimal.ZERO)
     val saldoTotal = _saldoTotal.asStateFlow()
 
+    /** true tras el primer refresco: recién ahí una caché vacía significa "no debes nada" (Empty). */
+    private var yaRefresco = false
+
     init {
+        // Cache-first: la pantalla se pinta desde Room y se actualiza sola cuando el refresco escribe.
+        // El saldo es informativo (N3): el importe se reconfirma con el servidor al momento de pagar.
+        observar()
         cargar()
     }
 
+    private fun observar() {
+        viewModelScope.launch {
+            repo.observarDeudas().collect { lista ->
+                _saldoTotal.value = lista.mapNotNull { it.saldo }.fold(BigDecimal.ZERO) { acc, s -> acc + s }
+                if (lista.isNotEmpty()) _estado.value = UiState.Success(lista)
+                else if (yaRefresco) _estado.value = UiState.Empty
+            }
+        }
+    }
+
+    /** Refresca desde la red hacia Room. No tapa la caché con un spinner: solo Loading/Error si aún no hay datos. */
     fun cargar() {
         viewModelScope.launch {
-            _estado.value = UiState.Loading
-            _estado.value = when (val r = repo.mias()) {
-                is RespuestaRed.Exito -> {
-                    _saldoTotal.value = r.data.mapNotNull { it.saldo }
-                        .fold(BigDecimal.ZERO) { acc, s -> acc + s }
-                    if (r.data.isEmpty()) UiState.Empty else UiState.Success(r.data)
+            if (_estado.value !is UiState.Success) _estado.value = UiState.Loading
+            when (val r = repo.refrescarDeudas()) {
+                is RespuestaRed.Exito -> yaRefresco = true // el Flow de Room actualiza la lista
+                is RespuestaRed.Fallo -> {
+                    yaRefresco = true
+                    if (_estado.value !is UiState.Success) _estado.value = UiState.Error(r.error.mensaje) { cargar() }
                 }
-                is RespuestaRed.Fallo -> UiState.Error(r.error.mensaje) { cargar() }
             }
         }
     }

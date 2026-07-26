@@ -3,6 +3,7 @@ package com.costumi.app.di
 import android.content.Context
 import androidx.room.Room
 import com.costumi.app.data.local.CostumiDatabase
+import com.costumi.app.data.local.dao.DeudaDao
 import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.FavoritoDao
@@ -51,4 +52,7 @@ object DatabaseModule {
 
     @Provides
     fun providePerfilDao(db: CostumiDatabase): PerfilDao = db.perfilDao()
+
+    @Provides
+    fun provideDeudaDao(db: CostumiDatabase): DeudaDao = db.deudaDao()
 }

@@ -2,6 +2,7 @@ package com.costumi.app.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.costumi.app.data.local.dao.DeudaDao
 import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.EmpresaDao
 import com.costumi.app.data.local.dao.FavoritoDao
@@ -9,6 +10,7 @@ import com.costumi.app.data.local.dao.MiEmpresaDao
 import com.costumi.app.data.local.dao.PerfilDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
 import com.costumi.app.data.local.dao.SucursalDao
+import com.costumi.app.data.local.entity.DeudaEntity
 import com.costumi.app.data.local.entity.DisfrazVitrinaEntity
 import com.costumi.app.data.local.entity.EmpresaEntity
 import com.costumi.app.data.local.entity.FavoritoDisfrazEntity
@@ -30,8 +32,9 @@ import com.costumi.app.data.local.entity.SucursalEntity
         DisfrazVitrinaEntity::class,
         MiEmpresaEntity::class,
         PerfilEntity::class,
+        DeudaEntity::class,
     ],
-    version = 7,
+    version = 8,
     exportSchema = false,
 )
 abstract class CostumiDatabase : RoomDatabase() {
@@ -42,6 +45,7 @@ abstract class CostumiDatabase : RoomDatabase() {
     abstract fun disfrazVitrinaDao(): DisfrazVitrinaDao
     abstract fun miEmpresaDao(): MiEmpresaDao
     abstract fun perfilDao(): PerfilDao
+    abstract fun deudaDao(): DeudaDao
 
     companion object {
         const val NOMBRE = "costumi.db"

@@ -5,6 +5,7 @@ import com.costumi.app.core.DispatcherProvider
 import com.costumi.app.core.RespuestaRed
 import com.costumi.app.core.Rol
 import com.costumi.app.core.TipoError
+import com.costumi.app.data.local.dao.DeudaDao
 import com.costumi.app.data.local.dao.DisfrazVitrinaDao
 import com.costumi.app.data.local.dao.FavoritoDao
 import com.costumi.app.data.local.dao.PrendaVitrinaDao
@@ -41,6 +42,7 @@ class AuthRepository @Inject constructor(
     private val sucursales: SucursalDao,
     private val prendasVitrina: PrendaVitrinaDao,
     private val disfracesVitrina: DisfrazVitrinaDao,
+    private val deudas: DeudaDao,
 ) {
     fun haySesion(): Boolean = sesion.haySesion()
 
@@ -119,6 +121,8 @@ class AuthRepository @Inject constructor(
         // El catalogo cacheado de las tiendas visitadas tambien se borra (norma N1).
         prendasVitrina.limpiar()
         disfracesVitrina.limpiar()
+        // Las multas/saldos cacheados son datos personales de la cuenta que se cierra (norma N1).
+        deudas.limpiar()
         RespuestaRed.Exito(Unit)
     }
 }
