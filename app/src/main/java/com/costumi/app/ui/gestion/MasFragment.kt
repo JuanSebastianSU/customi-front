@@ -105,7 +105,9 @@ class MasFragment : Fragment(R.layout.fragment_mas) {
         binding.botonSucursal.setOnClickListener { elegirSucursalDialogo() }
         observar(vm.sucursales) { lista ->
             sucursalesActuales = lista
-            binding.botonSucursal.isVisible = lista.size > 1
+            val hayVarias = lista.size > 1
+            binding.botonSucursal.isVisible = hayVarias
+            binding.notaSucursal.isVisible = hayVarias
             actualizarTextoSucursal()
         }
 

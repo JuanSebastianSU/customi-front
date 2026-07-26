@@ -31,13 +31,27 @@
                 android:orientation="vertical" />
 
             <!-- Sucursal activa (multi-sucursal, Fase B): acota ventas/rentas/caja. Solo si hay más de una. -->
+            <!-- Nota que aclara para qué sirve el selector, y qué NO hace (no filtra empleados), para
+                 evitar la confusión de usarlo esperando que filtre el personal. Su visibilidad la maneja
+                 el fragment junto con el botón (solo con más de una sucursal). -->
+            <TextView
+                android:id="@+id/notaSucursal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:text="Acota lo que ves en Ventas, Rentas y Caja a una sucursal. No filtra la lista de empleados: para eso usa los filtros dentro de «Empleados»."
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/botonSucursal"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="6dp"
                 app:icon="@drawable/ic_chevron_right"
                 android:text="Sucursal activa: Todas"
                 android:visibility="gone" />

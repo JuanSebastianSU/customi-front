@@ -215,7 +215,10 @@
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 335 626; Start-Sleep -Seconds 1; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 200 1205; Start-Sleep -Seconds 1; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
       "Bash(rm -f _shot.png)",
-      "Bash(git commit -q -m 'Empleados: filtros por rol y por sucursal *)"
+      "Bash(git commit -q -m 'Empleados: filtros por rol y por sucursal *)",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb install -r \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\app\\\\build\\\\outputs\\\\apk\\\\debug\\\\app-debug.apk\" | Select-Object -Last 1; Start-Sleep -Seconds 2; & $adb shell input tap 1154 2593; Start-Sleep -Seconds 1; & $adb shell input swipe 640 2000 640 500 300; Start-Sleep -Milliseconds 400; & $adb shell input swipe 640 2000 640 500 300; Start-Sleep -Milliseconds 700; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell input tap 1154 2593; Start-Sleep -Seconds 1; & $adb shell input swipe 640 2000 640 500 300; Start-Sleep -Milliseconds 400; & $adb shell input swipe 640 2000 640 700 300; Start-Sleep -Milliseconds 700; & $adb exec-out screencap -p > \"C:\\\\Users\\\\User\\\\AndroidStudioProjects\\\\AppCustomi2\\\\_shot.png\"; Write-Output \"done\")",
+      "Bash(git commit -q -m 'Nota aclaratoria sobre el selector de Sucursal activa \\(Mas\\) *)"
     ]
   }
 }
