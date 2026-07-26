@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.costumi.app.R
+import com.costumi.app.core.UiState
 import com.costumi.app.core.comoPrecio
 import com.costumi.app.ui.common.comoDiaMes
 import com.costumi.app.databinding.DialogAltaEmpleadoBinding
@@ -50,8 +51,14 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
         binding.lista.adapter = adapter
         binding.fabNuevo.setOnClickListener { dialogoAlta() }
 
+        binding.botonFiltroRol.setOnClickListener { menuFiltroRol(it) }
+        binding.botonFiltroSucursal.setOnClickListener { menuFiltroSucursal(it) }
+
         observar(vm.estado) { estado ->
-            binding.stateView.mostrar(estado, vacio = "No hay empleados. Da de alta al primero.") {
+            // Si un filtro (rol/sucursal) deja la lista vacia, limpiar las filas previas: el StateView es
+            // transparente y si no se veian debajo del mensaje de vacio.
+            if (estado !is UiState.Success) adapter.submitList(emptyList())
+            binding.stateView.mostrar(estado, vacio = "No hay empleados con ese filtro.") {
                 ultimaLista = it
                 adapter.submitList(it)
             }
@@ -68,6 +75,37 @@ class EmpleadosFragment : Fragment(R.layout.fragment_empleados) {
                 is EventoEmpleado.Invitacion -> mostrarInvitacion(evento)
                 is EventoEmpleado.Pendientes -> mostrarPendientes(evento.invitaciones)
             }
+        }
+    }
+
+    /** Filtro por rol: "Todos" + los roles operativos. Actualiza el texto del boton y filtra en la app. */
+    private fun menuFiltroRol(ancla: View) {
+        android.widget.PopupMenu(requireContext(), ancla).apply {
+            menu.add(0, 0, 0, "Todos")
+            roles.forEachIndexed { i, (label, _) -> menu.add(0, i + 1, i + 1, label) }
+            setOnMenuItemClickListener { item ->
+                val sel = if (item.itemId == 0) null else roles[item.itemId - 1]
+                vm.filtrarRol(sel?.second)
+                binding.botonFiltroRol.text = "Rol: ${sel?.first ?: "Todos"}"
+                true
+            }
+            show()
+        }
+    }
+
+    /** Filtro por sucursal: "Todas" + cada sucursal de la empresa. */
+    private fun menuFiltroSucursal(ancla: View) {
+        if (sucursales.isEmpty()) { mostrarMensaje("Aun no se cargaron las sucursales."); return }
+        android.widget.PopupMenu(requireContext(), ancla).apply {
+            menu.add(0, 0, 0, "Todas")
+            sucursales.forEachIndexed { i, s -> menu.add(0, i + 1, i + 1, s.nombre.orEmpty()) }
+            setOnMenuItemClickListener { item ->
+                val sel = if (item.itemId == 0) null else sucursales[item.itemId - 1]
+                vm.filtrarSucursal(sel?.id)
+                binding.botonFiltroSucursal.text = "Sucursal: ${sel?.nombre ?: "Todas"}"
+                true
+            }
+            show()
         }
     }
 

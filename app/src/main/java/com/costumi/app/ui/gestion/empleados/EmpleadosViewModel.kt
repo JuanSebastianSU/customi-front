@@ -55,22 +55,48 @@ class EmpleadosViewModel @Inject constructor(
     /** Texto de busqueda vigente; null = sin filtrar. */
     private var buscar: String? = null
 
+    /** Lo último traído del backend sin filtrar por rol/sucursal; se re-filtra en memoria. */
+    private var todos: List<EmpleadoDetalleResponse> = emptyList()
+
+    /** Filtros en la app (la lista de personal es acotada y viene completa). null = sin filtrar. */
+    private var rolFiltro: String? = null
+    private var sucursalFiltro: UUID? = null
+
     /** El usuario escribio en la caja de busqueda: se guarda y se recarga la lista. */
     fun buscar(texto: String) {
         buscar = texto.trim().ifBlank { null }
         cargar()
     }
 
+    /** Filtra por rol (en MAYUSCULAS como el backend); null = todos. Se aplica sobre lo ya traido. */
+    fun filtrarRol(rol: String?) {
+        rolFiltro = rol
+        publicar()
+    }
+
+    /** Filtra por sucursal asignada; null = todas. */
+    fun filtrarSucursal(id: UUID?) {
+        sucursalFiltro = id
+        publicar()
+    }
+
     fun cargar() {
         viewModelScope.launch {
             _estado.value = UiState.Loading
-            _estado.value = when (val r = repo.empleados(buscar)) {
-                is RespuestaRed.Exito ->
-                    if (r.data.isEmpty()) UiState.Empty
-                    else UiState.Success(r.data.sortedByDescending { it.activo == true })
-                is RespuestaRed.Fallo -> UiState.Error(r.error.mensaje) { cargar() }
+            when (val r = repo.empleados(buscar)) {
+                is RespuestaRed.Exito -> { todos = r.data; publicar() }
+                is RespuestaRed.Fallo -> _estado.value = UiState.Error(r.error.mensaje) { cargar() }
             }
         }
+    }
+
+    /** Aplica los filtros de rol/sucursal sobre lo traido, ordena (activos primero) y lo emite. */
+    private fun publicar() {
+        val visibles = todos
+            .filter { rolFiltro == null || it.rol?.uppercase() == rolFiltro }
+            .filter { sucursalFiltro == null || it.sucursales.orEmpty().contains(sucursalFiltro) }
+            .sortedByDescending { it.activo == true }
+        _estado.value = if (visibles.isEmpty()) UiState.Empty else UiState.Success(visibles)
     }
 
     private fun cargarSucursales() {
